@@ -102,12 +102,12 @@ type SpecificationsListProps = {
 
 const SpecificationsList = ({ title, specifications }: SpecificationsListProps) => (
 
-  <section>
+  <section className="flex flex-col gap-3">
     <h2>{title}</h2>
 
-    <dl>
+    <dl className="flex flex-col gap-3">
       {specifications.map(([label, value]) => (
-        <div key={label}>
+        <div key={label} className="flex justify-evenly border border-gray-400 rounded-md">
           <dt>{label}</dt>
           <dd>{value}</dd>
         </div>

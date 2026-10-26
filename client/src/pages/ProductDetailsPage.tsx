@@ -35,12 +35,14 @@ const ProductDetailsPage = () => {
   }
 
   return (
-    <div>
-      <Link to={"/"}>Back to products</Link>
-      <p>{product.category.name}</p>
-      <p>{product.name}</p>
-      <p>${product.price.toFixed(2)}</p>
-      <p>{product.description}</p>
+    <div className="flex flex-col justify-center text-center p-3">
+      <Link to={"/"} className="flex justify-start border border-blue-300 max-w-35">Back to products</Link>
+      <div className="flex flex-col gap-2 p-2 border-b-2 border-gray-300">
+        <p>Product: {product.name}</p>
+        <p>Price${product.price.toFixed(2)}</p>
+        <p>{product.description}</p>
+        <p>{product.category.name}</p>
+      </div>
 
       <ProductSpecifications key={product.id} product={product} />
     </div>

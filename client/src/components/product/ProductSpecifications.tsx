@@ -1,11 +1,10 @@
-import type { ProductDetails } from "../../types/productTypes";
+import type { ProductDetails } from '../../types/productTypes';
 
 type ProductSpecificationsProps = {
   product: ProductDetails;
 };
 
-const ProductSpecifications = ({product}: ProductSpecificationsProps) => {
-  
+const ProductSpecifications = ({ product }: ProductSpecificationsProps) => {
   if (product.laptopDetails) {
     const details = product.laptopDetails;
 
@@ -13,11 +12,11 @@ const ProductSpecifications = ({product}: ProductSpecificationsProps) => {
       <SpecificationsList
         title="Laptop Specifications"
         specifications={[
-          ["Processor", details.processor],
-          ["RAM", details.ram],
-          ["Storage", details.storage],
-          ["Screen Size", details.screenSize],
-          ["Graphics Card", details.graphicsCard],
+          ['Processor', details.processor],
+          ['RAM', details.ram],
+          ['Storage', details.storage],
+          ['Screen Size', details.screenSize],
+          ['Graphics Card', details.graphicsCard],
         ]}
       />
     );
@@ -30,11 +29,11 @@ const ProductSpecifications = ({product}: ProductSpecificationsProps) => {
       <SpecificationsList
         title="Computer Specifications"
         specifications={[
-          ["Processor", details.processor],
-          ["RAM", details.ram],
-          ["Storage", details.storage],
-          ["Graphics Card", details.graphicsCard],
-          ["Form Factor", details.formFactor],
+          ['Processor', details.processor],
+          ['RAM', details.ram],
+          ['Storage', details.storage],
+          ['Graphics Card', details.graphicsCard],
+          ['Form Factor', details.formFactor],
         ]}
       />
     );
@@ -47,12 +46,12 @@ const ProductSpecifications = ({product}: ProductSpecificationsProps) => {
       <SpecificationsList
         title="Mobile Phone Specifications"
         specifications={[
-          ["Processor", details.processor],
-          ["RAM", details.ram],
-          ["Storage", details.storage],
-          ["Battery", details.battery],
-          ["Camera", details.camera],
-          ["Screen Size", details.screenSize],
+          ['Processor', details.processor],
+          ['RAM', details.ram],
+          ['Storage', details.storage],
+          ['Battery', details.battery],
+          ['Camera', details.camera],
+          ['Screen Size', details.screenSize],
         ]}
       />
     );
@@ -65,11 +64,11 @@ const ProductSpecifications = ({product}: ProductSpecificationsProps) => {
       <SpecificationsList
         title="Console Specifications"
         specifications={[
-          ["Manufacturer", details.manufacturer],
-          ["Storage", details.storage],
-          ["Resolution", details.resolution],
-          ["Maximum Players", details.maxPlayers],
-          ["Connectivity", details.connectivity],
+          ['Manufacturer', details.manufacturer],
+          ['Storage', details.storage],
+          ['Resolution', details.resolution],
+          ['Maximum Players', details.maxPlayers],
+          ['Connectivity', details.connectivity],
         ]}
       />
     );
@@ -82,11 +81,11 @@ const ProductSpecifications = ({product}: ProductSpecificationsProps) => {
       <SpecificationsList
         title="Tablet Specifications"
         specifications={[
-          ["Processor", details.processor],
-          ["RAM", details.ram],
-          ["Storage", details.storage],
-          ["Battery", details.battery],
-          ["Screen Size", details.screenSize],
+          ['Processor', details.processor],
+          ['RAM', details.ram],
+          ['Storage', details.storage],
+          ['Battery', details.battery],
+          ['Screen Size', details.screenSize],
         ]}
       />
     );
@@ -100,21 +99,25 @@ type SpecificationsListProps = {
   specifications: [string, string][];
 };
 
-const SpecificationsList = ({ title, specifications }: SpecificationsListProps) => (
-
+const SpecificationsList = ({
+  title,
+  specifications,
+}: SpecificationsListProps) => (
   <section className="flex flex-col gap-3">
     <h2>{title}</h2>
 
     <dl className="flex flex-col gap-3">
       {specifications.map(([label, value]) => (
-        <div key={label} className="flex justify-evenly border border-gray-400 rounded-md">
+        <div
+          key={label}
+          className="flex justify-evenly border border-gray-400 rounded-md"
+        >
           <dt>{label}</dt>
           <dd>{value}</dd>
         </div>
       ))}
     </dl>
   </section>
-
 );
 
 export default ProductSpecifications;

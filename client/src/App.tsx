@@ -1,14 +1,12 @@
-import { Routes, Route } from "react-router-dom";
-import ProductsPage from "./pages/ProductsPage";
-import ProductDetailsPage from "./pages/ProductDetailsPage";
+import { Route, Routes } from 'react-router-dom';
+import CategoryPage from './pages/CategoryPage';
+import StorefrontPage from './pages/StorefrontPage';
+import StoreProductPage from './pages/StoreProductPage';
 
-const App = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<ProductsPage />} />
-      <Route path="/products/:id" element={<ProductDetailsPage />} />
-    </Routes>
-  );
-}
+const App = () => <Routes>
+  <Route path="/" element={<StorefrontPage />} />
+  <Route path="/categories/:slug" element={<CategoryPage />} />
+  <Route path="/products/:id" element={<StoreProductPage />} />
+</Routes>;
 
 export default App;

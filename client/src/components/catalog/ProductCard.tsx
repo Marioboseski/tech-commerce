@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import type { Product } from '../data/catalog';
-import { money } from '../data/catalog';
+import type { Product } from '../../data/catalog';
+import { money } from '../../data/catalog';
 type Props = { product:Product; onAdd?: (id:number)=>void; onFavorite?: (id:number)=>void; isFavorite?:boolean };
 export default function ProductCard({product,onAdd,onFavorite,isFavorite=false}:Props){return <article className="product-card"><div className="product-image"><span className="badge">{product.badge}</span><span>{product.icon}</span>{onFavorite&&<button className={`heart ${isFavorite?'active':''}`} onClick={()=>onFavorite(product.id)} aria-label="Toggle favorite">♥</button>}</div><div className="product-info"><div className="product-category">{product.category}</div><h3 className="product-title"><Link to={`/products/${product.id}`}>{product.name}</Link></h3><p className="product-description">{product.description}</p><div className="product-meta">★★★★★ <span>{product.rating}/5</span></div><div className="product-bottom"><strong className="price">{money(product.price)}</strong>{onAdd?<button className="add-button" onClick={()=>onAdd(product.id)}>+ Add to cart</button>:<Link className="add-button" to={`/products/${product.id}`}>View product</Link>}</div></div></article>}

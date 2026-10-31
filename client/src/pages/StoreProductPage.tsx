@@ -1,6 +1,6 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { money, products } from '../data/catalog';
-import StoreHeader from '../components/StoreHeader';
+import StoreHeader from '../components/layout/StoreHeader';
 
 export default function StoreProductPage() {
   const { id } = useParams();

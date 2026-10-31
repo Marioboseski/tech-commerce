@@ -1,7 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { categories, products } from '../data/catalog';
-import StoreHeader from '../components/StoreHeader';
-import ProductCard from '../components/ProductCard';
+import StoreHeader from '../components/layout/StoreHeader';
+import ProductCard from '../components/catalog/ProductCard';
 
 export default function CategoryPage() {
   const { slug } = useParams();

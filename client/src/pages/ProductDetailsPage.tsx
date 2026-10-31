@@ -2,7 +2,7 @@ import { getProductById } from "../services/productsService";
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import type { ProductDetails } from "../types/productTypes";
-import ProductSpecifications from "../components/ProductSpecifications";
+import ProductSpecifications from "../components/product/ProductSpecifications";
 
 const ProductDetailsPage = () => {
   const { id } = useParams();

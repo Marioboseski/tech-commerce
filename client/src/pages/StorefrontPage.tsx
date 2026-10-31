@@ -2,12 +2,12 @@ import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { categories, products } from '../data/catalog';
 import type { Category } from '../data/catalog';
-import CartDrawer from '../components/CartDrawer';
-import CategoryCard from '../components/CategoryCard';
-import ProductCard from '../components/ProductCard';
-import SearchBar from '../components/SearchBar';
-import StoreFooter from '../components/StoreFooter';
-import StoreHeader from '../components/StoreHeader';
+import CartDrawer from '../components/cart/CartDrawer';
+import CategoryCard from '../components/catalog/CategoryCard';
+import ProductCard from '../components/catalog/ProductCard';
+import SearchBar from '../components/catalog/SearchBar';
+import StoreFooter from '../components/layout/StoreFooter';
+import StoreHeader from '../components/layout/StoreHeader';
 
 const features = [['✦','Clean UX','Minimal sections and easy browsing.'],['◈','Component-ready','Designed as reusable React pieces.'],['◌','Graphic-rich','Visuals with no stock dependency.'],['↻','Responsive','Works across desktop and mobile.']];
 

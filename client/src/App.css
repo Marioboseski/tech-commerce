@@ -286,6 +286,89 @@ h4 {
   position: relative;
   display: flex;
 }
+.favorites-menu {
+  position: relative;
+  display: flex;
+}
+.favorites-dropdown {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 320px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 16px 32px rgba(36, 45, 85, 0.14);
+}
+.favorites-dropdown-title {
+  margin: 4px 8px 8px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+.favorite-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+}
+.favorite-preview:hover,
+.favorite-preview:focus-visible {
+  background: #f2eeff;
+}
+.favorite-preview-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+  background: #f7f8fc;
+  font-size: 18px;
+}
+.favorite-preview span:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.favorite-preview strong {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.favorite-preview small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.favorites-view-all {
+  display: block;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  color: #6c47f5;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+.favorites-view-all:hover,
+.favorites-view-all:focus-visible {
+  background: #f2eeff;
+}
+.favorites-empty {
+  margin: 0;
+  padding: 13px 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
 .profile-toggle {
   width: 44px;
   height: 44px;
@@ -341,6 +424,27 @@ h4 {
 .profile-dropdown button:focus-visible {
   background: #f2eeff;
   color: #6c47f5;
+}
+.favorites-page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.favorites-empty-state {
+  padding: 42px 24px;
+  border: 1px dashed #d9ddec;
+  border-radius: 20px;
+  background: #fff;
+  color: var(--muted);
+  text-align: center;
+}
+.favorites-empty-state h2 {
+  color: var(--text);
+  font-size: 22px;
+}
+.favorites-empty-state p {
+  margin: 8px 0 0;
 }
 .main-nav {
   border-top: 1px solid var(--border);
@@ -1103,6 +1207,10 @@ h4 {
   }
   .header-action {
     padding: 10px;
+  }
+  .favorites-dropdown {
+    right: -76px;
+    width: min(320px, calc(100vw - 32px));
   }
   .listing-header .container {
     align-items: flex-start;

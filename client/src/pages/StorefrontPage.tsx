@@ -8,6 +8,7 @@ import ProductCard from '../components/catalog/ProductCard';
 import SearchBar from '../components/catalog/SearchBar';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
+import { useFavorites } from '../context/FavoritesContext';
 
 const features = [
   ['✦', 'Clean UX', 'Minimal sections and easy browsing.'],
@@ -20,11 +21,10 @@ export default function StorefrontPage() {
   const [category, setCategory] = useState<Category>('All');
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('featured');
-  const [favorites, setFavorites] = useState<Set<number>>(new Set());
-  const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [cart, setCart] = useState<Record<number, number>>({});
   const [cartOpen, setCartOpen] = useState(false);
   const [toast, setToast] = useState('');
+  const { favorites, toggleFavorite } = useFavorites();
 
   const shown = useMemo(
     () =>
@@ -32,7 +32,6 @@ export default function StorefrontPage() {
         .filter(
           (product) =>
             (category === 'All' || product.category === category) &&
-            (!favoritesOnly || favorites.has(product.id)) &&
             `${product.name} ${product.category} ${product.description}`
               .toLowerCase()
               .includes(query.toLowerCase()),
@@ -46,7 +45,7 @@ export default function StorefrontPage() {
                 ? a.name.localeCompare(b.name)
                 : 0,
         ),
-    [category, query, sort, favorites, favoritesOnly],
+    [category, query, sort],
   );
 
   const quantity = Object.values(cart).reduce(
@@ -58,20 +57,6 @@ export default function StorefrontPage() {
     setCart((current) => ({ ...current, [id]: (current[id] ?? 0) + 1 }));
     setToast('Added to cart');
     window.setTimeout(() => setToast(''), 1800);
-  };
-
-  const toggleFavorite = (id: number) => {
-    setFavorites((current) => {
-      const next = new Set(current);
-
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-
-      return next;
-    });
   };
 
   const changeQuantity = (id: number, delta: number) => {
@@ -105,35 +90,17 @@ export default function StorefrontPage() {
           />
         }
         actions={
-          <>
-            <button
-              className={`icon-button header-action ${favoritesOnly ? 'is-active' : ''}`}
-              aria-label="Show favorites"
-              onClick={() => {
-                setFavoritesOnly((value) => !value);
-                setCategory('All');
-                document
-                  .getElementById('products')
-                  ?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
+          <button className="icon-button header-action" aria-label="Open shopping cart" onClick={() => setCartOpen(true)}>
+            <span className="icon-wrap">
               <svg className="header-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z" />
+                <circle cx="8" cy="21" r="1" />
+                <circle cx="19" cy="21" r="1" />
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57L20 7.05H5.12" />
               </svg>
-              <span className="action-label">Favorites</span>
-            </button>
-            <button className="icon-button header-action" aria-label="Open shopping cart" onClick={() => setCartOpen(true)}>
-              <span className="icon-wrap">
-                <svg className="header-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="8" cy="21" r="1" />
-                  <circle cx="19" cy="21" r="1" />
-                  <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57L20 7.05H5.12" />
-                </svg>
-                {quantity > 0 && <b className="cart-count">{quantity}</b>}
-              </span>
-              <span className="action-label">Cart</span>
-            </button>
-          </>
+              {quantity > 0 && <b className="cart-count">{quantity}</b>}
+            </span>
+            <span className="action-label">Cart</span>
+          </button>
         }
       />
       <main>
@@ -259,7 +226,6 @@ export default function StorefrontPage() {
               <h2 className="section-title">Explore products</h2>
               <p className="subheading">
                 Showing {shown.length} product{shown.length === 1 ? '' : 's'}
-                {favoritesOnly ? ' in favorites' : ''}
                 {category !== 'All' ? ` in ${category}` : ''}.
               </p>
             </div>
@@ -268,7 +234,6 @@ export default function StorefrontPage() {
                 value={category}
                 onChange={(event) => {
                   setCategory(event.target.value as Category);
-                  setFavoritesOnly(false);
                 }}
               >
                 <option value="All">All categories</option>
@@ -308,7 +273,6 @@ export default function StorefrontPage() {
                 onClick={() => {
                   setQuery('');
                   setCategory('All');
-                  setFavoritesOnly(false);
                 }}
               >
                 Clear filters

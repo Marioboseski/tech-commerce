@@ -1,9 +1,11 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { money, products } from '../data/catalog';
 import StoreHeader from '../components/layout/StoreHeader';
+import { useFavorites } from '../context/FavoritesContext';
 
 export default function StoreProductPage() {
   const { id } = useParams();
+  const { favorites, toggleFavorite } = useFavorites();
   const product = products.find((item) => item.id === Number(id));
 
   if (!product) {
@@ -39,7 +41,14 @@ export default function StoreProductPage() {
               <strong className="detail-price">{money(product.price)}</strong>
               <div className="detail-actions">
                 <button className="primary-button">Add to cart</button>
-                <button className="ghost-button">♡ Save to favorites</button>
+                <button
+                  className="ghost-button"
+                  onClick={() => toggleFavorite(product.id)}
+                >
+                  {favorites.has(product.id)
+                    ? 'Remove from favorites'
+                    : 'Save to favorites'}
+                </button>
               </div>
               <div className="detail-note">
                 Free delivery on demo orders over $75. Checkout will be

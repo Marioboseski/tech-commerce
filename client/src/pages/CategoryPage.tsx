@@ -2,9 +2,11 @@ import { Navigate, useParams } from 'react-router-dom';
 import { categories, products } from '../data/catalog';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductCard from '../components/catalog/ProductCard';
+import { useFavorites } from '../context/FavoritesContext';
 
 export default function CategoryPage() {
   const { slug } = useParams();
+  const { favorites, toggleFavorite } = useFavorites();
   const category = categories.find(
     (item) => item.name.toLowerCase() === slug?.toLowerCase(),
   );
@@ -32,7 +34,12 @@ export default function CategoryPage() {
           </div>
           <div className="product-grid">
             {categoryProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                isFavorite={favorites.has(product.id)}
+                onFavorite={toggleFavorite}
+              />
             ))}
           </div>
         </section>

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 type FavoritesContextValue = {
@@ -9,7 +9,18 @@ type FavoritesContextValue = {
 const FavoritesContext = createContext<FavoritesContextValue | null>(null);
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
-  const [favorites, setFavorites] = useState<Set<number>>(new Set());
+  const [favorites, setFavorites] = useState<Set<number>>(() => {
+    try {
+      const savedFavorites = window.localStorage.getItem('techstore-favorites');
+      return new Set<number>(savedFavorites ? JSON.parse(savedFavorites) : []);
+    } catch {
+      return new Set();
+    }
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem('techstore-favorites', JSON.stringify([...favorites]));
+  }, [favorites]);
 
   const toggleFavorite = (id: number) => {
     setFavorites((current) => {

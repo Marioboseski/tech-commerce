@@ -1,5 +1,6 @@
 import type { Product } from '../../data/catalog';
 import { money } from '../../data/catalog';
+import { Link } from 'react-router-dom';
 type Props = {
   cart: Record<number, number>;
   products: Product[];
@@ -22,6 +23,7 @@ export default function CartDrawer({
         count,
     0,
   );
+  const shipping = total === 0 || total >= 75 ? 0 : 9.9;
   return (
     <>
       <button className="backdrop" aria-label="Close cart" onClick={onClose} />
@@ -77,7 +79,21 @@ export default function CartDrawer({
             <span>Subtotal</span>
             <strong>{money(total)}</strong>
           </div>
-          <p className="subheading">Demo only — checkout is not connected.</p>
+          <div className="cart-summary-line">
+            <span>Delivery</span>
+            <strong>{shipping ? money(shipping) : 'Free'}</strong>
+          </div>
+          <div className="cart-summary-line cart-total-line">
+            <span>Total</span>
+            <strong>{money(total + shipping)}</strong>
+          </div>
+          {entries.length ? (
+            <Link className="checkout-button" to="/checkout" onClick={onClose}>
+              Continue to checkout
+            </Link>
+          ) : (
+            <p className="subheading">Your cart is ready when you are.</p>
+          )}
         </div>
       </aside>
     </>

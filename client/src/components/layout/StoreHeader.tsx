@@ -30,7 +30,8 @@ export default function StoreHeader({
 
   const submitHeaderSearch = (event: FormEvent) => {
     event.preventDefault();
-    navigate('/');
+    const search = headerQuery.trim();
+    navigate(search ? `/?search=${encodeURIComponent(search)}` : '/');
   };
 
   const defaultActions = (

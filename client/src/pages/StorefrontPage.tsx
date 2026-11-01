@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import type { FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { categories, products } from '../data/catalog';
 import type { Category } from '../data/catalog';
 import CategoryCard from '../components/catalog/CategoryCard';
@@ -17,10 +18,26 @@ const features = [
 ];
 
 export default function StorefrontPage() {
-  const [category, setCategory] = useState<Category>('All');
-  const [query, setQuery] = useState('');
-  const [sort, setSort] = useState('featured');
+  const [searchParams, setSearchParams] = useSearchParams();
   const { favorites, toggleFavorite } = useFavorites();
+  const requestedCategory = searchParams.get('category') as Category | null;
+  const category =
+    requestedCategory === 'All' || categories.some((item) => item.name === requestedCategory)
+      ? (requestedCategory ?? 'All')
+      : 'All';
+  const query = searchParams.get('search') ?? '';
+  const sort = searchParams.get('sort') ?? 'featured';
+
+  const updateFilters = (updates: Record<string, string>) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value && value !== 'All' && value !== 'featured') next.set(key, value);
+        else next.delete(key);
+      });
+      return next;
+    }, { replace: true });
+  };
 
   const shown = useMemo(
     () =>
@@ -55,7 +72,7 @@ export default function StorefrontPage() {
         middle={
           <SearchBar
             query={query}
-            onQueryChange={setQuery}
+            onQueryChange={(value) => updateFilters({ search: value })}
             onSubmit={submitSearch}
           />
         }
@@ -191,7 +208,7 @@ export default function StorefrontPage() {
               <select
                 value={category}
                 onChange={(event) => {
-                  setCategory(event.target.value as Category);
+                  updateFilters({ category: event.target.value });
                 }}
               >
                 <option value="All">All categories</option>
@@ -201,7 +218,7 @@ export default function StorefrontPage() {
               </select>
               <select
                 value={sort}
-                onChange={(event) => setSort(event.target.value)}
+                onChange={(event) => updateFilters({ sort: event.target.value })}
               >
                 <option value="featured">Featured</option>
                 <option value="price-asc">Price: low to high</option>
@@ -228,8 +245,7 @@ export default function StorefrontPage() {
               <button
                 className="primary-button"
                 onClick={() => {
-                  setQuery('');
-                  setCategory('All');
+                  updateFilters({ search: '', category: '' });
                 }}
               >
                 Clear filters

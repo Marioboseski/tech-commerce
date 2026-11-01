@@ -4,6 +4,8 @@ import FavoritesPage from './pages/FavoritesPage';
 import StorefrontPage from './pages/StorefrontPage';
 import StoreProductPage from './pages/StoreProductPage';
 import CartDrawer from './components/cart/CartDrawer';
+import AccountPage from './pages/AccountPage';
+import CheckoutPage from './pages/CheckoutPage';
 import { products } from './data/catalog';
 import { CartProvider, useCart } from './context/CartContext';
 import { FavoritesProvider } from './context/FavoritesContext';
@@ -16,6 +18,9 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<StorefrontPage />} />
       <Route path="/favorites" element={<FavoritesPage />} />
+      <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/login" element={<AccountPage />} />
+      <Route path="/register" element={<AccountPage />} />
       <Route path="/categories/:slug" element={<CategoryPage />} />
       <Route path="/products/:id" element={<StoreProductPage />} />
     </Routes>

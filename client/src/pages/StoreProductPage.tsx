@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { money, products } from '../data/catalog';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductGallery from '../components/product/ProductGallery';
+import ProductCard from '../components/catalog/ProductCard';
 import { useCart } from '../context/CartContext';
 import { useFavorites } from '../context/FavoritesContext';
 
@@ -9,11 +11,15 @@ export default function StoreProductPage() {
   const { id } = useParams();
   const { favorites, toggleFavorite } = useFavorites();
   const { addToCart } = useCart();
+  const [addedToCart, setAddedToCart] = useState(false);
   const product = products.find((item) => item.id === Number(id));
 
   if (!product) {
     return <Navigate to="/" replace />;
   }
+  const relatedProducts = products
+    .filter((item) => item.category === product.category && item.id !== product.id)
+    .slice(0, 3);
 
   return (
     <div className="detail-page">
@@ -42,7 +48,11 @@ export default function StoreProductPage() {
               <div className="detail-actions">
                 <button
                   className="primary-button"
-                  onClick={() => addToCart(product.id)}
+                  onClick={() => {
+                    addToCart(product.id);
+                    setAddedToCart(true);
+                    window.setTimeout(() => setAddedToCart(false), 2200);
+                  }}
                 >
                   Add to cart
                 </button>
@@ -68,6 +78,10 @@ export default function StoreProductPage() {
             </div>
             <dl>
               <div>
+                <dt>SKU</dt>
+                <dd>TS-{product.category.slice(0, 3).toUpperCase()}-{String(product.id).padStart(3, '0')}</dd>
+              </div>
+              <div>
                 <dt>Category</dt>
                 <dd>{product.category}</dd>
               </div>
@@ -85,8 +99,25 @@ export default function StoreProductPage() {
               </div>
             </dl>
           </section>
+          {relatedProducts.length > 0 && (
+            <section className="related-products">
+              <p className="eyebrow">YOU MAY ALSO LIKE</p>
+              <h2 className="section-title">More in {product.category}</h2>
+              <div className="product-grid">
+                {relatedProducts.map((relatedProduct) => (
+                  <ProductCard
+                    key={relatedProduct.id}
+                    product={relatedProduct}
+                    isFavorite={favorites.has(relatedProduct.id)}
+                    onFavorite={toggleFavorite}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
         </section>
       </main>
+      {addedToCart && <div className="toast show" role="status">Added to cart</div>}
     </div>
   );
 }

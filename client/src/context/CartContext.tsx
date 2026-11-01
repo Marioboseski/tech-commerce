@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 type CartContextValue = {
@@ -13,8 +13,19 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cart, setCart] = useState<Record<number, number>>({});
+  const [cart, setCart] = useState<Record<number, number>>(() => {
+    try {
+      const savedCart = window.localStorage.getItem('techstore-cart');
+      return savedCart ? JSON.parse(savedCart) : {};
+    } catch {
+      return {};
+    }
+  });
   const [cartOpen, setCartOpen] = useState(false);
+
+  useEffect(() => {
+    window.localStorage.setItem('techstore-cart', JSON.stringify(cart));
+  }, [cart]);
 
   const addToCart = (id: number) => {
     setCart((current) => ({ ...current, [id]: (current[id] ?? 0) + 1 }));

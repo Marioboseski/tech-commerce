@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { categories, products } from '../data/catalog';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductCard from '../components/catalog/ProductCard';
@@ -7,20 +7,17 @@ import { useFavorites } from '../context/FavoritesContext';
 
 export default function CategoryPage() {
   const { slug } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { favorites, toggleFavorite } = useFavorites();
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [appliedMinPrice, setAppliedMinPrice] = useState('');
-  const [appliedMaxPrice, setAppliedMaxPrice] = useState('');
+  const [minPrice, setMinPrice] = useState(() => searchParams.get('minPrice') ?? '');
+  const [maxPrice, setMaxPrice] = useState(() => searchParams.get('maxPrice') ?? '');
   const category = categories.find(
     (item) => item.name.toLowerCase() === slug?.toLowerCase(),
   );
 
   useEffect(() => {
-    setMinPrice('');
-    setMaxPrice('');
-    setAppliedMinPrice('');
-    setAppliedMaxPrice('');
+    setMinPrice(searchParams.get('minPrice') ?? '');
+    setMaxPrice(searchParams.get('maxPrice') ?? '');
   }, [category?.name]);
 
   if (!category) {
@@ -31,8 +28,8 @@ export default function CategoryPage() {
     (product) => product.category === category.name,
   );
   const filteredProducts = categoryProducts.filter((product) => {
-    const minimum = appliedMinPrice === '' ? 0 : Number(appliedMinPrice);
-    const maximum = appliedMaxPrice === '' ? Infinity : Number(appliedMaxPrice);
+    const minimum = searchParams.get('minPrice') === null ? 0 : Number(searchParams.get('minPrice'));
+    const maximum = searchParams.get('maxPrice') === null ? Infinity : Number(searchParams.get('maxPrice'));
     return product.price >= minimum && product.price <= maximum;
   });
 
@@ -59,8 +56,14 @@ export default function CategoryPage() {
                 className="price-filter-form"
                 onSubmit={(event) => {
                   event.preventDefault();
-                  setAppliedMinPrice(minPrice);
-                  setAppliedMaxPrice(maxPrice);
+                  setSearchParams((current) => {
+                    const next = new URLSearchParams(current);
+                    if (minPrice) next.set('minPrice', minPrice);
+                    else next.delete('minPrice');
+                    if (maxPrice) next.set('maxPrice', maxPrice);
+                    else next.delete('maxPrice');
+                    return next;
+                  }, { replace: true });
                 }}
               >
                 <label>
@@ -88,15 +91,14 @@ export default function CategoryPage() {
                 <button className="apply-price-filter" type="submit">
                   Apply filter
                 </button>
-                {(minPrice || maxPrice || appliedMinPrice || appliedMaxPrice) && (
+                {(minPrice || maxPrice || searchParams.get('minPrice') || searchParams.get('maxPrice')) && (
                   <button
                     className="clear-price-filter"
                     type="button"
                     onClick={() => {
                       setMinPrice('');
                       setMaxPrice('');
-                      setAppliedMinPrice('');
-                      setAppliedMaxPrice('');
+                      setSearchParams({}, { replace: true });
                     }}
                   >
                     Clear price filter
@@ -129,6 +131,7 @@ export default function CategoryPage() {
                     onClick={() => {
                       setMinPrice('');
                       setMaxPrice('');
+                      setSearchParams({}, { replace: true });
                     }}
                   >
                     Clear price filter

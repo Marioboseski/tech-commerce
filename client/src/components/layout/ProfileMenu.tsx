@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 type ProfileMenuProps = {
   /** Reserved for the real authentication session when it is introduced. */
@@ -34,8 +35,8 @@ export default function ProfileMenu({
   }, [open]);
 
   const items = isAuthenticated
-    ? ['Profile', 'My Orders', 'Logout']
-    : ['Login', 'Register'];
+    ? [{ label: 'Profile', to: '/profile' }, { label: 'My Orders', to: '/orders' }, { label: 'Logout', to: '/' }]
+    : [{ label: 'Login', to: '/login' }, { label: 'Register', to: '/register' }];
 
   return (
     <div className="profile-menu" ref={menuRef}>
@@ -57,9 +58,9 @@ export default function ProfileMenu({
       {open && (
         <div className="profile-dropdown" role="menu" aria-label="User menu">
           {items.map((item) => (
-            <button key={item} type="button" role="menuitem">
-              {item}
-            </button>
+            <Link key={item.label} to={item.to} role="menuitem" onClick={() => setOpen(false)}>
+              {item.label}
+            </Link>
           ))}
         </div>
       )}

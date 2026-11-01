@@ -1,11 +1,13 @@
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductCard from '../components/catalog/ProductCard';
 import { products } from '../data/catalog';
-import { useFavorites } from '../context/FavoritesContext';
+import { useFavorites } from '../hooks/useFavorites';
 
 export default function FavoritesPage() {
   const { favorites, toggleFavorite } = useFavorites();
-  const favoriteProducts = products.filter((product) => favorites.has(product.id));
+  const favoriteProducts = products.filter((product) =>
+    favorites.has(product.id),
+  );
 
   return (
     <div className="listing-page">

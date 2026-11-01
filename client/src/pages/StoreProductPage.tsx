@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { money, products } from '../data/catalog';
+import { products } from '../data/catalog';
+import { money } from '../lib/formatters';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductGallery from '../components/product/ProductGallery';
 import ProductCard from '../components/catalog/ProductCard';
-import { useCart } from '../context/CartContext';
-import { useFavorites } from '../context/FavoritesContext';
+import { useCart } from '../hooks/useCart';
+import { useFavorites } from '../hooks/useFavorites';
 
 export default function StoreProductPage() {
   const { id } = useParams();
@@ -18,7 +19,9 @@ export default function StoreProductPage() {
     return <Navigate to="/" replace />;
   }
   const relatedProducts = products
-    .filter((item) => item.category === product.category && item.id !== product.id)
+    .filter(
+      (item) => item.category === product.category && item.id !== product.id,
+    )
     .slice(0, 3);
 
   return (
@@ -36,7 +39,7 @@ export default function StoreProductPage() {
             <span>{product.name}</span>
           </div>
           <div className="product-detail">
-            <ProductGallery product={product} />
+            <ProductGallery key={product.id} product={product} />
             <div className="detail-content">
               <p className="eyebrow">{product.category}</p>
               <h1>{product.name}</h1>
@@ -79,7 +82,10 @@ export default function StoreProductPage() {
             <dl>
               <div>
                 <dt>SKU</dt>
-                <dd>TS-{product.category.slice(0, 3).toUpperCase()}-{String(product.id).padStart(3, '0')}</dd>
+                <dd>
+                  TS-{product.category.slice(0, 3).toUpperCase()}-
+                  {String(product.id).padStart(3, '0')}
+                </dd>
               </div>
               <div>
                 <dt>Category</dt>
@@ -117,7 +123,11 @@ export default function StoreProductPage() {
           )}
         </section>
       </main>
-      {addedToCart && <div className="toast show" role="status">Added to cart</div>}
+      {addedToCart && (
+        <div className="toast show" role="status">
+          Added to cart
+        </div>
+      )}
     </div>
   );
 }

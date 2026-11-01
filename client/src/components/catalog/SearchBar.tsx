@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { money, products } from '../../data/catalog';
+import { products } from '../../data/catalog';
+import { money } from '../../lib/formatters';
 type Props = {
   query: string;
   onQueryChange: (query: string) => void;
@@ -26,13 +27,19 @@ export default function SearchBar({ query, onQueryChange, onSubmit }: Props) {
   );
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
 
     const closeOnOutsideClick = (event: MouseEvent) => {
-      if (!searchRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!searchRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
     };
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
+      if (event.key === 'Escape') {
+        setOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', closeOnOutsideClick);
@@ -93,7 +100,9 @@ export default function SearchBar({ query, onQueryChange, onSubmit }: Props) {
                   <strong>{product.name}</strong>
                   <small>{product.category}</small>
                 </span>
-                <strong className="search-result-price">{money(product.price)}</strong>
+                <strong className="search-result-price">
+                  {money(product.price)}
+                </strong>
               </Link>
             ))
           ) : (

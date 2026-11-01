@@ -2,7 +2,8 @@ import { useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { categories } from '../../data/catalog';
-import { useCart } from '../../context/CartContext';
+import { useCart } from '../../hooks/useCart';
+import { getCartQuantity } from '../../lib/cart';
 import SearchBar from '../catalog/SearchBar';
 import FavoritesMenu from './FavoritesMenu';
 import ProfileMenu from './ProfileMenu';
@@ -23,10 +24,7 @@ export default function StoreHeader({
   const navigate = useNavigate();
   const { cart, setCartOpen } = useCart();
   const [headerQuery, setHeaderQuery] = useState('');
-  const cartQuantity = Object.values(cart).reduce(
-    (total, quantity) => total + quantity,
-    0,
-  );
+  const cartQuantity = getCartQuantity(cart);
 
   const submitHeaderSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -42,7 +40,11 @@ export default function StoreHeader({
       onClick={() => setCartOpen(true)}
     >
       <span className="icon-wrap">
-        <svg className="header-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <svg
+          className="header-action-icon"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
           <circle cx="8" cy="21" r="1" />
           <circle cx="19" cy="21" r="1" />
           <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57L20 7.05H5.12" />

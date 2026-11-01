@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { Product } from '../../data/catalog';
-import { money } from '../../data/catalog';
+import { money } from '../../lib/formatters';
 type Props = {
   product: Product;
   onFavorite?: (id: number) => void;

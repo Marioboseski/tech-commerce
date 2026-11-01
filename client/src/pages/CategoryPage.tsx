@@ -1,24 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { categories, products } from '../data/catalog';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductCard from '../components/catalog/ProductCard';
-import { useFavorites } from '../context/FavoritesContext';
+import { useFavorites } from '../hooks/useFavorites';
 
 export default function CategoryPage() {
   const { slug } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const { favorites, toggleFavorite } = useFavorites();
-  const [minPrice, setMinPrice] = useState(() => searchParams.get('minPrice') ?? '');
-  const [maxPrice, setMaxPrice] = useState(() => searchParams.get('maxPrice') ?? '');
+  const [minPrice, setMinPrice] = useState(
+    () => searchParams.get('minPrice') ?? '',
+  );
+  const [maxPrice, setMaxPrice] = useState(
+    () => searchParams.get('maxPrice') ?? '',
+  );
   const category = categories.find(
     (item) => item.name.toLowerCase() === slug?.toLowerCase(),
   );
-
-  useEffect(() => {
-    setMinPrice(searchParams.get('minPrice') ?? '');
-    setMaxPrice(searchParams.get('maxPrice') ?? '');
-  }, [category?.name]);
 
   if (!category) {
     return <Navigate to="/" replace />;
@@ -28,8 +27,14 @@ export default function CategoryPage() {
     (product) => product.category === category.name,
   );
   const filteredProducts = categoryProducts.filter((product) => {
-    const minimum = searchParams.get('minPrice') === null ? 0 : Number(searchParams.get('minPrice'));
-    const maximum = searchParams.get('maxPrice') === null ? Infinity : Number(searchParams.get('maxPrice'));
+    const minimum =
+      searchParams.get('minPrice') === null
+        ? 0
+        : Number(searchParams.get('minPrice'));
+    const maximum =
+      searchParams.get('maxPrice') === null
+        ? Infinity
+        : Number(searchParams.get('maxPrice'));
     return product.price >= minimum && product.price <= maximum;
   });
 
@@ -47,7 +52,10 @@ export default function CategoryPage() {
             <div className="category-heading-icon">{category.icon}</div>
           </div>
           <div className="category-products-layout">
-            <aside className="price-filter-sidebar" aria-label="Filter by price">
+            <aside
+              className="price-filter-sidebar"
+              aria-label="Filter by price"
+            >
               <div className="price-filter-heading">
                 <span>Filter products</span>
                 <h2>Price range</h2>
@@ -56,14 +64,23 @@ export default function CategoryPage() {
                 className="price-filter-form"
                 onSubmit={(event) => {
                   event.preventDefault();
-                  setSearchParams((current) => {
-                    const next = new URLSearchParams(current);
-                    if (minPrice) next.set('minPrice', minPrice);
-                    else next.delete('minPrice');
-                    if (maxPrice) next.set('maxPrice', maxPrice);
-                    else next.delete('maxPrice');
-                    return next;
-                  }, { replace: true });
+                  setSearchParams(
+                    (current) => {
+                      const next = new URLSearchParams(current);
+                      if (minPrice) {
+                        next.set('minPrice', minPrice);
+                      } else {
+                        next.delete('minPrice');
+                      }
+                      if (maxPrice) {
+                        next.set('maxPrice', maxPrice);
+                      } else {
+                        next.delete('maxPrice');
+                      }
+                      return next;
+                    },
+                    { replace: true },
+                  );
                 }}
               >
                 <label>
@@ -91,7 +108,10 @@ export default function CategoryPage() {
                 <button className="apply-price-filter" type="submit">
                   Apply filter
                 </button>
-                {(minPrice || maxPrice || searchParams.get('minPrice') || searchParams.get('maxPrice')) && (
+                {(minPrice ||
+                  maxPrice ||
+                  searchParams.get('minPrice') ||
+                  searchParams.get('maxPrice')) && (
                   <button
                     className="clear-price-filter"
                     type="button"
@@ -108,7 +128,8 @@ export default function CategoryPage() {
             </aside>
             <div className="category-product-results">
               <p className="subheading">
-                {filteredProducts.length} product{filteredProducts.length === 1 ? '' : 's'} available
+                {filteredProducts.length} product
+                {filteredProducts.length === 1 ? '' : 's'} available
               </p>
               {filteredProducts.length ? (
                 <div className="product-grid">

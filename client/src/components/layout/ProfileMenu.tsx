@@ -14,10 +14,14 @@ export default function ProfileMenu({
   const toggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
 
     const closeOnOutsideClick = (event: MouseEvent) => {
-      if (!menuRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!menuRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
     };
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -35,8 +39,15 @@ export default function ProfileMenu({
   }, [open]);
 
   const items = isAuthenticated
-    ? [{ label: 'Profile', to: '/profile' }, { label: 'My Orders', to: '/orders' }, { label: 'Logout', to: '/' }]
-    : [{ label: 'Login', to: '/login' }, { label: 'Register', to: '/register' }];
+    ? [
+        { label: 'Profile', to: '/profile' },
+        { label: 'My Orders', to: '/orders' },
+        { label: 'Logout', to: '/' },
+      ]
+    : [
+        { label: 'Login', to: '/login' },
+        { label: 'Register', to: '/register' },
+      ];
 
   return (
     <div className="profile-menu" ref={menuRef}>
@@ -58,7 +69,12 @@ export default function ProfileMenu({
       {open && (
         <div className="profile-dropdown" role="menu" aria-label="User menu">
           {items.map((item) => (
-            <Link key={item.label} to={item.to} role="menuitem" onClick={() => setOpen(false)}>
+            <Link
+              key={item.label}
+              to={item.to}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+            >
               {item.label}
             </Link>
           ))}

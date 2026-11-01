@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { money, products } from '../../data/catalog';
-import { useFavorites } from '../../context/FavoritesContext';
+import { products } from '../../data/catalog';
+import { money } from '../../lib/formatters';
+import { useFavorites } from '../../hooks/useFavorites';
 
 export default function FavoritesMenu() {
   const [open, setOpen] = useState(false);
@@ -14,13 +15,19 @@ export default function FavoritesMenu() {
   const previewProducts = favoriteProducts.slice(0, 3);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
 
     const closeOnOutsideClick = (event: MouseEvent) => {
-      if (!menuRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!menuRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
     };
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
+      if (event.key === 'Escape') {
+        setOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', closeOnOutsideClick);
@@ -42,7 +49,11 @@ export default function FavoritesMenu() {
         onClick={() => setOpen((value) => !value)}
       >
         <span className="icon-wrap">
-          <svg className="header-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <svg
+            className="header-action-icon"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z" />
           </svg>
           {favoriteProducts.length > 0 && (
@@ -52,7 +63,11 @@ export default function FavoritesMenu() {
         <span className="action-label">Favorites</span>
       </button>
       {open && (
-        <div className="favorites-dropdown" role="menu" aria-label="Favorite products">
+        <div
+          className="favorites-dropdown"
+          role="menu"
+          aria-label="Favorite products"
+        >
           {previewProducts.length ? (
             <>
               <p className="favorites-dropdown-title">Favorites</p>
@@ -64,7 +79,9 @@ export default function FavoritesMenu() {
                   to={`/products/${product.id}`}
                   onClick={() => setOpen(false)}
                 >
-                  <span className="favorite-preview-icon"><img src={product.image} alt="" /></span>
+                  <span className="favorite-preview-icon">
+                    <img src={product.image} alt="" />
+                  </span>
                   <span>
                     <strong>{product.name}</strong>
                     <small>{money(product.price)}</small>
@@ -83,7 +100,9 @@ export default function FavoritesMenu() {
               )}
             </>
           ) : (
-            <p className="favorites-empty">There is nothing in your favorites yet.</p>
+            <p className="favorites-empty">
+              There is nothing in your favorites yet.
+            </p>
           )}
         </div>
       )}

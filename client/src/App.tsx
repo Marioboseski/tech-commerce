@@ -7,23 +7,25 @@ import CartDrawer from './components/cart/CartDrawer';
 import AccountPage from './pages/AccountPage';
 import CheckoutPage from './pages/CheckoutPage';
 import { products } from './data/catalog';
-import { CartProvider, useCart } from './context/CartContext';
-import { FavoritesProvider } from './context/FavoritesContext';
+import { CartProvider } from './context/CartProvider';
+import { FavoritesProvider } from './context/FavoritesProvider';
+import { useCart } from './hooks/useCart';
 
 function AppRoutes() {
-  const { cart, cartOpen, changeQuantity, removeFromCart, setCartOpen } = useCart();
+  const { cart, cartOpen, changeQuantity, removeFromCart, setCartOpen } =
+    useCart();
 
   return (
     <>
-    <Routes>
-      <Route path="/" element={<StorefrontPage />} />
-      <Route path="/favorites" element={<FavoritesPage />} />
-      <Route path="/checkout" element={<CheckoutPage />} />
-      <Route path="/login" element={<AccountPage />} />
-      <Route path="/register" element={<AccountPage />} />
-      <Route path="/categories/:slug" element={<CategoryPage />} />
-      <Route path="/products/:id" element={<StoreProductPage />} />
-    </Routes>
+      <Routes>
+        <Route path="/" element={<StorefrontPage />} />
+        <Route path="/favorites" element={<FavoritesPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/login" element={<AccountPage />} />
+        <Route path="/register" element={<AccountPage />} />
+        <Route path="/categories/:slug" element={<CategoryPage />} />
+        <Route path="/products/:id" element={<StoreProductPage />} />
+      </Routes>
       {cartOpen && (
         <CartDrawer
           cart={cart}

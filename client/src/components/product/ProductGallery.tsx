@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { Product } from '../../data/catalog';
 
 const views = [
@@ -13,8 +13,6 @@ type ProductGalleryProps = {
 
 export default function ProductGallery({ product }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-
-  useEffect(() => setActiveIndex(0), [product.id]);
 
   const selectPrevious = () => {
     setActiveIndex((current) => (current - 1 + views.length) % views.length);
@@ -39,7 +37,11 @@ export default function ProductGallery({ product }: ProductGalleryProps) {
           </svg>
         </button>
         <div className="gallery-product-art" aria-live="polite">
-          <img className="gallery-product-image" src={product.image} alt={`${product.name} — ${activeView.label.toLowerCase()}`} />
+          <img
+            className="gallery-product-image"
+            src={product.image}
+            alt={`${product.name} — ${activeView.label.toLowerCase()}`}
+          />
           <span className="gallery-view-label">{activeView.label}</span>
         </div>
         <button
@@ -53,7 +55,11 @@ export default function ProductGallery({ product }: ProductGalleryProps) {
           </svg>
         </button>
       </div>
-      <div className="gallery-thumbnails" role="tablist" aria-label="Product images">
+      <div
+        className="gallery-thumbnails"
+        role="tablist"
+        aria-label="Product images"
+      >
         {views.map((view, index) => (
           <button
             className={`gallery-thumbnail gallery-view-${view.id} ${activeIndex === index ? 'is-active' : ''}`}

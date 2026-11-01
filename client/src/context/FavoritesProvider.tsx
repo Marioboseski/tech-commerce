@@ -1,12 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-
-type FavoritesContextValue = {
-  favorites: Set<number>;
-  toggleFavorite: (id: number) => void;
-};
-
-const FavoritesContext = createContext<FavoritesContextValue | null>(null);
+import { FavoritesContext } from './favorites-context';
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [favorites, setFavorites] = useState<Set<number>>(() => {
@@ -19,13 +13,20 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
-    window.localStorage.setItem('techstore-favorites', JSON.stringify([...favorites]));
+    window.localStorage.setItem(
+      'techstore-favorites',
+      JSON.stringify([...favorites]),
+    );
   }, [favorites]);
 
   const toggleFavorite = (id: number) => {
     setFavorites((current) => {
       const next = new Set(current);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   };
@@ -35,14 +36,4 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       {children}
     </FavoritesContext.Provider>
   );
-}
-
-export function useFavorites() {
-  const context = useContext(FavoritesContext);
-
-  if (!context) {
-    throw new Error('useFavorites must be used within FavoritesProvider');
-  }
-
-  return context;
 }

@@ -2,19 +2,16 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
-import { money, products } from '../data/catalog';
-import { useCart } from '../context/CartContext';
+import { products } from '../data/catalog';
+import { money } from '../lib/formatters';
+import { getCartEntries, getCartTotals } from '../lib/cart';
+import { useCart } from '../hooks/useCart';
 
 export default function CheckoutPage() {
   const [submitted, setSubmitted] = useState(false);
   const { cart } = useCart();
-  const entries = Object.entries(cart).filter(([, quantity]) => quantity > 0);
-  const subtotal = entries.reduce(
-    (total, [id, quantity]) =>
-      total + (products.find((product) => product.id === Number(id))?.price ?? 0) * quantity,
-    0,
-  );
-  const shipping = subtotal === 0 || subtotal >= 75 ? 0 : 9.9;
+  const entries = getCartEntries(cart, products);
+  const { subtotal, shipping, total } = getCartTotals(cart, products);
 
   return (
     <div className="checkout-page">
@@ -32,29 +29,72 @@ export default function CheckoutPage() {
               }}
             >
               <h2>Delivery details</h2>
-              <label>Full name<input required autoComplete="name" /></label>
-              <label>Email address<input required type="email" autoComplete="email" /></label>
-              <label>Street address<input required autoComplete="street-address" /></label>
+              <label>
+                Full name
+                <input required autoComplete="name" />
+              </label>
+              <label>
+                Email address
+                <input required type="email" autoComplete="email" />
+              </label>
+              <label>
+                Street address
+                <input required autoComplete="street-address" />
+              </label>
               <div className="checkout-form-row">
-                <label>City<input required autoComplete="address-level2" /></label>
-                <label>Postal code<input required autoComplete="postal-code" /></label>
+                <label>
+                  City
+                  <input required autoComplete="address-level2" />
+                </label>
+                <label>
+                  Postal code
+                  <input required autoComplete="postal-code" />
+                </label>
               </div>
-              <button className="primary-button" type="submit">Place demo order</button>
-              {submitted && <p className="checkout-message">Order UI is ready; payment and order submission will be connected with the backend.</p>}
+              <button className="primary-button" type="submit">
+                Place demo order
+              </button>
+              {submitted && (
+                <p className="checkout-message">
+                  Order UI is ready; payment and order submission will be
+                  connected with the backend.
+                </p>
+              )}
             </form>
             <aside className="checkout-summary">
               <h2>Order summary</h2>
-              {entries.map(([id, quantity]) => {
-                const product = products.find((item) => item.id === Number(id))!;
-                return <div className="checkout-item" key={id}><span>{product.name} × {quantity}</span><strong>{money(product.price * quantity)}</strong></div>;
+              {entries.map(({ product, quantity }) => {
+                return (
+                  <div className="checkout-item" key={product.id}>
+                    <span>
+                      {product.name} × {quantity}
+                    </span>
+                    <strong>{money(product.price * quantity)}</strong>
+                  </div>
+                );
               })}
-              <div className="checkout-summary-line"><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
-              <div className="checkout-summary-line"><span>Delivery</span><strong>{shipping ? money(shipping) : 'Free'}</strong></div>
-              <div className="checkout-summary-line checkout-grand-total"><span>Total</span><strong>{money(subtotal + shipping)}</strong></div>
+              <div className="checkout-summary-line">
+                <span>Subtotal</span>
+                <strong>{money(subtotal)}</strong>
+              </div>
+              <div className="checkout-summary-line">
+                <span>Delivery</span>
+                <strong>{shipping ? money(shipping) : 'Free'}</strong>
+              </div>
+              <div className="checkout-summary-line checkout-grand-total">
+                <span>Total</span>
+                <strong>{money(total)}</strong>
+              </div>
             </aside>
           </div>
         ) : (
-          <div className="favorites-empty-state"><h2>Your cart is empty</h2><p>Add a product before continuing to checkout.</p><Link className="primary-button" to="/">Browse products</Link></div>
+          <div className="favorites-empty-state">
+            <h2>Your cart is empty</h2>
+            <p>Add a product before continuing to checkout.</p>
+            <Link className="primary-button" to="/">
+              Browse products
+            </Link>
+          </div>
         )}
       </main>
       <StoreFooter />

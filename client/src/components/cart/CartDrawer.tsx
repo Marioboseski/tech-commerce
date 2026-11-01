@@ -1,5 +1,6 @@
 import type { Product } from '../../data/catalog';
-import { money } from '../../data/catalog';
+import { money } from '../../lib/formatters';
+import { getCartEntries, getCartTotals } from '../../lib/cart';
 import { Link } from 'react-router-dom';
 type Props = {
   cart: Record<number, number>;
@@ -15,15 +16,8 @@ export default function CartDrawer({
   onQuantityChange,
   onRemove,
 }: Props) {
-  const entries = Object.entries(cart).filter(([, count]) => count > 0);
-  const total = entries.reduce(
-    (sum, [id, count]) =>
-      sum +
-      (products.find((product) => product.id === Number(id))?.price ?? 0) *
-        count,
-    0,
-  );
-  const shipping = total === 0 || total >= 75 ? 0 : 9.9;
+  const entries = getCartEntries(cart, products);
+  const { subtotal, shipping, total } = getCartTotals(cart, products);
   return (
     <>
       <button className="backdrop" aria-label="Close cart" onClick={onClose} />
@@ -39,11 +33,12 @@ export default function CartDrawer({
         </div>
         <div className="cart-items">
           {entries.length ? (
-            entries.map(([id, count]) => {
-              const product = products.find((item) => item.id === Number(id))!;
+            entries.map(({ product, quantity }) => {
               return (
-                <div className="cart-item" key={id}>
-                  <div className="thumb"><img src={product.image} alt="" /></div>
+                <div className="cart-item" key={product.id}>
+                  <div className="thumb">
+                    <img src={product.image} alt="" />
+                  </div>
                   <div>
                     <strong>{product.name}</strong>
                     <p>{money(product.price)}</p>
@@ -51,7 +46,7 @@ export default function CartDrawer({
                       <button onClick={() => onQuantityChange(product.id, -1)}>
                         −
                       </button>{' '}
-                      {count}{' '}
+                      {quantity}{' '}
                       <button onClick={() => onQuantityChange(product.id, 1)}>
                         +
                       </button>
@@ -77,7 +72,7 @@ export default function CartDrawer({
         <div className="cart-bottom">
           <div className="subtotal">
             <span>Subtotal</span>
-            <strong>{money(total)}</strong>
+            <strong>{money(subtotal)}</strong>
           </div>
           <div className="cart-summary-line">
             <span>Delivery</span>

@@ -8,28 +8,35 @@ import ProductCard from '../components/catalog/ProductCard';
 import SearchBar from '../components/catalog/SearchBar';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
-import { useFavorites } from '../context/FavoritesContext';
+import { useFavorites } from '../hooks/useFavorites';
 
 export default function StorefrontPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { favorites, toggleFavorite } = useFavorites();
   const requestedCategory = searchParams.get('category') as Category | null;
   const category =
-    requestedCategory === 'All' || categories.some((item) => item.name === requestedCategory)
+    requestedCategory === 'All' ||
+    categories.some((item) => item.name === requestedCategory)
       ? (requestedCategory ?? 'All')
       : 'All';
   const query = searchParams.get('search') ?? '';
   const sort = searchParams.get('sort') ?? 'featured';
 
   const updateFilters = (updates: Record<string, string>) => {
-    setSearchParams((current) => {
-      const next = new URLSearchParams(current);
-      Object.entries(updates).forEach(([key, value]) => {
-        if (value && value !== 'All' && value !== 'featured') next.set(key, value);
-        else next.delete(key);
-      });
-      return next;
-    }, { replace: true });
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+        Object.entries(updates).forEach(([key, value]) => {
+          if (value && value !== 'All' && value !== 'featured') {
+            next.set(key, value);
+          } else {
+            next.delete(key);
+          }
+        });
+        return next;
+      },
+      { replace: true },
+    );
   };
 
   const shown = useMemo(
@@ -75,9 +82,7 @@ export default function StorefrontPage() {
           <div className="hero-card">
             <div className="hero-copy">
               <p className="eyebrow">MODERN TECH STORE</p>
-              <h1>
-                Find the right tech for work, play and everyday life.
-              </h1>
+              <h1>Find the right tech for work, play and everyday life.</h1>
               <p className="hero-text">
                 Shop laptops, smartphones, tablets, desktops and accessories.
                 Compare products, save your favorites and build your cart with
@@ -137,17 +142,29 @@ export default function StorefrontPage() {
                 Browse laptops, desktops and accessories for focused work and
                 everyday productivity.
               </p>
-              <img className="panel-image" src="/products/studiodesk.jpg" alt="" />
+              <img
+                className="panel-image"
+                src="/products/studiodesk.jpg"
+                alt=""
+              />
             </article>
             <article className="info-panel">
               <span className="panel-kicker">Mobile</span>
               <h3>Take your tech wherever you go.</h3>
-              <img className="panel-image" src="/products/apex-pro.jpg" alt="" />
+              <img
+                className="panel-image"
+                src="/products/apex-pro.jpg"
+                alt=""
+              />
             </article>
             <article className="info-panel">
               <span className="panel-kicker">Accessories</span>
               <h3>Complete the setup with the right extras.</h3>
-              <img className="panel-image" src="/products/wavepods.jpg" alt="" />
+              <img
+                className="panel-image"
+                src="/products/wavepods.jpg"
+                alt=""
+              />
             </article>
           </div>
         </section>
@@ -175,7 +192,9 @@ export default function StorefrontPage() {
               </select>
               <select
                 value={sort}
-                onChange={(event) => updateFilters({ sort: event.target.value })}
+                onChange={(event) =>
+                  updateFilters({ sort: event.target.value })
+                }
               >
                 <option value="featured">Featured</option>
                 <option value="price-asc">Price: low to high</option>

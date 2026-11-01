@@ -1,97 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@400;600;700;800&display=swap');
-:root {
-  --bg: #f7f8fd;
-  --text: #16213d;
-  --muted: #7d859b;
-  --border: #e9ecf5;
-  --purple: #6b4ce6;
-  --purple-dark: #5435d1;
-  --shadow: 0 15px 40px rgba(41, 49, 95, 0.08);
-}
-* {
-  box-sizing: border-box;
-}
-html {
-  scroll-behavior: smooth;
-}
-body {
-  margin: 0;
-  min-width: 320px;
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-}
-button,
-input,
-select {
-  font: inherit;
-}
-button {
-  cursor: pointer;
-}
-a {
-  text-decoration: none;
-  color: inherit;
-}
-.storefront {
-  overflow: hidden;
-}
-.container {
-  width: min(1240px, calc(100% - 48px));
-  margin: auto;
-}
-.section {
-  padding-top: 64px;
-}
-.eyebrow {
-  margin: 0 0 10px;
-  color: var(--purple);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 2px;
-}
-.section-title,
-h1,
-h2,
-h3,
-h4 {
-  font-family: Manrope, sans-serif;
-  letter-spacing: -0.03em;
-  margin: 0;
-}
-.section-title {
-  font-size: 34px;
-}
-.subheading {
-  margin: 10px 0 0;
-  color: var(--muted);
-  line-height: 1.6;
-}
-.primary-button,
-.ghost-button,
-.add-button,
-.search-button {
-  border: 0;
-  border-radius: 12px;
-  padding: 14px 20px;
-  font-weight: 700;
-}
-.primary-button,
-.add-button,
-.search-button {
-  background: var(--purple);
-  color: #fff;
-}
-.primary-button:hover,
-.add-button:hover,
-.search-button:hover {
-  background: var(--purple-dark);
-}
-.ghost-button {
-  background: #fff;
-  border: 1px solid #dddff2;
-  color: var(--text);
-}
+@import './styles/foundation.css';
 .site-header {
   position: sticky;
   top: 0;
@@ -217,7 +124,9 @@ h4 {
 .search-result-price {
   margin-left: auto;
   color: var(--text);
-  font: 700 14px Manrope, sans-serif;
+  font:
+    700 14px Manrope,
+    sans-serif;
   white-space: nowrap;
 }
 .search-empty {
@@ -248,7 +157,9 @@ h4 {
   gap: 8px;
   padding: 8px;
   border-radius: 12px;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 .header-action:hover,
 .header-action:focus-visible,
@@ -389,7 +300,9 @@ h4 {
   border-radius: 50%;
   background: #f2eeff;
   color: var(--text);
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 .profile-toggle:hover,
 .profile-toggle:focus-visible,
@@ -428,7 +341,9 @@ h4 {
   font-size: 14px;
   font-weight: 600;
   text-align: left;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 .profile-dropdown a {
   display: block;
@@ -438,7 +353,9 @@ h4 {
   color: var(--text);
   font-size: 14px;
   font-weight: 600;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 .profile-dropdown button:hover,
 .profile-dropdown button:focus-visible {
@@ -1297,7 +1214,9 @@ h4 {
   color: var(--text);
   box-shadow: 0 8px 18px rgba(50, 58, 105, 0.1);
   transform: translateY(-50%);
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 .gallery-arrow:hover,
 .gallery-arrow:focus-visible {
@@ -1334,7 +1253,9 @@ h4 {
   border-radius: 13px;
   background: #f2f4fb;
   overflow: hidden;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 .gallery-thumbnail img {
   width: 100%;

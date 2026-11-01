@@ -1,9 +1,12 @@
-export type Category =
-  'All' | 'Laptops' | 'Smartphones' | 'Tablets' | 'Desktops' | 'Accessories';
+export type CategoryName =
+  'Laptops' | 'Smartphones' | 'Tablets' | 'Desktops' | 'Accessories';
+
+export type Category = 'All' | CategoryName;
+
 export type Product = {
   id: number;
   name: string;
-  category: Exclude<Category, 'All'>;
+  category: CategoryName;
   price: number;
   description: string;
   badge: string;
@@ -11,15 +14,33 @@ export type Product = {
   icon: string;
   image: string;
 };
-export const categories: {
-  name: Exclude<Category, 'All'>;
+
+export type CatalogCategory = {
+  name: CategoryName;
   tagline: string;
   icon: string;
   image: string;
-}[] = [
-  { name: 'Laptops', tagline: 'Portable power for work and study', icon: '💻', image: '/products/novabook-air.jpg' },
-  { name: 'Smartphones', tagline: 'Stay connected in style', icon: '📱', image: '/products/apex-pro.jpg' },
-  { name: 'Tablets', tagline: 'Flexible devices for everyday use', icon: '📟', image: '/products/slatepad.jpg' },
+};
+
+export const categories: CatalogCategory[] = [
+  {
+    name: 'Laptops',
+    tagline: 'Portable power for work and study',
+    icon: '💻',
+    image: '/products/novabook-air.jpg',
+  },
+  {
+    name: 'Smartphones',
+    tagline: 'Stay connected in style',
+    icon: '📱',
+    image: '/products/apex-pro.jpg',
+  },
+  {
+    name: 'Tablets',
+    tagline: 'Flexible devices for everyday use',
+    icon: '📟',
+    image: '/products/slatepad.jpg',
+  },
   {
     name: 'Desktops',
     tagline: 'Strong performance for your setup',
@@ -33,159 +54,147 @@ export const categories: {
     image: '/products/wavepods.jpg',
   },
 ];
-const productImages: Record<number, string> = {
-  1: '/products/novabook-air.jpg',
-  2: '/products/apex-pro.jpg',
-  3: '/products/slatepad.jpg',
-  4: '/products/studiodesk.jpg',
-  5: '/products/wavepods.jpg',
-  6: '/products/orbitbook.jpg',
-  7: '/products/pixelon-mini.jpg',
-  8: '/products/focus-tab.jpg',
-  9: '/products/tower-core.jpg',
-  10: '/products/keypad.jpg',
-  11: '/products/mouseflow.jpg',
-  12: '/products/pocketsound.jpg',
-};
-export const products: Product[] = [
-  [
-    1,
-    'NovaBook Air 14',
-    'Laptops',
-    899,
-    'Lightweight everyday laptop with a crisp display and long battery life.',
-    'New',
-    '4.8',
-    '💻',
-  ],
-  [
-    2,
-    'Apex Pro X',
-    'Smartphones',
-    699,
-    'Balanced flagship phone with smooth performance and elegant camera design.',
-    'Popular',
-    '4.7',
-    '📱',
-  ],
-  [
-    3,
-    'SlatePad 11',
-    'Tablets',
-    469,
-    'Portable tablet suited for browsing, drawing and video calls.',
-    'Top rated',
-    '4.6',
-    '📟',
-  ],
-  [
-    4,
-    'StudioDesk One',
-    'Desktops',
-    1249,
-    'All-in-one desktop for productivity, meetings and creative work.',
-    'Featured',
-    '4.9',
-    '🖥️',
-  ],
-  [
-    5,
-    'WavePods Max',
-    'Accessories',
-    229,
-    'Comfortable wireless headphones with immersive audio and clean design.',
-    'Best seller',
-    '4.8',
-    '🎧',
-  ],
-  [
-    6,
-    'OrbitBook 16',
-    'Laptops',
-    1349,
-    'Larger display and fast internals for multitasking and content creation.',
-    'Pro',
-    '4.9',
-    '💻',
-  ],
-  [
-    7,
-    'Pixelon Mini',
-    'Smartphones',
-    549,
-    'Compact smartphone with stylish finish and dependable battery life.',
-    'Compact',
-    '4.5',
-    '📱',
-  ],
-  [
-    8,
-    'Focus Tab 10',
-    'Tablets',
-    389,
-    'Slim tablet for reading, light note-taking and entertainment.',
-    'Everyday',
-    '4.4',
-    '📟',
-  ],
-  [
-    9,
-    'Tower Core S',
-    'Desktops',
-    999,
-    'Desktop tower built for a reliable home office workstation.',
-    'Essential',
-    '4.6',
-    '🖥️',
-  ],
-  [
-    10,
-    'KeyPad Studio',
-    'Accessories',
-    129,
-    'Minimal keyboard accessory with clean lines and tactile comfort.',
-    'Clean setup',
-    '4.5',
-    '⌨️',
-  ],
-  [
-    11,
-    'MouseFlow Pro',
-    'Accessories',
-    79,
-    'Ergonomic wireless mouse designed for all-day use.',
-    'Desk gear',
-    '4.4',
-    '🖱️',
-  ],
-  [
-    12,
-    'PocketSound Lite',
-    'Accessories',
-    99,
-    'Compact earbuds that fit a modern mobile lifestyle.',
-    'Audio',
-    '4.3',
-    '🎧',
-  ],
-].map(
-  ([id, name, category, price, description, badge, rating, icon]) =>
-    ({
-      id,
-      name,
-      category,
-      price,
-      description,
-      badge,
-      rating,
-      icon,
-      image: productImages[id as number],
-    }) as Product,
-);
 
-export const money = (value: number) =>
-  new Intl.NumberFormat('de-DE', {
-    style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: 0,
-  }).format(value);
+export const products: Product[] = [
+  {
+    id: 1,
+    name: 'NovaBook Air 14',
+    category: 'Laptops',
+    price: 899,
+    description:
+      'Lightweight everyday laptop with a crisp display and long battery life.',
+    badge: 'New',
+    rating: '4.8',
+    icon: '💻',
+    image: '/products/novabook-air.jpg',
+  },
+  {
+    id: 2,
+    name: 'Apex Pro X',
+    category: 'Smartphones',
+    price: 699,
+    description:
+      'Balanced flagship phone with smooth performance and elegant camera design.',
+    badge: 'Popular',
+    rating: '4.7',
+    icon: '📱',
+    image: '/products/apex-pro.jpg',
+  },
+  {
+    id: 3,
+    name: 'SlatePad 11',
+    category: 'Tablets',
+    price: 469,
+    description:
+      'Portable tablet suited for browsing, drawing and video calls.',
+    badge: 'Top rated',
+    rating: '4.6',
+    icon: '📟',
+    image: '/products/slatepad.jpg',
+  },
+  {
+    id: 4,
+    name: 'StudioDesk One',
+    category: 'Desktops',
+    price: 1249,
+    description:
+      'All-in-one desktop for productivity, meetings and creative work.',
+    badge: 'Featured',
+    rating: '4.9',
+    icon: '🖥️',
+    image: '/products/studiodesk.jpg',
+  },
+  {
+    id: 5,
+    name: 'WavePods Max',
+    category: 'Accessories',
+    price: 229,
+    description:
+      'Comfortable wireless headphones with immersive audio and clean design.',
+    badge: 'Best seller',
+    rating: '4.8',
+    icon: '🎧',
+    image: '/products/wavepods.jpg',
+  },
+  {
+    id: 6,
+    name: 'OrbitBook 16',
+    category: 'Laptops',
+    price: 1349,
+    description:
+      'Larger display and fast internals for multitasking and content creation.',
+    badge: 'Pro',
+    rating: '4.9',
+    icon: '💻',
+    image: '/products/orbitbook.jpg',
+  },
+  {
+    id: 7,
+    name: 'Pixelon Mini',
+    category: 'Smartphones',
+    price: 549,
+    description:
+      'Compact smartphone with stylish finish and dependable battery life.',
+    badge: 'Compact',
+    rating: '4.5',
+    icon: '📱',
+    image: '/products/pixelon-mini.jpg',
+  },
+  {
+    id: 8,
+    name: 'Focus Tab 10',
+    category: 'Tablets',
+    price: 389,
+    description:
+      'Slim tablet for reading, light note-taking and entertainment.',
+    badge: 'Everyday',
+    rating: '4.4',
+    icon: '📟',
+    image: '/products/focus-tab.jpg',
+  },
+  {
+    id: 9,
+    name: 'Tower Core S',
+    category: 'Desktops',
+    price: 999,
+    description: 'Desktop tower built for a reliable home office workstation.',
+    badge: 'Essential',
+    rating: '4.6',
+    icon: '🖥️',
+    image: '/products/tower-core.jpg',
+  },
+  {
+    id: 10,
+    name: 'KeyPad Studio',
+    category: 'Accessories',
+    price: 129,
+    description:
+      'Minimal keyboard accessory with clean lines and tactile comfort.',
+    badge: 'Clean setup',
+    rating: '4.5',
+    icon: '⌨️',
+    image: '/products/keypad.jpg',
+  },
+  {
+    id: 11,
+    name: 'MouseFlow Pro',
+    category: 'Accessories',
+    price: 79,
+    description: 'Ergonomic wireless mouse designed for all-day use.',
+    badge: 'Desk gear',
+    rating: '4.4',
+    icon: '🖱️',
+    image: '/products/mouseflow.jpg',
+  },
+  {
+    id: 12,
+    name: 'PocketSound Lite',
+    category: 'Accessories',
+    price: 99,
+    description: 'Compact earbuds that fit a modern mobile lifestyle.',
+    badge: 'Audio',
+    rating: '4.3',
+    icon: '🎧',
+    image: '/products/pocketsound.jpg',
+  },
+];

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import type { Category } from '../../data/catalog';
+import type { CatalogCategory } from '../../data/catalog';
 type Props = {
-  category: { name: Exclude<Category, 'All'>; tagline: string; icon: string; image: string };
+  category: CatalogCategory;
 };
 export default function CategoryCard({ category }: Props) {
   return (

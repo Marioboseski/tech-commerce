@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { CircleUserRound } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
 export default function ProfileMenu() {
@@ -61,11 +62,7 @@ export default function ProfileMenu() {
             {user.name.charAt(0).toUpperCase()}
           </span>
         ) : (
-          <svg className="profile-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="12" r="10" />
-            <circle cx="12" cy="10" r="3" />
-            <path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66" />
-          </svg>
+          <CircleUserRound className="profile-icon" aria-hidden="true" />
         )}
       </button>
       {open && (

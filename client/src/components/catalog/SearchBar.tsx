@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import { products } from '../../data/catalog';
 import { money } from '../../lib/formatters';
 type Props = {
@@ -58,7 +59,7 @@ export default function SearchBar({ query, onQueryChange, onSubmit }: Props) {
   return (
     <div className="search-area" ref={searchRef}>
       <form className="search-form" onSubmit={handleSubmit} role="search">
-        <span aria-hidden="true">⌕</span>
+        <Search className="search-icon" aria-hidden="true" />
         <input
           value={query}
           onChange={(event) => {

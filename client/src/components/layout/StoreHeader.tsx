@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
+import { ShoppingCart } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { categories } from '../../data/catalog';
 import { useCart } from '../../hooks/useCart';
@@ -34,15 +35,7 @@ export default function StoreHeader({ middle, actions }: StoreHeaderProps) {
       onClick={() => setCartOpen(true)}
     >
       <span className="icon-wrap">
-        <svg
-          className="header-action-icon"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <circle cx="8" cy="21" r="1" />
-          <circle cx="19" cy="21" r="1" />
-          <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57L20 7.05H5.12" />
-        </svg>
+        <ShoppingCart className="header-action-icon" aria-hidden="true" />
         {cartQuantity > 0 && <b className="cart-count">{cartQuantity}</b>}
       </span>
       <span className="action-label">Cart</span>
@@ -68,6 +61,7 @@ export default function StoreHeader({ middle, actions }: StoreHeaderProps) {
         <div className="header-actions">
           <FavoritesMenu />
           {actions ?? defaultActions}
+          <span className="header-divider" aria-hidden="true" />
           <ProfileMenu />
         </div>
       </div>

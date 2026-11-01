@@ -1,7 +1,11 @@
 import { prisma } from "../lib/prisma.js"
 
-export const getProducts = async () => {
+export const getProducts = async (categoryId?: number) => {
   const products = await prisma.product.findMany({
+    ...(categoryId !== undefined && {
+      where: { categoryId }
+    }),
+
     include: {
       category: {
         select: {

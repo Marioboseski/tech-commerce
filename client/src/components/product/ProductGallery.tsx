@@ -39,7 +39,7 @@ export default function ProductGallery({ product }: ProductGalleryProps) {
           </svg>
         </button>
         <div className="gallery-product-art" aria-live="polite">
-          <span className="gallery-product-icon" aria-hidden="true">{product.icon}</span>
+          <img className="gallery-product-image" src={product.image} alt={`${product.name} — ${activeView.label.toLowerCase()}`} />
           <span className="gallery-view-label">{activeView.label}</span>
         </div>
         <button
@@ -64,7 +64,7 @@ export default function ProductGallery({ product }: ProductGalleryProps) {
             aria-label={`Show ${view.label.toLowerCase()}`}
             onClick={() => setActiveIndex(index)}
           >
-            <span aria-hidden="true">{product.icon}</span>
+            <img src={product.image} alt="" />
           </button>
         ))}
       </div>

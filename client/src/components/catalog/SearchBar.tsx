@@ -86,8 +86,8 @@ export default function SearchBar({ query, onQueryChange, onSubmit }: Props) {
                   setOpen(false);
                 }}
               >
-                <span className="search-result-icon" aria-hidden="true">
-                  {product.icon}
+                <span className="search-result-icon">
+                  <img src={product.image} alt="" />
                 </span>
                 <span className="search-result-copy">
                   <strong>{product.name}</strong>

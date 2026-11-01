@@ -15,7 +15,7 @@ export default function ProductCard({
     <article className="product-card">
       <div className="product-image">
         <span className="badge">{product.badge}</span>
-        <span>{product.icon}</span>
+        <img src={product.image} alt={product.name} />
         {onFavorite && (
           <button
             className={`heart ${isFavorite ? 'active' : ''}`}

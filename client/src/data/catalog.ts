@@ -9,6 +9,7 @@ export type Product = {
   badge: string;
   rating: string;
   icon: string;
+  image: string;
 };
 export const categories: {
   name: Exclude<Category, 'All'>;
@@ -29,6 +30,20 @@ export const categories: {
     icon: '🎧',
   },
 ];
+const productImages: Record<number, string> = {
+  1: '/products/novabook-air.jpg',
+  2: '/products/apex-pro.jpg',
+  3: '/products/slatepad.jpg',
+  4: '/products/studiodesk.jpg',
+  5: '/products/wavepods.jpg',
+  6: '/products/orbitbook.jpg',
+  7: '/products/pixelon-mini.jpg',
+  8: '/products/focus-tab.jpg',
+  9: '/products/tower-core.jpg',
+  10: '/products/keypad.jpg',
+  11: '/products/mouseflow.jpg',
+  12: '/products/pocketsound.jpg',
+};
 export const products: Product[] = [
   [
     1,
@@ -161,8 +176,10 @@ export const products: Product[] = [
       badge,
       rating,
       icon,
+      image: productImages[id as number],
     }) as Product,
 );
+
 export const money = (value: number) =>
   new Intl.NumberFormat('de-DE', {
     style: 'currency',

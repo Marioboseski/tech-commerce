@@ -43,7 +43,7 @@ export default function CartDrawer({
               const product = products.find((item) => item.id === Number(id))!;
               return (
                 <div className="cart-item" key={id}>
-                  <div className="thumb">{product.icon}</div>
+                  <div className="thumb"><img src={product.image} alt="" /></div>
                   <div>
                     <strong>{product.name}</strong>
                     <p>{money(product.price)}</p>

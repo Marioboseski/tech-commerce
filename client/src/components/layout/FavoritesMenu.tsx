@@ -64,7 +64,7 @@ export default function FavoritesMenu() {
                   to={`/products/${product.id}`}
                   onClick={() => setOpen(false)}
                 >
-                  <span className="favorite-preview-icon" aria-hidden="true">{product.icon}</span>
+                  <span className="favorite-preview-icon"><img src={product.image} alt="" /></span>
                   <span>
                     <strong>{product.name}</strong>
                     <small>{money(product.price)}</small>

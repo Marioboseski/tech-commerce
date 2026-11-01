@@ -15,19 +15,22 @@ export const categories: {
   name: Exclude<Category, 'All'>;
   tagline: string;
   icon: string;
+  image: string;
 }[] = [
-  { name: 'Laptops', tagline: 'Portable power for work and study', icon: '💻' },
-  { name: 'Smartphones', tagline: 'Stay connected in style', icon: '📱' },
-  { name: 'Tablets', tagline: 'Flexible devices for everyday use', icon: '📟' },
+  { name: 'Laptops', tagline: 'Portable power for work and study', icon: '💻', image: '/products/novabook-air.jpg' },
+  { name: 'Smartphones', tagline: 'Stay connected in style', icon: '📱', image: '/products/apex-pro.jpg' },
+  { name: 'Tablets', tagline: 'Flexible devices for everyday use', icon: '📟', image: '/products/slatepad.jpg' },
   {
     name: 'Desktops',
     tagline: 'Strong performance for your setup',
     icon: '🖥️',
+    image: '/products/studiodesk.jpg',
   },
   {
     name: 'Accessories',
     tagline: 'The finishing touches for every desk',
     icon: '🎧',
+    image: '/products/wavepods.jpg',
   },
 ];
 const productImages: Record<number, string> = {

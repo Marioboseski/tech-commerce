@@ -10,13 +10,6 @@ import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
 import { useFavorites } from '../context/FavoritesContext';
 
-const features = [
-  ['✦', 'Curated tech', 'Popular devices and everyday essentials in one place.'],
-  ['◈', 'Saved favorites', 'Keep products you want to compare or revisit later.'],
-  ['◌', 'Product details', 'Review key specifications before choosing a device.'],
-  ['↻', 'Cart at a glance', 'Review your selected products whenever you need.'],
-];
-
 export default function StorefrontPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { favorites, toggleFavorite } = useFavorites();
@@ -105,49 +98,13 @@ export default function StorefrontPage() {
                   Shop by category
                 </button>
               </div>
-              <div className="hero-stats">
-                <div className="stat-pill">
-                  <strong>5</strong>
-                  <span>Technology categories</span>
-                </div>
-                <div className="stat-pill">
-                  <strong>12</strong>
-                  <span>Products to explore</span>
-                </div>
-                <div className="stat-pill">
-                  <strong>Easy</strong>
-                  <span>Favorites and cart</span>
-                </div>
-              </div>
             </div>
             <div className="hero-visual" aria-hidden="true">
-              <i className="orb one" />
-              <i className="orb two" />
-              <i className="device laptop" />
-              <i className="device phone" />
-              <div className="float-card top">
-                <span>SHOP LAPTOPS</span>
-                <strong>Laptops</strong>
-                <small>Power for work, study and play</small>
-              </div>
-              <div className="float-card bottom">
-                <span>TRENDING NOW</span>
-                <strong>Tech for every setup</strong>
-                <small>Accessories that complete your desk</small>
+              <div className="hero-product-photo hero-product-main">
+                <img src="/products/novabook-air.jpg" alt="" />
               </div>
             </div>
           </div>
-        </section>
-        <section className="container features-strip">
-          {features.map(([icon, title, text]) => (
-            <article className="feature-box" key={title}>
-              <div className="feature-icon">{icon}</div>
-              <div>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </div>
-            </article>
-          ))}
         </section>
         <section className="container section" id="categories">
           <div className="section-top">
@@ -168,29 +125,29 @@ export default function StorefrontPage() {
         <section className="container section">
           <div className="section-top">
             <div>
-              <p className="eyebrow">STORE HIGHLIGHTS</p>
-              <h2 className="section-title">A more visual homepage</h2>
+              <p className="eyebrow">SHOP BY YOUR SETUP</p>
+              <h2 className="section-title">Tech for every day</h2>
             </div>
           </div>
           <div className="panel-grid">
             <article className="info-panel">
               <span className="panel-kicker">Workspace</span>
-              <h3>Build a setup for focus and productivity.</h3>
+              <h3>Build a workspace that works for you.</h3>
               <p>
-                Balanced layouts for laptops, desktops and accessories with
-                clean visual hierarchy.
+                Browse laptops, desktops and accessories for focused work and
+                everyday productivity.
               </p>
-              <span className="panel-emoji">🖥️</span>
+              <img className="panel-image" src="/products/studiodesk.jpg" alt="" />
             </article>
             <article className="info-panel">
               <span className="panel-kicker">Mobile</span>
-              <h3>Portable devices in a lighter visual style.</h3>
-              <span className="panel-emoji">📱</span>
+              <h3>Take your tech wherever you go.</h3>
+              <img className="panel-image" src="/products/apex-pro.jpg" alt="" />
             </article>
             <article className="info-panel">
               <span className="panel-kicker">Accessories</span>
-              <h3>Layered graphics for a richer storefront feel.</h3>
-              <span className="panel-emoji">🎧</span>
+              <h3>Complete the setup with the right extras.</h3>
+              <img className="panel-image" src="/products/wavepods.jpg" alt="" />
             </article>
           </div>
         </section>

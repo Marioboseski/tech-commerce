@@ -1,6 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { money, products } from '../data/catalog';
 import StoreHeader from '../components/layout/StoreHeader';
+import ProductGallery from '../components/product/ProductGallery';
 import { useCart } from '../context/CartContext';
 import { useFavorites } from '../context/FavoritesContext';
 
@@ -29,10 +30,7 @@ export default function StoreProductPage() {
             <span>{product.name}</span>
           </div>
           <div className="product-detail">
-            <div className="detail-visual">
-              <span className="badge">{product.badge}</span>
-              <span>{product.icon}</span>
-            </div>
+            <ProductGallery product={product} />
             <div className="detail-content">
               <p className="eyebrow">{product.category}</p>
               <h1>{product.name}</h1>

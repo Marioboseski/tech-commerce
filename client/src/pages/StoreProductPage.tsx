@@ -1,11 +1,13 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { money, products } from '../data/catalog';
 import StoreHeader from '../components/layout/StoreHeader';
+import { useCart } from '../context/CartContext';
 import { useFavorites } from '../context/FavoritesContext';
 
 export default function StoreProductPage() {
   const { id } = useParams();
   const { favorites, toggleFavorite } = useFavorites();
+  const { addToCart } = useCart();
   const product = products.find((item) => item.id === Number(id));
 
   if (!product) {
@@ -40,7 +42,12 @@ export default function StoreProductPage() {
               <p className="detail-description">{product.description}</p>
               <strong className="detail-price">{money(product.price)}</strong>
               <div className="detail-actions">
-                <button className="primary-button">Add to cart</button>
+                <button
+                  className="primary-button"
+                  onClick={() => addToCart(product.id)}
+                >
+                  Add to cart
+                </button>
                 <button
                   className="ghost-button"
                   onClick={() => toggleFavorite(product.id)}

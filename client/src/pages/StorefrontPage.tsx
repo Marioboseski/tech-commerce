@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { categories, products } from '../data/catalog';
 import type { Category } from '../data/catalog';
-import CartDrawer from '../components/cart/CartDrawer';
 import CategoryCard from '../components/catalog/CategoryCard';
 import ProductCard from '../components/catalog/ProductCard';
 import SearchBar from '../components/catalog/SearchBar';
@@ -11,19 +10,16 @@ import StoreHeader from '../components/layout/StoreHeader';
 import { useFavorites } from '../context/FavoritesContext';
 
 const features = [
-  ['✦', 'Clean UX', 'Minimal sections and easy browsing.'],
-  ['◈', 'Component-ready', 'Designed as reusable React pieces.'],
-  ['◌', 'Graphic-rich', 'Visuals with no stock dependency.'],
-  ['↻', 'Responsive', 'Works across desktop and mobile.'],
+  ['✦', 'Curated tech', 'Popular devices and everyday essentials in one place.'],
+  ['◈', 'Saved favorites', 'Keep products you want to compare or revisit later.'],
+  ['◌', 'Product details', 'Review key specifications before choosing a device.'],
+  ['↻', 'Cart at a glance', 'Review your selected products whenever you need.'],
 ];
 
 export default function StorefrontPage() {
   const [category, setCategory] = useState<Category>('All');
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('featured');
-  const [cart, setCart] = useState<Record<number, number>>({});
-  const [cartOpen, setCartOpen] = useState(false);
-  const [toast, setToast] = useState('');
   const { favorites, toggleFavorite } = useFavorites();
 
   const shown = useMemo(
@@ -48,32 +44,6 @@ export default function StorefrontPage() {
     [category, query, sort],
   );
 
-  const quantity = Object.values(cart).reduce(
-    (total, count) => total + count,
-    0,
-  );
-
-  const add = (id: number) => {
-    setCart((current) => ({ ...current, [id]: (current[id] ?? 0) + 1 }));
-    setToast('Added to cart');
-    window.setTimeout(() => setToast(''), 1800);
-  };
-
-  const changeQuantity = (id: number, delta: number) => {
-    setCart((current) => {
-      const next = { ...current };
-      const count = (next[id] ?? 0) + delta;
-
-      if (count <= 0) {
-        delete next[id];
-      } else {
-        next[id] = count;
-      }
-
-      return next;
-    });
-  };
-
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
     document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
@@ -89,19 +59,6 @@ export default function StorefrontPage() {
             onSubmit={submitSearch}
           />
         }
-        actions={
-          <button className="icon-button header-action" aria-label="Open shopping cart" onClick={() => setCartOpen(true)}>
-            <span className="icon-wrap">
-              <svg className="header-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="8" cy="21" r="1" />
-                <circle cx="19" cy="21" r="1" />
-                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57L20 7.05H5.12" />
-              </svg>
-              {quantity > 0 && <b className="cart-count">{quantity}</b>}
-            </span>
-            <span className="action-label">Cart</span>
-          </button>
-        }
       />
       <main>
         <section className="container section">
@@ -109,15 +66,16 @@ export default function StorefrontPage() {
             <div className="hero-copy">
               <p className="eyebrow">MODERN TECH STORE</p>
               <h1>
-                Minimal webshop with richer visuals and a cleaner shopping flow.
+                Find the right tech for work, play and everyday life.
               </h1>
               <p className="hero-text">
-                Browse everyday tech essentials through polished illustrations,
-                clean category blocks and elegant product cards.
+                Shop laptops, smartphones, tablets, desktops and accessories.
+                Compare products, save your favorites and build your cart with
+                confidence.
               </p>
               <div className="hero-actions">
                 <a className="primary-button" href="#products">
-                  Browse products
+                  Shop products
                 </a>
                 <button
                   className="ghost-button"
@@ -127,21 +85,21 @@ export default function StorefrontPage() {
                       ?.scrollIntoView({ behavior: 'smooth' })
                   }
                 >
-                  Explore categories
+                  Shop by category
                 </button>
               </div>
               <div className="hero-stats">
                 <div className="stat-pill">
                   <strong>5</strong>
-                  <span>Core categories</span>
+                  <span>Technology categories</span>
                 </div>
                 <div className="stat-pill">
                   <strong>12</strong>
-                  <span>Starter products</span>
+                  <span>Products to explore</span>
                 </div>
                 <div className="stat-pill">
-                  <strong>100%</strong>
-                  <span>Responsive layout</span>
+                  <strong>Easy</strong>
+                  <span>Favorites and cart</span>
                 </div>
               </div>
             </div>
@@ -151,14 +109,14 @@ export default function StorefrontPage() {
               <i className="device laptop" />
               <i className="device phone" />
               <div className="float-card top">
-                <span>TOP CATEGORY</span>
+                <span>SHOP LAPTOPS</span>
                 <strong>Laptops</strong>
-                <small>Work, study and create</small>
+                <small>Power for work, study and play</small>
               </div>
               <div className="float-card bottom">
-                <span>POPULAR PICK</span>
-                <strong>Wireless audio</strong>
-                <small>Accessories for every setup</small>
+                <span>TRENDING NOW</span>
+                <strong>Tech for every setup</strong>
+                <small>Accessories that complete your desk</small>
               </div>
             </div>
           </div>
@@ -258,7 +216,6 @@ export default function StorefrontPage() {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  onAdd={add}
                   onFavorite={toggleFavorite}
                   isFavorite={favorites.has(product.id)}
                 />
@@ -282,26 +239,6 @@ export default function StorefrontPage() {
         </section>
       </main>
       <StoreFooter />
-      {cartOpen && (
-        <CartDrawer
-          cart={cart}
-          products={products}
-          onClose={() => setCartOpen(false)}
-          onQuantityChange={changeQuantity}
-          onRemove={(id) =>
-            setCart((current) => {
-              const next = { ...current };
-              delete next[id];
-              return next;
-            })
-          }
-        />
-      )}{' '}
-      {toast && (
-        <div className="toast" role="status">
-          {toast}
-        </div>
-      )}
     </div>
   );
 }

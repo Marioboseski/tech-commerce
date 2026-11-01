@@ -3,13 +3,11 @@ import type { Product } from '../../data/catalog';
 import { money } from '../../data/catalog';
 type Props = {
   product: Product;
-  onAdd?: (id: number) => void;
   onFavorite?: (id: number) => void;
   isFavorite?: boolean;
 };
 export default function ProductCard({
   product,
-  onAdd,
   onFavorite,
   isFavorite = false,
 }: Props) {
@@ -39,15 +37,9 @@ export default function ProductCard({
         </div>
         <div className="product-bottom">
           <strong className="price">{money(product.price)}</strong>
-          {onAdd ? (
-            <button className="add-button" onClick={() => onAdd(product.id)}>
-              + Add to cart
-            </button>
-          ) : (
-            <Link className="add-button" to={`/products/${product.id}`}>
-              View product
-            </Link>
-          )}
+          <Link className="add-button" to={`/products/${product.id}`}>
+            View product
+          </Link>
         </div>
       </div>
     </article>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { categories } from '../../data/catalog';
+import { useCart } from '../../context/CartContext';
 import SearchBar from '../catalog/SearchBar';
 import FavoritesMenu from './FavoritesMenu';
 import ProfileMenu from './ProfileMenu';
@@ -20,7 +21,12 @@ export default function StoreHeader({
 }: StoreHeaderProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const { cart, setCartOpen } = useCart();
   const [headerQuery, setHeaderQuery] = useState('');
+  const cartQuantity = Object.values(cart).reduce(
+    (total, quantity) => total + quantity,
+    0,
+  );
 
   const submitHeaderSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -32,7 +38,7 @@ export default function StoreHeader({
       className="icon-button header-action"
       type="button"
       aria-label="Open shopping cart"
-      onClick={() => navigate('/')}
+      onClick={() => setCartOpen(true)}
     >
       <span className="icon-wrap">
         <svg className="header-action-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -40,6 +46,7 @@ export default function StoreHeader({
           <circle cx="19" cy="21" r="1" />
           <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57L20 7.05H5.12" />
         </svg>
+        {cartQuantity > 0 && <b className="cart-count">{cartQuantity}</b>}
       </span>
       <span className="action-label">Cart</span>
     </button>

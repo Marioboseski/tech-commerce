@@ -107,7 +107,8 @@ export default function StorefrontPage() {
         actions={
           <>
             <button
-              className="icon-button"
+              className={`icon-button header-action ${favoritesOnly ? 'is-active' : ''}`}
+              aria-label="Show favorites"
               onClick={() => {
                 setFavoritesOnly((value) => !value);
                 setCategory('All');
@@ -116,11 +117,21 @@ export default function StorefrontPage() {
                   ?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              ♡ <span className="action-label">Favorites</span>
+              <svg className="header-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z" />
+              </svg>
+              <span className="action-label">Favorites</span>
             </button>
-            <button className="icon-button" onClick={() => setCartOpen(true)}>
-              🛒 <span className="action-label">Cart</span>
-              {quantity > 0 && <b className="cart-count">{quantity}</b>}
+            <button className="icon-button header-action" aria-label="Open shopping cart" onClick={() => setCartOpen(true)}>
+              <span className="icon-wrap">
+                <svg className="header-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="8" cy="21" r="1" />
+                  <circle cx="19" cy="21" r="1" />
+                  <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57L20 7.05H5.12" />
+                </svg>
+                {quantity > 0 && <b className="cart-count">{quantity}</b>}
+              </span>
+              <span className="action-label">Cart</span>
             </button>
           </>
         }

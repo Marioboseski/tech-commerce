@@ -12,13 +12,7 @@ export default function StoreProductPage() {
 
   return (
     <div className="detail-page">
-      <StoreHeader
-        actions={
-          <Link className="icon-button" to="/">
-            Store home
-          </Link>
-        }
-      />
+      <StoreHeader />
       <main>
         <section className="container section">
           <div className="breadcrumbs">

@@ -1,4 +1,4 @@
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import { categories, products } from '../data/catalog';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductCard from '../components/catalog/ProductCard';
@@ -19,13 +19,7 @@ export default function CategoryPage() {
 
   return (
     <div className="listing-page">
-      <StoreHeader
-        actions={
-          <Link className="icon-button" to="/">
-            Store home
-          </Link>
-        }
-      />
+      <StoreHeader />
       <main>
         <section className="container section">
           <p className="eyebrow">CATEGORY</p>

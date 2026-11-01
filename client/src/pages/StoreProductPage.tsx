@@ -58,7 +58,7 @@ export default function StoreProductPage() {
                 </button>
               </div>
               <div className="detail-note">
-                Free delivery on demo orders over $75. Checkout will be
+                Free delivery on demo orders over €75. Checkout will be
                 connected when we introduce the API.
               </div>
             </div>

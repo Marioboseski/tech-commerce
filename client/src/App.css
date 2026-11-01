@@ -992,6 +992,86 @@ h4 {
 .category-heading-icon {
   font-size: 78px;
 }
+.category-products-layout {
+  display: grid;
+  grid-template-columns: 224px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.price-filter-sidebar {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(42, 49, 92, 0.05);
+}
+.price-filter-heading {
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.price-filter-heading span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--purple);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.price-filter-heading h2 {
+  font-size: 18px;
+}
+.price-filter-form {
+  display: grid;
+  gap: 14px;
+}
+.price-filter-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.price-filter-form input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--text);
+}
+.apply-price-filter {
+  min-height: 42px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--purple);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background-color 0.2s ease;
+}
+.apply-price-filter:hover {
+  background: var(--purple-dark);
+}
+.clear-price-filter {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 18px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 9px;
+  background: #f2eeff;
+  color: var(--purple);
+  font-size: 12px;
+  font-weight: 700;
+}
+.clear-price-filter:hover {
+  background: #e9e1ff;
+}
+.category-product-results > .subheading {
+  margin: 0 0 16px;
+}
 .breadcrumbs {
   display: flex;
   flex-wrap: wrap;
@@ -1091,6 +1171,9 @@ h4 {
   }
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+  .category-products-layout {
+    grid-template-columns: 1fr;
   }
   .panel-grid {
     grid-template-columns: 1fr 1fr;
@@ -1218,6 +1301,13 @@ h4 {
   }
   .category-heading {
     padding: 20px;
+  }
+  .price-filter-heading {
+    margin-bottom: 16px;
+  }
+  .clear-price-filter {
+    width: 100%;
+    margin-top: 18px;
   }
   .category-heading-icon {
     font-size: 58px;

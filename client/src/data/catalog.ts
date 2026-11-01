@@ -164,8 +164,8 @@ export const products: Product[] = [
     }) as Product,
 );
 export const money = (value: number) =>
-  new Intl.NumberFormat('en-US', {
+  new Intl.NumberFormat('de-DE', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'EUR',
     maximumFractionDigits: 0,
   }).format(value);

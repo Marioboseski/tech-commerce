@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import type { ProductDetails } from '../types/productTypes';
 import ProductSpecifications from '../components/product/ProductSpecifications';
+import { money } from '../data/catalog';
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
@@ -44,7 +45,7 @@ const ProductDetailsPage = () => {
       </Link>
       <div className="flex flex-col gap-2 p-2 border-b-2 border-gray-300">
         <p>Product: {product.name}</p>
-        <p>Price${product.price.toFixed(2)}</p>
+        <p>Price: {money(product.price)}</p>
         <p>{product.description}</p>
         <p>{product.category.name}</p>
       </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { products } from '../data/catalog';
 import { money } from '../lib/formatters';
 import StoreHeader from '../components/layout/StoreHeader';
@@ -7,11 +7,14 @@ import ProductGallery from '../components/product/ProductGallery';
 import ProductCard from '../components/catalog/ProductCard';
 import { useCart } from '../hooks/useCart';
 import { useFavorites } from '../hooks/useFavorites';
+import { useAuth } from '../hooks/useAuth';
 
 export default function StoreProductPage() {
   const { id } = useParams();
   const { favorites, toggleFavorite } = useFavorites();
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [addedToCart, setAddedToCart] = useState(false);
   const product = products.find((item) => item.id === Number(id));
 
@@ -52,12 +55,16 @@ export default function StoreProductPage() {
                 <button
                   className="primary-button"
                   onClick={() => {
+                    if (!user) {
+                      navigate('/login');
+                      return;
+                    }
                     addToCart(product.id);
                     setAddedToCart(true);
                     window.setTimeout(() => setAddedToCart(false), 2200);
                   }}
                 >
-                  Add to cart
+                  {user ? 'Add to cart' : 'Sign in to add to cart'}
                 </button>
                 <button
                   className="ghost-button"

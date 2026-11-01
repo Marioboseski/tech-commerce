@@ -310,6 +310,51 @@
   background: #e9e1ff;
   color: #6c47f5;
 }
+.profile-toggle.is-signed-in {
+  background: var(--purple);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(107, 76, 230, 0.25);
+}
+.profile-toggle.is-signed-in:hover,
+.profile-toggle.is-signed-in:focus-visible,
+.profile-toggle.is-signed-in[aria-expanded='true'] {
+  background: var(--purple-dark);
+  color: #fff;
+}
+.profile-initials {
+  font:
+    800 15px Manrope,
+    sans-serif;
+}
+.profile-greeting {
+  margin: 4px 8px 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+}
+.profile-greeting strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--text);
+  font-size: 13px;
+}
+.profile-logout {
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #b53850;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+.profile-logout:hover,
+.profile-logout:focus-visible {
+  background: #fff0f3;
+}
 .profile-icon {
   width: 26px;
   height: 26px;
@@ -1389,6 +1434,14 @@
   color: var(--muted);
   font-size: 13px;
   line-height: 1.5;
+}
+.account-error {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff0f3;
+  color: #b53850;
+  font-size: 13px;
 }
 .account-main {
   display: grid;

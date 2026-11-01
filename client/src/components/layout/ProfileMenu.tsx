@@ -1,17 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
-type ProfileMenuProps = {
-  /** Reserved for the real authentication session when it is introduced. */
-  isAuthenticated?: boolean;
-};
-
-export default function ProfileMenu({
-  isAuthenticated = false,
-}: ProfileMenuProps) {
+export default function ProfileMenu() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     if (!open) {
@@ -38,11 +33,10 @@ export default function ProfileMenu({
     };
   }, [open]);
 
-  const items = isAuthenticated
+  const items = user
     ? [
         { label: 'Profile', to: '/profile' },
         { label: 'My Orders', to: '/orders' },
-        { label: 'Logout', to: '/' },
       ]
     : [
         { label: 'Login', to: '/login' },
@@ -52,22 +46,35 @@ export default function ProfileMenu({
   return (
     <div className="profile-menu" ref={menuRef}>
       <button
-        className="profile-toggle"
+        className={`profile-toggle ${user ? 'is-signed-in' : ''}`}
         type="button"
         ref={toggleRef}
-        aria-label="Open user menu"
+        aria-label={
+          user ? `Open account menu for ${user.name}` : 'Open user menu'
+        }
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
-        <svg className="profile-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="10" />
-          <circle cx="12" cy="10" r="3" />
-          <path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66" />
-        </svg>
+        {user ? (
+          <span className="profile-initials">
+            {user.name.charAt(0).toUpperCase()}
+          </span>
+        ) : (
+          <svg className="profile-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="10" r="3" />
+            <path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66" />
+          </svg>
+        )}
       </button>
       {open && (
         <div className="profile-dropdown" role="menu" aria-label="User menu">
+          {user && (
+            <p className="profile-greeting">
+              Signed in as <strong>{user.name}</strong>
+            </p>
+          )}
           {items.map((item) => (
             <Link
               key={item.label}
@@ -78,6 +85,19 @@ export default function ProfileMenu({
               {item.label}
             </Link>
           ))}
+          {user && (
+            <button
+              className="profile-logout"
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                logout();
+                setOpen(false);
+              }}
+            >
+              Logout
+            </button>
+          )}
         </div>
       )}
     </div>

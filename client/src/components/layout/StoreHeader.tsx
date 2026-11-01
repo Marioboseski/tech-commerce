@@ -11,15 +11,9 @@ import ProfileMenu from './ProfileMenu';
 type StoreHeaderProps = {
   middle?: ReactNode;
   actions?: ReactNode;
-  /** Connect this to the real auth session when authentication is added. */
-  isAuthenticated?: boolean;
 };
 
-export default function StoreHeader({
-  middle,
-  actions,
-  isAuthenticated = false,
-}: StoreHeaderProps) {
+export default function StoreHeader({ middle, actions }: StoreHeaderProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { cart, setCartOpen } = useCart();
@@ -74,7 +68,7 @@ export default function StoreHeader({
         <div className="header-actions">
           <FavoritesMenu />
           {actions ?? defaultActions}
-          <ProfileMenu isAuthenticated={isAuthenticated} />
+          <ProfileMenu />
         </div>
       </div>
       <nav className="main-nav" aria-label="Main navigation">

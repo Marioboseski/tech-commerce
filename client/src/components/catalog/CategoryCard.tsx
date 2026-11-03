@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import type { CatalogCategory } from '../../data/catalog';
+import type { ApiCategory } from '../../types/category';
 type Props = {
-  category: CatalogCategory;
+  category: ApiCategory;
 };
 export default function CategoryCard({ category }: Props) {
   return (
@@ -10,11 +10,9 @@ export default function CategoryCard({ category }: Props) {
       to={`/categories/${category.name.toLowerCase()}`}
     >
       <div className="category-art">
-        <img src={category.image} alt="" />
         <span>{category.name}</span>
       </div>
       <strong>{category.name}</strong>
-      <small>{category.tagline}</small>
       <span>Browse category →</span>
     </Link>
   );

@@ -1,26 +1,63 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { categories, products } from '../data/catalog';
-import type { Category } from '../data/catalog';
 import CategoryCard from '../components/catalog/CategoryCard';
 import ProductCard from '../components/catalog/ProductCard';
 import SearchBar from '../components/catalog/SearchBar';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
 import { useFavorites } from '../hooks/useFavorites';
+import { getProducts } from '../services/productApi';
+import type { ApiProduct } from '../types/product';
+import { getCategories } from '../services/categoryApi';
+import type { ApiCategory } from '../types/category';
 
 export default function StorefrontPage() {
+  const [products, setProducts] = useState<ApiProduct[]>([]);
+  const [categories, setCategories] = useState<ApiCategory[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const { favorites, toggleFavorite } = useFavorites();
-  const requestedCategory = searchParams.get('category') as Category | null;
-  const category =
-    requestedCategory === 'All' ||
-    categories.some((item) => item.name === requestedCategory)
-      ? (requestedCategory ?? 'All')
-      : 'All';
+  const requestedCategory = searchParams.get('category');
+  const category = requestedCategory &&
+    categories.some((item) => item.slug === requestedCategory)
+    ? (requestedCategory) : 'All';
+  const selectedCategory = categories.find((item) => item.slug === category);
+  const selectedCategoryId = selectedCategory?.id;
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
   const query = searchParams.get('search') ?? '';
   const sort = searchParams.get('sort') ?? 'featured';
+
+  useEffect(() => {
+    if (!categoriesLoaded) return;
+
+    let ignore = false;
+
+    const loadProducts = async () => {
+      try {
+        const data = await getProducts(selectedCategoryId);
+
+        if (!ignore) {
+          setProducts(data);
+        }
+      } catch (error) {
+        console.log("Failed to load products", error);
+      }
+    }
+    loadProducts();
+
+    return () => {
+      ignore = true;
+    }
+  }, [categoriesLoaded, selectedCategoryId]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      const data = await getCategories();
+      setCategories(data);
+      setCategoriesLoaded(true);
+    }
+    loadCategories();
+  }, []);
 
   const updateFilters = (updates: Record<string, string>) => {
     setSearchParams(
@@ -44,8 +81,7 @@ export default function StorefrontPage() {
       products
         .filter(
           (product) =>
-            (category === 'All' || product.category === category) &&
-            `${product.name} ${product.category} ${product.description}`
+            `${product.name} ${product.category.name} ${product.description}`
               .toLowerCase()
               .includes(query.toLowerCase()),
         )
@@ -58,7 +94,7 @@ export default function StorefrontPage() {
                 ? a.name.localeCompare(b.name)
                 : 0,
         ),
-    [category, query, sort],
+    [products, query, sort],
   );
 
   const submitSearch = (event: FormEvent) => {
@@ -187,7 +223,7 @@ export default function StorefrontPage() {
               >
                 <option value="All">All categories</option>
                 {categories.map((item) => (
-                  <option key={item.name}>{item.name}</option>
+                  <option key={item.id} value={item.slug}>{item.name}</option>
                 ))}
               </select>
               <select

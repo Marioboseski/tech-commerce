@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import type { Product } from '../../data/catalog';
+import type { ApiProduct } from '../../types/product';
 import { money } from '../../lib/formatters';
 type Props = {
-  product: Product;
+  product: ApiProduct;
   onFavorite?: (id: number) => void;
   isFavorite?: boolean;
 };
@@ -14,8 +14,6 @@ export default function ProductCard({
   return (
     <article className="product-card">
       <div className="product-image">
-        <span className="badge">{product.badge}</span>
-        <img src={product.image} alt={product.name} />
         {onFavorite && (
           <button
             className={`heart ${isFavorite ? 'active' : ''}`}
@@ -27,14 +25,12 @@ export default function ProductCard({
         )}
       </div>
       <div className="product-info">
-        <div className="product-category">{product.category}</div>
+        <div className="product-category">{product.category.name}</div>
         <h3 className="product-title">
           <Link to={`/products/${product.id}`}>{product.name}</Link>
         </h3>
         <p className="product-description">{product.description}</p>
-        <div className="product-meta">
-          ★★★★★ <span>{product.rating}/5</span>
-        </div>
+        
         <div className="product-bottom">
           <strong className="price">{money(product.price)}</strong>
           <Link className="add-button" to={`/products/${product.id}`}>

@@ -11,6 +11,7 @@ import { products } from './data/catalog';
 import { CartProvider } from './context/CartProvider';
 import { FavoritesProvider } from './context/FavoritesProvider';
 import { AuthProvider } from './context/AuthProvider';
+import { CategoriesProvider } from './context/CategoriesProvider';
 import { useCart } from './hooks/useCart';
 
 function AppRoutes() {
@@ -45,11 +46,13 @@ function AppRoutes() {
 
 const App = () => (
   <AuthProvider>
-    <FavoritesProvider>
-      <CartProvider>
-        <AppRoutes />
-      </CartProvider>
-    </FavoritesProvider>
+    <CategoriesProvider>
+      <FavoritesProvider>
+        <CartProvider>
+          <AppRoutes />
+        </CartProvider>
+      </FavoritesProvider>
+    </CategoriesProvider>
   </AuthProvider>
 );
 

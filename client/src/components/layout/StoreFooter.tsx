@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { categories } from '../../data/catalog';
+import { useCategories } from '../../hooks/useCategories';
 export default function StoreFooter() {
+  const { categories } = useCategories();
   return (
     <footer className="site-footer">
       <div className="container footer-grid">
@@ -19,10 +20,8 @@ export default function StoreFooter() {
           <h4>Categories</h4>
           <ul>
             {categories.slice(0, 3).map((category) => (
-              <li key={category.name}>
-                <Link to={`/categories/${category.name.toLowerCase()}`}>
-                  {category.name}
-                </Link>
+              <li key={category.id}>
+                <Link to={`/categories/${category.slug}`}>{category.name}</Link>
               </li>
             ))}
           </ul>
@@ -30,12 +29,11 @@ export default function StoreFooter() {
         <div>
           <h4>More</h4>
           <ul>
-            <li>
-              <Link to="/categories/desktops">Desktops</Link>
-            </li>
-            <li>
-              <Link to="/categories/accessories">Accessories</Link>
-            </li>
+            {categories.slice(3).map((category) => (
+              <li key={category.id}>
+                <Link to={`/categories/${category.slug}`}>{category.name}</Link>
+              </li>
+            ))}
             <li>
               <a href="#home">Back to top</a>
             </li>

@@ -47,7 +47,7 @@ export default function StoreProductPage() {
         return;
       }
 
-      const sameCategory = await getProducts(data.categoryId);
+      const sameCategory = await getProducts({ categoryId: data.categoryId });
       if (!ignore) {
         setRelatedProducts(
           sameCategory.filter((item) => item.id !== data.id).slice(0, 3),

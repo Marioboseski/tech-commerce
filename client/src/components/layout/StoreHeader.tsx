@@ -2,8 +2,8 @@ import { useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { categories } from '../../data/catalog';
 import { useCart } from '../../hooks/useCart';
+import { useCategories } from '../../hooks/useCategories';
 import { getCartQuantity } from '../../lib/cart';
 import SearchBar from '../catalog/SearchBar';
 import FavoritesMenu from './FavoritesMenu';
@@ -18,6 +18,7 @@ export default function StoreHeader({ middle, actions }: StoreHeaderProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { cart, setCartOpen } = useCart();
+  const { categories } = useCategories();
   const [headerQuery, setHeaderQuery] = useState('');
   const cartQuantity = getCartQuantity(cart);
 
@@ -75,9 +76,9 @@ export default function StoreHeader({ middle, actions }: StoreHeaderProps) {
           </Link>
           {categories.map((item) => (
             <Link
-              key={item.name}
-              className={`nav-link ${pathname === `/categories/${item.name.toLowerCase()}` ? 'active' : ''}`}
-              to={`/categories/${item.name.toLowerCase()}`}
+              key={item.id}
+              className={`nav-link ${pathname === `/categories/${item.slug}` ? 'active' : ''}`}
+              to={`/categories/${item.slug}`}
             >
               {item.name}
             </Link>

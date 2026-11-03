@@ -1,13 +1,25 @@
 const API_URL = import.meta.env.VITE_API_URL;
 import type { ApiProduct, ApiProductDetails } from "../types/product";
 
-export const getProducts = async (categoryId? : number): Promise<ApiProduct[]> => {
+export type ProductFilters = {
+  categoryId?: number;
+  minPrice?: number;
+  maxPrice?: number;
+};
+
+export const getProducts = async (filters: ProductFilters = {}): Promise<ApiProduct[]> => {
 
   if (!API_URL) {
     throw new Error ("Missing VITE_API_URL environment variable");
   }
 
-  const query = categoryId !== undefined ? `?categoryId=${categoryId}` : "";
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined) {
+      params.set(key, String(value));
+    }
+  });
+  const query = params.size ? `?${params}` : "";
 
   const res = await fetch(`${API_URL}/api/products${query}`);
   if (!res.ok) {

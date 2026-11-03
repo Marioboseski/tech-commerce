@@ -9,12 +9,11 @@ import StoreHeader from '../components/layout/StoreHeader';
 import { useFavorites } from '../hooks/useFavorites';
 import { getProducts } from '../services/productApi';
 import type { ApiProduct } from '../types/product';
-import { getCategories } from '../services/categoryApi';
-import type { ApiCategory } from '../types/category';
+import { useCategories } from '../hooks/useCategories';
 
 export default function StorefrontPage() {
   const [products, setProducts] = useState<ApiProduct[]>([]);
-  const [categories, setCategories] = useState<ApiCategory[]>([]);
+  const { categories, categoriesLoaded } = useCategories();
   const [searchParams, setSearchParams] = useSearchParams();
   const { favorites, toggleFavorite } = useFavorites();
   const requestedCategory = searchParams.get('category');
@@ -23,7 +22,6 @@ export default function StorefrontPage() {
     ? (requestedCategory) : 'All';
   const selectedCategory = categories.find((item) => item.slug === category);
   const selectedCategoryId = selectedCategory?.id;
-  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
   const query = searchParams.get('search') ?? '';
   const sort = searchParams.get('sort') ?? 'featured';
 
@@ -34,7 +32,7 @@ export default function StorefrontPage() {
 
     const loadProducts = async () => {
       try {
-        const data = await getProducts(selectedCategoryId);
+        const data = await getProducts({ categoryId: selectedCategoryId });
 
         if (!ignore) {
           setProducts(data);
@@ -49,15 +47,6 @@ export default function StorefrontPage() {
       ignore = true;
     }
   }, [categoriesLoaded, selectedCategoryId]);
-
-  useEffect(() => {
-    const loadCategories = async () => {
-      const data = await getCategories();
-      setCategories(data);
-      setCategoriesLoaded(true);
-    }
-    loadCategories();
-  }, []);
 
   const updateFilters = (updates: Record<string, string>) => {
     setSearchParams(

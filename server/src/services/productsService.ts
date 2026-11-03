@@ -1,10 +1,22 @@
 import { prisma } from "../lib/prisma.js"
 
-export const getProducts = async (categoryId?: number) => {
+type ProductFilters = {
+  categoryId: number | undefined;
+  minPrice: number | undefined;
+  maxPrice: number | undefined;
+};
+
+export const getProducts = async ({ categoryId, minPrice, maxPrice }: ProductFilters) => {
   const products = await prisma.product.findMany({
-    ...(categoryId !== undefined && {
-      where: { categoryId }
-    }),
+    where: {
+      ...(categoryId !== undefined && { categoryId }),
+      ...((minPrice !== undefined || maxPrice !== undefined) && {
+        price: {
+          ...(minPrice !== undefined && { gte: minPrice }),
+          ...(maxPrice !== undefined && { lte: maxPrice }),
+        }
+      }),
+    },
 
     include: {
       category: {

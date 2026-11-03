@@ -29,6 +29,7 @@ export const getProductById = async (id: number) => {
       category: {
         select: {
           name: true,
+          slug: true,
         }
       },
 

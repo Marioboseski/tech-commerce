@@ -1,13 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
-import { products } from '../data/catalog';
 import { money } from '../lib/formatters';
+import { getProductImage } from '../lib/productImage';
+import { getProductSpecs } from '../lib/productSpecs';
+import { getProductById, getProducts } from '../services/productApi';
+import type { ApiProduct, ApiProductDetails } from '../types/product';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductGallery from '../components/product/ProductGallery';
 import ProductCard from '../components/catalog/ProductCard';
 import { useCart } from '../hooks/useCart';
 import { useFavorites } from '../hooks/useFavorites';
 import { useAuth } from '../hooks/useAuth';
+
+type LoadedProduct = {
+  id: number;
+  product: ApiProductDetails | null;
+};
 
 export default function StoreProductPage() {
   const { id } = useParams();
@@ -16,16 +24,68 @@ export default function StoreProductPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [addedToCart, setAddedToCart] = useState(false);
-  const product = products.find((item) => item.id === Number(id));
+  const [loaded, setLoaded] = useState<LoadedProduct | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<ApiProduct[]>([]);
+
+  const productId = id && /^[1-9]\d*$/.test(id) ? Number(id) : null;
+
+  useEffect(() => {
+    if (productId === null) {
+      return;
+    }
+
+    let ignore = false;
+
+    const loadProduct = async () => {
+      const data = await getProductById(productId);
+      if (ignore) {
+        return;
+      }
+      setLoaded({ id: productId, product: data });
+      setRelatedProducts([]);
+      if (!data) {
+        return;
+      }
+
+      const sameCategory = await getProducts(data.categoryId);
+      if (!ignore) {
+        setRelatedProducts(
+          sameCategory.filter((item) => item.id !== data.id).slice(0, 3),
+        );
+      }
+    };
+    loadProduct();
+
+    return () => {
+      ignore = true;
+    };
+  }, [productId]);
+
+  if (productId === null) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Covers the first load and switching to another product (e.g. a related one).
+  if (!loaded || loaded.id !== productId) {
+    return (
+      <div className="detail-page">
+        <StoreHeader />
+        <main>
+          <section className="container section">
+            <p className="subheading">Loading product…</p>
+          </section>
+        </main>
+      </div>
+    );
+  }
+
+  const { product } = loaded;
 
   if (!product) {
     return <Navigate to="/" replace />;
   }
-  const relatedProducts = products
-    .filter(
-      (item) => item.category === product.category && item.id !== product.id,
-    )
-    .slice(0, 3);
+
+  const specs = getProductSpecs(product);
 
   return (
     <div className="detail-page">
@@ -35,20 +95,21 @@ export default function StoreProductPage() {
           <div className="breadcrumbs">
             <Link to="/">Home</Link>
             <span>/</span>
-            <Link to={`/categories/${product.category.toLowerCase()}`}>
-              {product.category}
+            <Link to={`/categories/${product.category.slug}`}>
+              {product.category.name}
             </Link>
             <span>/</span>
             <span>{product.name}</span>
           </div>
           <div className="product-detail">
-            <ProductGallery key={product.id} product={product} />
+            <ProductGallery
+              key={product.id}
+              name={product.name}
+              image={getProductImage(product)}
+            />
             <div className="detail-content">
-              <p className="eyebrow">{product.category}</p>
+              <p className="eyebrow">{product.category.name}</p>
               <h1>{product.name}</h1>
-              <div className="detail-rating">
-                ★★★★★ <span>{product.rating}/5 · Demo review score</span>
-              </div>
               <p className="detail-description">{product.description}</p>
               <strong className="detail-price">{money(product.price)}</strong>
               <div className="detail-actions">
@@ -89,22 +150,21 @@ export default function StoreProductPage() {
             <dl>
               <div>
                 <dt>SKU</dt>
-                <dd>
-                  TS-{product.category.slice(0, 3).toUpperCase()}-
-                  {String(product.id).padStart(3, '0')}
-                </dd>
+                <dd>{product.sku}</dd>
               </div>
               <div>
                 <dt>Category</dt>
-                <dd>{product.category}</dd>
+                <dd>{product.category.name}</dd>
               </div>
+              {specs.map((spec) => (
+                <div key={spec.label}>
+                  <dt>{spec.label}</dt>
+                  <dd>{spec.value}</dd>
+                </div>
+              ))}
               <div>
                 <dt>Availability</dt>
                 <dd>In stock</dd>
-              </div>
-              <div>
-                <dt>Rating</dt>
-                <dd>{product.rating} / 5</dd>
               </div>
               <div>
                 <dt>Shipping</dt>
@@ -115,7 +175,7 @@ export default function StoreProductPage() {
           {relatedProducts.length > 0 && (
             <section className="related-products">
               <p className="eyebrow">YOU MAY ALSO LIKE</p>
-              <h2 className="section-title">More in {product.category}</h2>
+              <h2 className="section-title">More in {product.category.name}</h2>
               <div className="product-grid">
                 {relatedProducts.map((relatedProduct) => (
                   <ProductCard

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import type { Product } from '../../data/catalog';
 
 const views = [
   { id: 'front', label: 'Front view' },
@@ -8,10 +7,11 @@ const views = [
 ];
 
 type ProductGalleryProps = {
-  product: Product;
+  name: string;
+  image: string;
 };
 
-export default function ProductGallery({ product }: ProductGalleryProps) {
+export default function ProductGallery({ name, image }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const selectPrevious = () => {
@@ -25,7 +25,6 @@ export default function ProductGallery({ product }: ProductGalleryProps) {
   return (
     <div className="product-gallery">
       <div className={`gallery-main gallery-view-${activeView.id}`}>
-        <span className="badge">{product.badge}</span>
         <button
           className="gallery-arrow gallery-arrow-previous"
           type="button"
@@ -39,8 +38,8 @@ export default function ProductGallery({ product }: ProductGalleryProps) {
         <div className="gallery-product-art" aria-live="polite">
           <img
             className="gallery-product-image"
-            src={product.image}
-            alt={`${product.name} — ${activeView.label.toLowerCase()}`}
+            src={image}
+            alt={`${name} — ${activeView.label.toLowerCase()}`}
           />
           <span className="gallery-view-label">{activeView.label}</span>
         </div>
@@ -70,7 +69,7 @@ export default function ProductGallery({ product }: ProductGalleryProps) {
             aria-label={`Show ${view.label.toLowerCase()}`}
             onClick={() => setActiveIndex(index)}
           >
-            <img src={product.image} alt="" />
+            <img src={image} alt="" />
           </button>
         ))}
       </div>

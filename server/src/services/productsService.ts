@@ -1,15 +1,31 @@
 import { prisma } from "../lib/prisma.js"
 
+// `contains` becomes SQL LIKE, where % and _ are wildcards. Escape them so a
+// search for "%" looks for the character itself instead of matching everything.
+const escapeLike = (value: string) => value.replace(/[\\%_]/g, "\\$&");
+
 type ProductFilters = {
   categoryId: number | undefined;
   minPrice: number | undefined;
   maxPrice: number | undefined;
   ids: number[] | undefined;
+  search: string | undefined;
+  limit: number | undefined;
 };
 
-export const getProducts = async ({ categoryId, minPrice, maxPrice, ids }: ProductFilters) => {
+export const getProducts = async ({ categoryId, minPrice, maxPrice, ids, search, limit }: ProductFilters) => {
+  const searchTerm = search !== undefined ? escapeLike(search) : undefined;
+
   const products = await prisma.product.findMany({
     where: {
+      // The MySQL collation (utf8mb4_unicode_ci) makes contains case-insensitive.
+      ...(searchTerm !== undefined && {
+        OR: [
+          { name: { contains: searchTerm } },
+          { description: { contains: searchTerm } },
+          { category: { name: { contains: searchTerm } } },
+        ]
+      }),
       ...(ids !== undefined && { id: { in: ids } }),
       ...(categoryId !== undefined && { categoryId }),
       ...((minPrice !== undefined || maxPrice !== undefined) && {
@@ -19,6 +35,10 @@ export const getProducts = async ({ categoryId, minPrice, maxPrice, ids }: Produ
         }
       }),
     },
+
+    // A stable order is needed so that `limit` always returns the same products.
+    orderBy: { id: "asc" },
+    ...(limit !== undefined && { take: limit }),
 
     include: {
       category: {

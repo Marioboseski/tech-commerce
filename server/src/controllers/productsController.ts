@@ -2,6 +2,8 @@ import * as productService from "../services/productsService.js";
 import type { Request, Response } from "express";
 
 const MAX_IDS = 100;
+const MAX_SEARCH_LENGTH = 100;
+const MAX_LIMIT = 100;
 
 // Non-negative number such as "100" or "99.99". Returns null when invalid.
 const parsePriceParam = (value: unknown): number | undefined | null => {
@@ -62,7 +64,35 @@ export const getProducts = async (req: Request, res: Response) => {
     }
   }
 
-  const products = await productService.getProducts({ categoryId, minPrice, maxPrice, ids });
+  // Free-text search in product name, description and category name.
+  const searchParam = req.query.search;
+
+  let search: string | undefined;
+
+  if (searchParam !== undefined) {
+    if (typeof searchParam !== "string" || searchParam.trim().length === 0 || searchParam.trim().length > MAX_SEARCH_LENGTH) {
+      return res.status(400).json({
+        message: `search must be between 1 and ${MAX_SEARCH_LENGTH} characters`
+      })
+    }
+    search = searchParam.trim();
+  }
+
+  // Maximum number of products to return, e.g. 6 for search suggestions.
+  const limitParam = req.query.limit;
+
+  let limit: number | undefined;
+
+  if (limitParam !== undefined) {
+    if (typeof limitParam !== "string" || !/^[1-9]\d*$/.test(limitParam) || Number(limitParam) > MAX_LIMIT) {
+      return res.status(400).json({
+        message: `limit must be an integer between 1 and ${MAX_LIMIT}`
+      })
+    }
+    limit = Number(limitParam);
+  }
+
+  const products = await productService.getProducts({ categoryId, minPrice, maxPrice, ids, search, limit });
   return res.json(products);
 }
 

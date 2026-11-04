@@ -6,6 +6,8 @@ export type ProductFilters = {
   minPrice?: number;
   maxPrice?: number;
   ids?: number[];
+  search?: string;
+  limit?: number;
 };
 
 export const getProducts = async (filters: ProductFilters = {}): Promise<ApiProduct[]> => {

@@ -1,9 +1,23 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
-import { products } from '../../data/catalog';
 import { money } from '../../lib/formatters';
+import { getProductImage } from '../../lib/productImage';
+import { getProducts } from '../../services/productApi';
+import type { ApiProduct } from '../../types/product';
+
+// Wait until the user stops typing before calling the API.
+const SEARCH_DELAY_MS = 300;
+const MAX_RESULTS = 6;
+// Must match MAX_SEARCH_LENGTH on the server.
+const MAX_QUERY_LENGTH = 100;
+
+type LoadedResults = {
+  query: string;
+  products: ApiProduct[];
+};
+
 type Props = {
   query: string;
   onQueryChange: (query: string) => void;
@@ -11,21 +25,35 @@ type Props = {
 };
 export default function SearchBar({ query, onQueryChange, onSubmit }: Props) {
   const [open, setOpen] = useState(false);
+  const [loaded, setLoaded] = useState<LoadedResults | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const normalizedQuery = query.trim().toLowerCase();
-  const results = useMemo(
-    () =>
-      normalizedQuery
-        ? products
-            .filter((product) =>
-              `${product.name} ${product.category} ${product.description}`
-                .toLowerCase()
-                .includes(normalizedQuery),
-            )
-            .slice(0, 6)
-        : [],
-    [normalizedQuery],
-  );
+  // True while waiting for the delay or for the API response.
+  const searching = loaded?.query !== normalizedQuery;
+  const results = searching ? [] : loaded.products;
+
+  useEffect(() => {
+    if (!open || !normalizedQuery) {
+      return;
+    }
+
+    let ignore = false;
+
+    const timer = window.setTimeout(async () => {
+      const data = await getProducts({
+        search: normalizedQuery,
+        limit: MAX_RESULTS,
+      });
+      if (!ignore) {
+        setLoaded({ query: normalizedQuery, products: data });
+      }
+    }, SEARCH_DELAY_MS);
+
+    return () => {
+      ignore = true;
+      window.clearTimeout(timer);
+    };
+  }, [open, normalizedQuery]);
 
   useEffect(() => {
     if (!open) {
@@ -67,6 +95,7 @@ export default function SearchBar({ query, onQueryChange, onSubmit }: Props) {
             setOpen(Boolean(event.target.value.trim()));
           }}
           onFocus={() => setOpen(Boolean(normalizedQuery))}
+          maxLength={MAX_QUERY_LENGTH}
           placeholder="Search laptops, smartphones, tablets..."
           aria-label="Search products"
           aria-autocomplete="list"
@@ -82,7 +111,9 @@ export default function SearchBar({ query, onQueryChange, onSubmit }: Props) {
           role="listbox"
           aria-label="Product search results"
         >
-          {results.length ? (
+          {searching ? (
+            <p className="search-empty">Searching…</p>
+          ) : results.length ? (
             results.map((product) => (
               <Link
                 className="search-result"
@@ -95,11 +126,11 @@ export default function SearchBar({ query, onQueryChange, onSubmit }: Props) {
                 }}
               >
                 <span className="search-result-icon">
-                  <img src={product.image} alt="" />
+                  <img src={getProductImage(product)} alt="" />
                 </span>
                 <span className="search-result-copy">
                   <strong>{product.name}</strong>
-                  <small>{product.category}</small>
+                  <small>{product.category.name}</small>
                 </span>
                 <strong className="search-result-price">
                   {money(product.price)}

@@ -1,10 +1,11 @@
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductCard from '../components/catalog/ProductCard';
-import { products } from '../data/catalog';
 import { useFavorites } from '../hooks/useFavorites';
+import { useProductsByIds } from '../hooks/useProductsByIds';
 
 export default function FavoritesPage() {
   const { favorites, toggleFavorite } = useFavorites();
+  const { products, loading } = useProductsByIds([...favorites]);
   const favoriteProducts = products.filter((product) =>
     favorites.has(product.id),
   );
@@ -19,13 +20,15 @@ export default function FavoritesPage() {
             <div>
               <h1 className="section-title">Favorites</h1>
               <p className="subheading">
-                {favoriteProducts.length
-                  ? `${favoriteProducts.length} saved product${favoriteProducts.length === 1 ? '' : 's'}.`
-                  : 'There is nothing in your favorites yet.'}
+                {loading
+                  ? 'Loading favorites…'
+                  : favoriteProducts.length
+                    ? `${favoriteProducts.length} saved product${favoriteProducts.length === 1 ? '' : 's'}.`
+                    : 'There is nothing in your favorites yet.'}
               </p>
             </div>
           </div>
-          {favoriteProducts.length ? (
+          {loading ? null : favoriteProducts.length ? (
             <div className="product-grid">
               {favoriteProducts.map((product) => (
                 <ProductCard

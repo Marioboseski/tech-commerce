@@ -1,19 +1,25 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
-import { products } from '../../data/catalog';
 import { money } from '../../lib/formatters';
+import { getProductImage } from '../../lib/productImage';
 import { useFavorites } from '../../hooks/useFavorites';
+import { useProductsByIds } from '../../hooks/useProductsByIds';
+
+const PREVIEW_COUNT = 3;
 
 export default function FavoritesMenu() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { favorites } = useFavorites();
-  const favoriteProducts = useMemo(
-    () => products.filter((product) => favorites.has(product.id)),
-    [favorites],
+  // The header is on every page, so products are only requested when the
+  // dropdown is opened. The badge count comes from the saved ids.
+  const previewIds = [...favorites].slice(0, PREVIEW_COUNT);
+  const { products, loading } = useProductsByIds(open ? previewIds : []);
+  const previewProducts = products.filter((product) =>
+    previewIds.includes(product.id),
   );
-  const previewProducts = favoriteProducts.slice(0, 3);
+  const favoritesCount = favorites.size;
 
   useEffect(() => {
     if (!open) {
@@ -44,16 +50,14 @@ export default function FavoritesMenu() {
       <button
         className={`icon-button header-action ${open ? 'is-active' : ''}`}
         type="button"
-        aria-label={`Open favorites${favoriteProducts.length ? `, ${favoriteProducts.length} saved` : ''}`}
+        aria-label={`Open favorites${favoritesCount ? `, ${favoritesCount} saved` : ''}`}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
         <span className="icon-wrap">
           <Heart className="header-action-icon" aria-hidden="true" />
-          {favoriteProducts.length > 0 && (
-            <b className="cart-count">{favoriteProducts.length}</b>
-          )}
+          {favoritesCount > 0 && <b className="cart-count">{favoritesCount}</b>}
         </span>
         <span className="action-label">Favorites</span>
       </button>
@@ -63,7 +67,9 @@ export default function FavoritesMenu() {
           role="menu"
           aria-label="Favorite products"
         >
-          {previewProducts.length ? (
+          {loading ? (
+            <p className="favorites-empty">Loading favorites…</p>
+          ) : previewProducts.length ? (
             <>
               <p className="favorites-dropdown-title">Favorites</p>
               {previewProducts.map((product) => (
@@ -75,7 +81,7 @@ export default function FavoritesMenu() {
                   onClick={() => setOpen(false)}
                 >
                   <span className="favorite-preview-icon">
-                    <img src={product.image} alt="" />
+                    <img src={getProductImage(product)} alt="" />
                   </span>
                   <span>
                     <strong>{product.name}</strong>
@@ -83,7 +89,7 @@ export default function FavoritesMenu() {
                   </span>
                 </Link>
               ))}
-              {favoriteProducts.length > 3 && (
+              {favoritesCount > PREVIEW_COUNT && (
                 <Link
                   className="favorites-view-all"
                   role="menuitem"

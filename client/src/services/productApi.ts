@@ -5,6 +5,7 @@ export type ProductFilters = {
   categoryId?: number;
   minPrice?: number;
   maxPrice?: number;
+  ids?: number[];
 };
 
 export const getProducts = async (filters: ProductFilters = {}): Promise<ApiProduct[]> => {
@@ -16,7 +17,7 @@ export const getProducts = async (filters: ProductFilters = {}): Promise<ApiProd
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([key, value]) => {
     if (value !== undefined) {
-      params.set(key, String(value));
+      params.set(key, Array.isArray(value) ? value.join(",") : String(value));
     }
   });
   const query = params.size ? `?${params}` : "";

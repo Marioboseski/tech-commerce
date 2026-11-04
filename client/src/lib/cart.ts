@@ -1,11 +1,11 @@
-import type { Product } from '../data/catalog';
+import type { ApiProduct } from '../types/product';
 
 export const getCartQuantity = (cart: Record<number, number>) =>
   Object.values(cart).reduce((total, quantity) => total + quantity, 0);
 
 export const getCartEntries = (
   cart: Record<number, number>,
-  products: Product[],
+  products: ApiProduct[],
 ) =>
   Object.entries(cart)
     .filter(([, quantity]) => quantity > 0)
@@ -16,7 +16,7 @@ export const getCartEntries = (
 
 export const getCartTotals = (
   cart: Record<number, number>,
-  products: Product[],
+  products: ApiProduct[],
 ) => {
   const subtotal = getCartEntries(cart, products).reduce(
     (total, { product, quantity }) => total + product.price * quantity,

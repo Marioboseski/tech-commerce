@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
-import { products } from '../data/catalog';
 import { money } from '../lib/formatters';
 import { getCartEntries, getCartTotals } from '../lib/cart';
 import { useCart } from '../hooks/useCart';
+import { useCartProducts } from '../hooks/useCartProducts';
 
 export default function CheckoutPage() {
   const [submitted, setSubmitted] = useState(false);
   const { cart } = useCart();
+  const { products, loading } = useCartProducts(cart);
   const entries = getCartEntries(cart, products);
   const { subtotal, shipping, total } = getCartTotals(cart, products);
 
@@ -19,7 +20,9 @@ export default function CheckoutPage() {
       <main className="container section">
         <p className="eyebrow">CHECKOUT</p>
         <h1 className="section-title">Complete your order</h1>
-        {entries.length ? (
+        {loading ? (
+          <p className="subheading">Loading your order…</p>
+        ) : entries.length ? (
           <div className="checkout-layout">
             <form
               className="checkout-form"

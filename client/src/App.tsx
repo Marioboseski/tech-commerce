@@ -7,7 +7,6 @@ import CartDrawer from './components/cart/CartDrawer';
 import AccountPage from './pages/AccountPage';
 import AccountDashboardPage from './pages/AccountDashboardPage';
 import CheckoutPage from './pages/CheckoutPage';
-import { products } from './data/catalog';
 import { CartProvider } from './context/CartProvider';
 import { FavoritesProvider } from './context/FavoritesProvider';
 import { AuthProvider } from './context/AuthProvider';
@@ -34,7 +33,6 @@ function AppRoutes() {
       {cartOpen && (
         <CartDrawer
           cart={cart}
-          products={products}
           onClose={() => setCartOpen(false)}
           onQuantityChange={changeQuantity}
           onRemove={removeFromCart}

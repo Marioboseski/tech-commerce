@@ -1,6 +1,8 @@
 import * as productService from "../services/productsService.js";
 import type { Request, Response } from "express";
 
+const MAX_IDS = 100;
+
 // Non-negative number such as "100" or "99.99". Returns null when invalid.
 const parsePriceParam = (value: unknown): number | undefined | null => {
   if (value === undefined) {
@@ -41,7 +43,26 @@ export const getProducts = async (req: Request, res: Response) => {
     })
   }
 
-  const products = await productService.getProducts({ categoryId, minPrice, maxPrice });
+  // Comma-separated product ids, e.g. "1,5,12" (used by the cart).
+  const idsParam = req.query.ids;
+
+  let ids: number[] | undefined;
+
+  if (idsParam !== undefined) {
+    if (typeof idsParam !== "string" || !/^[1-9]\d*(,[1-9]\d*)*$/.test(idsParam)) {
+      return res.status(400).json({
+        message: "ids must be a comma-separated list of positive integers"
+      })
+    }
+    ids = idsParam.split(",").map(Number);
+    if (ids.length > MAX_IDS) {
+      return res.status(400).json({
+        message: `ids can contain at most ${MAX_IDS} values`
+      })
+    }
+  }
+
+  const products = await productService.getProducts({ categoryId, minPrice, maxPrice, ids });
   return res.json(products);
 }
 

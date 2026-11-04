@@ -1,21 +1,21 @@
-import type { Product } from '../../data/catalog';
 import { money } from '../../lib/formatters';
 import { getCartEntries, getCartTotals } from '../../lib/cart';
+import { getProductImage } from '../../lib/productImage';
+import { useCartProducts } from '../../hooks/useCartProducts';
 import { Link } from 'react-router-dom';
 type Props = {
   cart: Record<number, number>;
-  products: Product[];
   onClose: () => void;
   onQuantityChange: (id: number, delta: number) => void;
   onRemove: (id: number) => void;
 };
 export default function CartDrawer({
   cart,
-  products,
   onClose,
   onQuantityChange,
   onRemove,
 }: Props) {
+  const { products, loading } = useCartProducts(cart);
   const entries = getCartEntries(cart, products);
   const { subtotal, shipping, total } = getCartTotals(cart, products);
   return (
@@ -32,12 +32,14 @@ export default function CartDrawer({
           </button>
         </div>
         <div className="cart-items">
-          {entries.length ? (
+          {loading ? (
+            <p>Loading cart…</p>
+          ) : entries.length ? (
             entries.map(({ product, quantity }) => {
               return (
                 <div className="cart-item" key={product.id}>
                   <div className="thumb">
-                    <img src={product.image} alt="" />
+                    <img src={getProductImage(product)} alt="" />
                   </div>
                   <div>
                     <strong>{product.name}</strong>
@@ -80,7 +82,7 @@ export default function CartDrawer({
           </div>
           <div className="cart-summary-line cart-total-line">
             <span>Total</span>
-            <strong>{money(total + shipping)}</strong>
+            <strong>{money(total)}</strong>
           </div>
           {entries.length ? (
             <Link className="checkout-button" to="/checkout" onClick={onClose}>

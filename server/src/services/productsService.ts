@@ -4,11 +4,13 @@ type ProductFilters = {
   categoryId: number | undefined;
   minPrice: number | undefined;
   maxPrice: number | undefined;
+  ids: number[] | undefined;
 };
 
-export const getProducts = async ({ categoryId, minPrice, maxPrice }: ProductFilters) => {
+export const getProducts = async ({ categoryId, minPrice, maxPrice, ids }: ProductFilters) => {
   const products = await prisma.product.findMany({
     where: {
+      ...(ids !== undefined && { id: { in: ids } }),
       ...(categoryId !== undefined && { categoryId }),
       ...((minPrice !== undefined || maxPrice !== undefined) && {
         price: {

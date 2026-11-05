@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma.js"
+import { toImageUrl } from "../lib/imageUrl.js"
 
 // `contains` becomes SQL LIKE, where % and _ are wildcards. Escape them so a
 // search for "%" looks for the character itself instead of matching everything.
@@ -50,7 +51,9 @@ export const getProducts = async ({ categoryId, minPrice, maxPrice, ids, search,
     }
   });
   return products.map((product) => ({
-    ...product, price: product.price.toNumber()
+    ...product,
+    price: product.price.toNumber(),
+    imageUrl: toImageUrl(product.imageUrl),
   }));
 };
 
@@ -127,5 +130,6 @@ export const getProductById = async (id: number) => {
   return {
     ...product,
     price: product.price.toNumber(),
+    imageUrl: toImageUrl(product.imageUrl),
   };
 };

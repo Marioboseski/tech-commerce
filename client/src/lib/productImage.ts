@@ -1,7 +1,7 @@
 import type { ApiProduct } from '../types/product';
 
-// Temporary: the database has no product images yet (image_url is NULL).
-// Until real images are stored, show a local placeholder per category.
+// Product images come from the API (imageUrl). A product without an image
+// (imageUrl is null) shows a local placeholder for its category.
 const categoryPlaceholders: Record<string, string> = {
   laptops: '/products/novabook-air.jpg',
   'mobile-phones': '/products/apex-pro.jpg',

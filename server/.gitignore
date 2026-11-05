@@ -3,3 +3,6 @@ node_modules
 .env
 
 /generated/prisma
+
+# Original product photos; optimized copies live in public/images/products
+/images-source

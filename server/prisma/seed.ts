@@ -1,4 +1,6 @@
 import "dotenv/config";
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "../generated/prisma/client.js";
 
@@ -20,6 +22,15 @@ const adapter = new PrismaMariaDb({
 });
 
 const prisma = new PrismaClient({ adapter });
+
+const PUBLIC_IMAGES_DIR = path.resolve(import.meta.dirname, "..", "public", "images");
+
+// Relative image path stored in the database, e.g. "products/laptops-001.webp".
+// Products without an optimized image get null, so the client shows a fallback.
+const getProductImagePath = (sku: string) => {
+  const imagePath = `products/${sku.toLowerCase()}.webp`;
+  return existsSync(path.join(PUBLIC_IMAGES_DIR, imagePath)) ? imagePath : null;
+};
 
 const categories = [
   { name: "Laptops", slug: "laptops" },
@@ -124,6 +135,7 @@ async function seed() {
     for (const [index, item] of group.items.entries()) {
       const [name, description, price] = item;
       const sku = `${group.categorySlug.toUpperCase().replaceAll("-", "_")}-${String(index + 1).padStart(3, "0")}`;
+      const imageUrl = getProductImagePath(sku);
 
       const product = await prisma.product.upsert({
         where: { sku },
@@ -131,6 +143,7 @@ async function seed() {
           name,
           description,
           price,
+          imageUrl,
           categoryId: category.id,
         },
         create: {
@@ -138,6 +151,7 @@ async function seed() {
           name,
           description,
           price,
+          imageUrl,
           categoryId: category.id,
         },
       });

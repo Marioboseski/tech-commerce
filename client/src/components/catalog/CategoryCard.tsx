@@ -5,10 +5,7 @@ type Props = {
 };
 export default function CategoryCard({ category }: Props) {
   return (
-    <Link
-      className="category-card"
-      to={`/categories/${category.name.toLowerCase()}`}
-    >
+    <Link className="category-card" to={`/categories/${category.slug}`}>
       <div className="category-art">
         <span>{category.name}</span>
       </div>

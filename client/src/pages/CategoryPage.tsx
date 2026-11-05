@@ -1,22 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductCard from '../components/catalog/ProductCard';
 import { useCategories } from '../hooks/useCategories';
 import { useFavorites } from '../hooks/useFavorites';
+import { useProducts } from '../hooks/useProducts';
 import { getCategoryMeta } from '../lib/categoryMeta';
-import { getProducts } from '../services/productApi';
-import type { ApiProduct } from '../types/product';
 
 // Same rule as the API: a non-negative number such as "100" or "99.99".
 // Anything else in the URL is ignored instead of being sent to the server.
 const parsePrice = (value: string | null) =>
   value !== null && /^\d+(\.\d+)?$/.test(value) ? Number(value) : undefined;
-
-type LoadedProducts = {
-  key: string;
-  products: ApiProduct[];
-};
 
 export default function CategoryPage() {
   const { slug } = useParams();
@@ -29,7 +23,6 @@ export default function CategoryPage() {
   const [maxPrice, setMaxPrice] = useState(
     () => searchParams.get('maxPrice') ?? '',
   );
-  const [loaded, setLoaded] = useState<LoadedProducts | null>(null);
 
   const category = categories.find((item) => item.slug === slug);
   const categoryId = category?.id;
@@ -40,33 +33,12 @@ export default function CategoryPage() {
     appliedMinPrice !== undefined &&
     appliedMaxPrice !== undefined &&
     appliedMinPrice > appliedMaxPrice;
-  // Identifies one request, so results from a previous category or price
-  // range are never shown for the current one.
-  const requestKey = `${categoryId}|${appliedMinPrice}|${appliedMaxPrice}`;
-
-  useEffect(() => {
-    if (categoryId === undefined || invalidRange) {
-      return;
-    }
-
-    let ignore = false;
-
-    const loadProducts = async () => {
-      const data = await getProducts({
-        categoryId,
-        minPrice: appliedMinPrice,
-        maxPrice: appliedMaxPrice,
-      });
-      if (!ignore) {
-        setLoaded({ key: requestKey, products: data });
-      }
-    };
-    loadProducts();
-
-    return () => {
-      ignore = true;
-    };
-  }, [categoryId, appliedMinPrice, appliedMaxPrice, invalidRange, requestKey]);
+  // Each category + price range is a separate cache entry, so results from a
+  // previous category or range are never shown for the current one.
+  const { data: products } = useProducts(
+    { categoryId, minPrice: appliedMinPrice, maxPrice: appliedMaxPrice },
+    { enabled: categoryId !== undefined && !invalidRange },
+  );
 
   if (!categoriesLoaded) {
     return (
@@ -86,8 +58,10 @@ export default function CategoryPage() {
   }
 
   const meta = getCategoryMeta(category.slug);
-  const productsLoading = !invalidRange && loaded?.key !== requestKey;
-  const filteredProducts = invalidRange ? [] : (loaded?.products ?? []);
+  // products is undefined while loading. A failed request stays here too
+  // until error handling is added.
+  const productsLoading = !invalidRange && products === undefined;
+  const filteredProducts = invalidRange ? [] : (products ?? []);
 
   return (
     <div className="listing-page">

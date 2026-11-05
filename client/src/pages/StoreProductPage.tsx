@@ -1,21 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { money } from '../lib/formatters';
 import { getProductImage } from '../lib/productImage';
 import { getProductSpecs } from '../lib/productSpecs';
-import { getProductById, getProducts } from '../services/productApi';
-import type { ApiProduct, ApiProductDetails } from '../types/product';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductGallery from '../components/product/ProductGallery';
 import ProductCard from '../components/catalog/ProductCard';
 import { useCart } from '../hooks/useCart';
 import { useFavorites } from '../hooks/useFavorites';
 import { useAuth } from '../hooks/useAuth';
-
-type LoadedProduct = {
-  id: number;
-  product: ApiProductDetails | null;
-};
+import { useProduct, useProducts } from '../hooks/useProducts';
 
 export default function StoreProductPage() {
   const { id } = useParams();
@@ -24,49 +18,23 @@ export default function StoreProductPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [addedToCart, setAddedToCart] = useState(false);
-  const [loaded, setLoaded] = useState<LoadedProduct | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<ApiProduct[]>([]);
 
   const productId = id && /^[1-9]\d*$/.test(id) ? Number(id) : null;
-
-  useEffect(() => {
-    if (productId === null) {
-      return;
-    }
-
-    let ignore = false;
-
-    const loadProduct = async () => {
-      const data = await getProductById(productId);
-      if (ignore) {
-        return;
-      }
-      setLoaded({ id: productId, product: data });
-      setRelatedProducts([]);
-      if (!data) {
-        return;
-      }
-
-      const sameCategory = await getProducts({ categoryId: data.categoryId });
-      if (!ignore) {
-        setRelatedProducts(
-          sameCategory.filter((item) => item.id !== data.id).slice(0, 3),
-        );
-      }
-    };
-    loadProduct();
-
-    return () => {
-      ignore = true;
-    };
-  }, [productId]);
+  const { data: product } = useProduct(productId);
+  // Related products are requested only once the product (and so its
+  // category) is known.
+  const { data: sameCategory = [] } = useProducts(
+    { categoryId: product?.categoryId },
+    { enabled: Boolean(product) },
+  );
 
   if (productId === null) {
     return <Navigate to="/" replace />;
   }
 
-  // Covers the first load and switching to another product (e.g. a related one).
-  if (!loaded || loaded.id !== productId) {
+  // undefined: still loading (also after switching to another product).
+  // A failed request stays here too until error handling is added.
+  if (product === undefined) {
     return (
       <div className="detail-page">
         <StoreHeader />
@@ -79,13 +47,15 @@ export default function StoreProductPage() {
     );
   }
 
-  const { product } = loaded;
-
-  if (!product) {
+  // null: the API answered that this product does not exist.
+  if (product === null) {
     return <Navigate to="/" replace />;
   }
 
   const specs = getProductSpecs(product);
+  const relatedProducts = sameCategory
+    .filter((item) => item.id !== product.id)
+    .slice(0, 3);
 
   return (
     <div className="detail-page">

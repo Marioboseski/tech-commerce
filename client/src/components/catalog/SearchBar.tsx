@@ -4,19 +4,14 @@ import { Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { money } from '../../lib/formatters';
 import { getProductImage } from '../../lib/productImage';
-import { getProducts } from '../../services/productApi';
-import type { ApiProduct } from '../../types/product';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
+import { useProducts } from '../../hooks/useProducts';
 
 // Wait until the user stops typing before calling the API.
 const SEARCH_DELAY_MS = 300;
 const MAX_RESULTS = 6;
 // Must match MAX_SEARCH_LENGTH on the server.
 const MAX_QUERY_LENGTH = 100;
-
-type LoadedResults = {
-  query: string;
-  products: ApiProduct[];
-};
 
 type Props = {
   query: string;
@@ -25,35 +20,18 @@ type Props = {
 };
 export default function SearchBar({ query, onQueryChange, onSubmit }: Props) {
   const [open, setOpen] = useState(false);
-  const [loaded, setLoaded] = useState<LoadedResults | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const normalizedQuery = query.trim().toLowerCase();
-  // True while waiting for the delay or for the API response.
-  const searching = loaded?.query !== normalizedQuery;
-  const results = searching ? [] : loaded.products;
-
-  useEffect(() => {
-    if (!open || !normalizedQuery) {
-      return;
-    }
-
-    let ignore = false;
-
-    const timer = window.setTimeout(async () => {
-      const data = await getProducts({
-        search: normalizedQuery,
-        limit: MAX_RESULTS,
-      });
-      if (!ignore) {
-        setLoaded({ query: normalizedQuery, products: data });
-      }
-    }, SEARCH_DELAY_MS);
-
-    return () => {
-      ignore = true;
-      window.clearTimeout(timer);
-    };
-  }, [open, normalizedQuery]);
+  const debouncedQuery = useDebouncedValue(normalizedQuery, SEARCH_DELAY_MS);
+  // Requested only while the dropdown is open and there is text to search.
+  const { data } = useProducts(
+    { search: debouncedQuery, limit: MAX_RESULTS },
+    { enabled: open && debouncedQuery !== '' },
+  );
+  // True while waiting for the delay or for the API response. A failed
+  // request stays here too until error handling is added.
+  const searching = debouncedQuery !== normalizedQuery || data === undefined;
+  const results = data ?? [];
 
   useEffect(() => {
     if (!open) {

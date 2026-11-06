@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import type { FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import CategoryCard from '../components/catalog/CategoryCard';
@@ -7,12 +7,14 @@ import SearchBar from '../components/catalog/SearchBar';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
 import { useFavorites } from '../hooks/useFavorites';
-import { getProducts } from '../services/productApi';
-import type { ApiProduct } from '../types/product';
 import { useCategories } from '../hooks/useCategories';
+import { useProducts } from '../hooks/useProducts';
+import type { ApiProduct } from '../types/product';
+
+// Stable empty list while the first request is loading.
+const NO_PRODUCTS: ApiProduct[] = [];
 
 export default function StorefrontPage() {
-  const [products, setProducts] = useState<ApiProduct[]>([]);
   const { categories, categoriesLoaded } = useCategories();
   const [searchParams, setSearchParams] = useSearchParams();
   const { favorites, toggleFavorite } = useFavorites();
@@ -25,28 +27,12 @@ export default function StorefrontPage() {
   const query = searchParams.get('search') ?? '';
   const sort = searchParams.get('sort') ?? 'featured';
 
-  useEffect(() => {
-    if (!categoriesLoaded) return;
-
-    let ignore = false;
-
-    const loadProducts = async () => {
-      try {
-        const data = await getProducts({ categoryId: selectedCategoryId });
-
-        if (!ignore) {
-          setProducts(data);
-        }
-      } catch (error) {
-        console.log("Failed to load products", error);
-      }
-    }
-    loadProducts();
-
-    return () => {
-      ignore = true;
-    }
-  }, [categoriesLoaded, selectedCategoryId]);
+  // Waits for the categories, because ?category=<slug> in the URL is turned
+  // into a category id. The previous list stays visible while switching.
+  const { data: products = NO_PRODUCTS } = useProducts(
+    { categoryId: selectedCategoryId },
+    { enabled: categoriesLoaded, keepPrevious: true },
+  );
 
   const updateFilters = (updates: Record<string, string>) => {
     setSearchParams(

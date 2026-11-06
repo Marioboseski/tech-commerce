@@ -1,4 +1,4 @@
-import { skipToken, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, skipToken, useQuery } from '@tanstack/react-query';
 import { getProductById, getProducts } from '../services/productApi';
 import type { ProductFilters } from '../services/productApi';
 
@@ -19,15 +19,23 @@ export function useProduct(id: number | null) {
   });
 }
 
-// A list of products (GET /api/products?...). Pass enabled: false to wait,
-// e.g. until another request has finished.
+type UseProductsOptions = {
+  // false: wait, e.g. until another request has finished.
+  enabled?: boolean;
+  // true: while new filters load, keep showing the previous list instead of
+  // nothing.
+  keepPrevious?: boolean;
+};
+
+// A list of products (GET /api/products?...).
 export function useProducts(
   filters: ProductFilters,
-  { enabled = true }: { enabled?: boolean } = {},
+  { enabled = true, keepPrevious = false }: UseProductsOptions = {},
 ) {
   return useQuery({
     queryKey: productKeys.list(filters),
     queryFn: () => getProducts(filters),
     enabled,
+    placeholderData: keepPrevious ? keepPreviousData : undefined,
   });
 }

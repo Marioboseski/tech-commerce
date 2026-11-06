@@ -4,6 +4,7 @@ import path from "node:path";
 import "dotenv/config";
 import productRoutes from "./routes/productRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use("/images", express.static(path.join(import.meta.dirname, "..", "public",
 
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -1483,6 +1483,14 @@
   color: #b53850;
   font-size: 13px;
 }
+.account-success {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #ecf8f0;
+  color: #23784a;
+  font-size: 13px;
+}
 .account-main {
   display: grid;
   min-height: 62vh;

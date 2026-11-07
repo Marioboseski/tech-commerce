@@ -9,11 +9,6 @@ export type AuthUser = {
 export type AuthContextValue = {
   user: AuthUser | null;
   login: (email: string, password: string) => { ok: boolean; message?: string };
-  register: (
-    name: string,
-    email: string,
-    password: string,
-  ) => { ok: boolean; message?: string };
   logout: () => void;
 };
 

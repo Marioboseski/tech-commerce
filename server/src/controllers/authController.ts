@@ -1,5 +1,5 @@
 import * as authService from "../services/authService.js";
-import { AUTH_COOKIE_NAME, authCookieOptions } from "../lib/authToken.js";
+import { AUTH_COOKIE_NAME, authCookieOptions, clearAuthCookieOptions } from "../lib/authToken.js";
 import type { Request, Response } from "express";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -82,4 +82,26 @@ export const login = async (req: Request, res: Response) => {
   res.cookie(AUTH_COOKIE_NAME, result.token, authCookieOptions);
   // The token is only in the httpOnly cookie, never in the JSON body.
   return res.status(200).json(result.user);
+}
+
+// Runs after requireAuth, which sets req.auth.
+export const me = async (req: Request, res: Response) => {
+  // The token only has the id, so we load fresh data (name, email...)
+  // from the database.
+  const user = req.auth ? await authService.getUserById(req.auth.userId) : null;
+
+  // No req.auth (route without requireAuth) or the account no longer exists.
+  if (!user) {
+    res.clearCookie(AUTH_COOKIE_NAME, clearAuthCookieOptions);
+    return res.status(401).json({ message: "Not logged in" });
+  }
+
+  return res.status(200).json(user);
+}
+
+// Works even without a cookie, so logging out twice is not an error.
+export const logout = (_req: Request, res: Response) => {
+  res.clearCookie(AUTH_COOKIE_NAME, clearAuthCookieOptions);
+  // 204 = success, no body to send back.
+  return res.status(204).end();
 }

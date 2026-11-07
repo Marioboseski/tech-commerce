@@ -1,5 +1,6 @@
 import express  from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import path from "node:path";
 import "dotenv/config";
 import productRoutes from "./routes/productRoutes.js";
@@ -18,6 +19,8 @@ if (!CLIENT_URL) {
 // the exact origin (not "*") and allows credentials.
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
 app.use(express.json());
+// Reads the Cookie header into req.cookies (needed for the login cookie).
+app.use(cookieParser());
 
 // Product images, e.g. /images/products/laptops-001.webp
 app.use("/images", express.static(path.join(import.meta.dirname, "..", "public", "images")));

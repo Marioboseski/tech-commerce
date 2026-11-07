@@ -38,6 +38,13 @@ export const registerUser = async ({ fullName, email, password }: RegisterInput)
   });
 };
 
+// Returns null when the user does not exist (e.g. was deleted).
+export const getUserById = (id: number) =>
+  prisma.user.findUnique({
+    where: { id },
+    select: publicUserSelect,
+  });
+
 type LoginInput = {
   email: string;
   password: string;

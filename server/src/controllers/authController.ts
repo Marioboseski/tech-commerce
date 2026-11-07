@@ -1,4 +1,5 @@
 import * as authService from "../services/authService.js";
+import { AUTH_COOKIE_NAME, authCookieOptions } from "../lib/authToken.js";
 import type { Request, Response } from "express";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -53,4 +54,32 @@ export const register = async (req: Request, res: Response) => {
   }
 
   return res.status(201).json(user);
+}
+
+export const login = async (req: Request, res: Response) => {
+  const { email, password } = req.body ?? {};
+
+  if (typeof email !== "string" || typeof password !== "string" || !email.trim() || !password) {
+    return res.status(400).json({
+      message: "email and password are required"
+    })
+  }
+
+  const result = await authService.loginUser({
+    // Same normalization as register, so Marko@Gmail.com can log in.
+    email: email.trim().toLowerCase(),
+    password,
+  });
+
+  // Same message for "no such email" and "wrong password", so nobody can
+  // find out which emails have an account.
+  if (!result) {
+    return res.status(401).json({
+      message: "Email or password is incorrect"
+    })
+  }
+
+  res.cookie(AUTH_COOKIE_NAME, result.token, authCookieOptions);
+  // The token is only in the httpOnly cookie, never in the JSON body.
+  return res.status(200).json(result.user);
 }

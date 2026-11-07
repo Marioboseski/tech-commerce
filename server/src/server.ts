@@ -8,7 +8,15 @@ import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 
-app.use(cors());
+const CLIENT_URL = process.env.CLIENT_URL;
+
+if (!CLIENT_URL) {
+  throw new Error("Missing required environment variable: CLIENT_URL");
+}
+
+// Cookies only work across origins (5173 -> 5000) when the server names
+// the exact origin (not "*") and allows credentials.
+app.use(cors({ origin: CLIENT_URL, credentials: true }));
 app.use(express.json());
 
 // Product images, e.g. /images/products/laptops-001.webp

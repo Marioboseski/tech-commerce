@@ -9,7 +9,6 @@ import AccountDashboardPage from './pages/AccountDashboardPage';
 import CheckoutPage from './pages/CheckoutPage';
 import { CartProvider } from './context/CartProvider';
 import { FavoritesProvider } from './context/FavoritesProvider';
-import { AuthProvider } from './context/AuthProvider';
 import { useCart } from './hooks/useCart';
 
 function AppRoutes() {
@@ -42,13 +41,11 @@ function AppRoutes() {
 }
 
 const App = () => (
-  <AuthProvider>
-    <FavoritesProvider>
-      <CartProvider>
-        <AppRoutes />
-      </CartProvider>
-    </FavoritesProvider>
-  </AuthProvider>
+  <FavoritesProvider>
+    <CartProvider>
+      <AppRoutes />
+    </CartProvider>
+  </FavoritesProvider>
 );
 
 export default App;

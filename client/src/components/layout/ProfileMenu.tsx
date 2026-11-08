@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { CircleUserRound } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useCurrentUser, useLogout } from '../../hooks/useCurrentUser';
 
 export default function ProfileMenu() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const { user, logout } = useAuth();
+  const { user } = useCurrentUser();
+  const logoutMutation = useLogout();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!open) {
@@ -51,7 +53,7 @@ export default function ProfileMenu() {
         type="button"
         ref={toggleRef}
         aria-label={
-          user ? `Open account menu for ${user.name}` : 'Open user menu'
+          user ? `Open account menu for ${user.fullName}` : 'Open user menu'
         }
         aria-haspopup="menu"
         aria-expanded={open}
@@ -59,7 +61,7 @@ export default function ProfileMenu() {
       >
         {user ? (
           <span className="profile-initials">
-            {user.name.charAt(0).toUpperCase()}
+            {user.fullName.charAt(0).toUpperCase()}
           </span>
         ) : (
           <CircleUserRound className="profile-icon" aria-hidden="true" />
@@ -69,7 +71,7 @@ export default function ProfileMenu() {
         <div className="profile-dropdown" role="menu" aria-label="User menu">
           {user && (
             <p className="profile-greeting">
-              Signed in as <strong>{user.name}</strong>
+              Signed in as <strong>{user.fullName}</strong>
             </p>
           )}
           {items.map((item) => (
@@ -87,9 +89,14 @@ export default function ProfileMenu() {
               className="profile-logout"
               type="button"
               role="menuitem"
+              disabled={logoutMutation.isPending}
               onClick={() => {
-                logout();
-                setOpen(false);
+                logoutMutation.mutate(undefined, {
+                  onSuccess: () => {
+                    setOpen(false);
+                    navigate('/');
+                  },
+                });
               }}
             >
               Logout

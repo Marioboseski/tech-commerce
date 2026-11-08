@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
-import { useAuth } from '../hooks/useAuth';
+import { useCurrentUser, useLogin } from '../hooks/useCurrentUser';
 import { registerUser } from '../services/authApi';
 import type { RegisterInput } from '../types/auth';
 
@@ -37,14 +37,13 @@ export default function AccountPage() {
   const { pathname, state } = useLocation();
   const mode = pathname === '/register' ? 'register' : 'login';
   const navigate = useNavigate();
-  // Login still uses the demo AuthProvider until POST /api/auth/login exists.
-  const { login } = useAuth();
+  const { user } = useCurrentUser();
+  const loginMutation = useLogin();
   const [formData, setFormData] = useState<RegisterInput>({
     fullName: '',
     email: '',
     password: '',
   });
-  const [message, setMessage] = useState('');
   const content = copy[mode];
   // Set by navigate('/login', { state: { registered: true } }) after sign up.
   const justRegistered =
@@ -64,8 +63,14 @@ export default function AccountPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const errorMessage =
-    mode === 'register' ? registerMutation.error?.message : message;
+  const activeMutation = mode === 'register' ? registerMutation : loginMutation;
+  const pendingLabel =
+    mode === 'register' ? 'Creating account…' : 'Signing in…';
+
+  // Already logged in: no reason to see the login/register form.
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="account-page">
@@ -79,12 +84,10 @@ export default function AccountPage() {
               registerMutation.mutate(formData);
               return;
             }
-            const result = login(formData.email, formData.password);
-            if (result.ok) {
-              navigate('/');
-            } else {
-              setMessage(result.message ?? 'Something went wrong.');
-            }
+            loginMutation.mutate(
+              { email: formData.email, password: formData.password },
+              { onSuccess: () => navigate('/') },
+            );
           }}
         >
           <p className="eyebrow">{content.eyebrow}</p>
@@ -138,19 +141,13 @@ export default function AccountPage() {
           <button
             className="primary-button"
             type="submit"
-            disabled={registerMutation.isPending}
+            disabled={activeMutation.isPending}
           >
-            {registerMutation.isPending ? 'Creating account…' : content.action}
+            {activeMutation.isPending ? pendingLabel : content.action}
           </button>
-          {errorMessage && (
+          {activeMutation.error && (
             <p className="account-error" role="alert">
-              {errorMessage}
-            </p>
-          )}
-          {mode === 'login' && (
-            <p className="account-note">
-              Demo account data is stored only in this browser until the backend
-              is connected.
+              {activeMutation.error.message}
             </p>
           )}
           <p className="account-switch">

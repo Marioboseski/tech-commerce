@@ -8,14 +8,14 @@ import ProductGallery from '../components/product/ProductGallery';
 import ProductCard from '../components/catalog/ProductCard';
 import { useCart } from '../hooks/useCart';
 import { useFavorites } from '../hooks/useFavorites';
-import { useAuth } from '../hooks/useAuth';
+import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useProduct, useProducts } from '../hooks/useProducts';
 
 export default function StoreProductPage() {
   const { id } = useParams();
   const { favorites, toggleFavorite } = useFavorites();
   const { addToCart } = useCart();
-  const { user } = useAuth();
+  const { user } = useCurrentUser();
   const navigate = useNavigate();
   const [addedToCart, setAddedToCart] = useState(false);
 

@@ -5,6 +5,12 @@ export type RegisterInput = {
   password: string;
 };
 
+// What the login form sends to the server.
+export type LoginInput = {
+  email: string;
+  password: string;
+};
+
 // What the server sends back. It never contains the password.
 export type ApiUser = {
   id: number;

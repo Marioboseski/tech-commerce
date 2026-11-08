@@ -1,11 +1,25 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
-import { useAuth } from '../hooks/useAuth';
+import { useCurrentUser } from '../hooks/useCurrentUser';
 
 export default function AccountDashboardPage() {
-  const { user } = useAuth();
+  const { user, isPending } = useCurrentUser();
   const { pathname } = useLocation();
+
+  // Right after a refresh we do not know yet who is logged in. Without this
+  // wait, a logged-in user would be sent to /login for a moment.
+  if (isPending) {
+    return (
+      <div className="account-page">
+        <StoreHeader />
+        <main className="container section account-main">
+          <p className="subheading">Loading your account…</p>
+        </main>
+        <StoreFooter />
+      </div>
+    );
+  }
 
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -19,7 +33,7 @@ export default function AccountDashboardPage() {
         <section className="account-card account-dashboard">
           <p className="eyebrow">MY ACCOUNT</p>
           <h1 className="section-title">
-            {isOrders ? 'My orders' : `Hello, ${user.name}`}
+            {isOrders ? 'My orders' : `Hello, ${user.fullName}`}
           </h1>
           {isOrders ? (
             <p className="account-note">

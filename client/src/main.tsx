@@ -6,6 +6,15 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/queryClient';
 
+// Remove data from the old demo login, which stored passwords in plain text.
+// Login now uses the API with an httpOnly cookie. Safe to delete this later.
+try {
+  window.localStorage.removeItem('techstore-demo-users');
+  window.localStorage.removeItem('techstore-demo-session');
+} catch {
+  // localStorage can be blocked (e.g. private mode); nothing to clean then.
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>

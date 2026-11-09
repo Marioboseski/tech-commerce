@@ -17,7 +17,7 @@ const NO_PRODUCTS: ApiProduct[] = [];
 export default function StorefrontPage() {
   const { categories, categoriesLoaded } = useCategories();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { favorites, toggleFavorite } = useFavorites();
+  const { favoriteIds, toggleFavorite } = useFavorites();
   const requestedCategory = searchParams.get('category');
   const category = requestedCategory &&
     categories.some((item) => item.slug === requestedCategory)
@@ -221,7 +221,7 @@ export default function StorefrontPage() {
                   key={product.id}
                   product={product}
                   onFavorite={toggleFavorite}
-                  isFavorite={favorites.has(product.id)}
+                  isFavorite={favoriteIds.has(product.id)}
                 />
               ))}
             </div>

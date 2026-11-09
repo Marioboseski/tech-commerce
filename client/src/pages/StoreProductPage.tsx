@@ -13,7 +13,7 @@ import { useProduct, useProducts } from '../hooks/useProducts';
 
 export default function StoreProductPage() {
   const { id } = useParams();
-  const { favorites, toggleFavorite } = useFavorites();
+  const { favoriteIds, toggleFavorite } = useFavorites();
   const { addToCart } = useCart();
   const { user } = useCurrentUser();
   const navigate = useNavigate();
@@ -99,9 +99,9 @@ export default function StoreProductPage() {
                 </button>
                 <button
                   className="ghost-button"
-                  onClick={() => toggleFavorite(product.id)}
+                  onClick={() => toggleFavorite(product)}
                 >
-                  {favorites.has(product.id)
+                  {favoriteIds.has(product.id)
                     ? 'Remove from favorites'
                     : 'Save to favorites'}
                 </button>
@@ -151,7 +151,7 @@ export default function StoreProductPage() {
                   <ProductCard
                     key={relatedProduct.id}
                     product={relatedProduct}
-                    isFavorite={favorites.has(relatedProduct.id)}
+                    isFavorite={favoriteIds.has(relatedProduct.id)}
                     onFavorite={toggleFavorite}
                   />
                 ))}

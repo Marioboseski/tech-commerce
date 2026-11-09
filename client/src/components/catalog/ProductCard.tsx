@@ -4,10 +4,14 @@ import { money } from '../../lib/formatters';
 import { getProductImage } from '../../lib/productImage';
 type Props = {
   product: ApiProduct;
-  onFavorite?: (id: number) => void;
+  onFavorite?: (product: ApiProduct) => void;
   isFavorite?: boolean;
 };
-export default function ProductCard({ product, onFavorite, isFavorite = false }: Props) {
+export default function ProductCard({
+  product,
+  onFavorite,
+  isFavorite = false,
+}: Props) {
   return (
     <article className="product-card">
       <div className="product-image">
@@ -15,7 +19,7 @@ export default function ProductCard({ product, onFavorite, isFavorite = false }:
         {onFavorite && (
           <button
             className={`heart ${isFavorite ? 'active' : ''}`}
-            onClick={() => onFavorite(product.id)}
+            onClick={() => onFavorite(product)}
             aria-label="Toggle favorite"
           >
             ♥

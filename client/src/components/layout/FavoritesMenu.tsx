@@ -4,22 +4,17 @@ import { Heart } from 'lucide-react';
 import { money } from '../../lib/formatters';
 import { getProductImage } from '../../lib/productImage';
 import { useFavorites } from '../../hooks/useFavorites';
-import { useProductsByIds } from '../../hooks/useProductsByIds';
 
 const PREVIEW_COUNT = 3;
 
 export default function FavoritesMenu() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { favorites } = useFavorites();
-  // The header is on every page, so products are only requested when the
-  // dropdown is opened. The badge count comes from the saved ids.
-  const previewIds = [...favorites].slice(0, PREVIEW_COUNT);
-  const { products, loading } = useProductsByIds(open ? previewIds : []);
-  const previewProducts = products.filter((product) =>
-    previewIds.includes(product.id),
-  );
-  const favoritesCount = favorites.size;
+  // Same cached list as the favorites page, so no extra request here.
+  const { favoriteProducts, isLoggedIn, isPending } = useFavorites();
+  // The list is newest first, so the preview shows the latest saved products.
+  const previewProducts = favoriteProducts.slice(0, PREVIEW_COUNT);
+  const favoritesCount = favoriteProducts.length;
 
   useEffect(() => {
     if (!open) {
@@ -67,11 +62,23 @@ export default function FavoritesMenu() {
           role="menu"
           aria-label="Favorite products"
         >
-          {loading ? (
+          {isPending ? (
             <p className="favorites-empty">Loading favorites…</p>
-          ) : previewProducts.length ? (
+          ) : !isLoggedIn ? (
+            <p className="favorites-empty">
+              <Link to="/login" onClick={() => setOpen(false)}>
+                Sign in
+              </Link>{' '}
+              to save favorites.
+            </p>
+          ) : (
             <>
               <p className="favorites-dropdown-title">Favorites</p>
+              {previewProducts.length === 0 && (
+                <p className="favorites-empty">
+                  There is nothing in your favorites yet.
+                </p>
+              )}
               {previewProducts.map((product) => (
                 <Link
                   className="favorite-preview"
@@ -89,21 +96,16 @@ export default function FavoritesMenu() {
                   </span>
                 </Link>
               ))}
-              {favoritesCount > PREVIEW_COUNT && (
-                <Link
-                  className="favorites-view-all"
-                  role="menuitem"
-                  to="/favorites"
-                  onClick={() => setOpen(false)}
-                >
-                  View all favorites
-                </Link>
-              )}
+              {/* Always shown, so the favorites page can always be reached. */}
+              <Link
+                className="favorites-view-all"
+                role="menuitem"
+                to="/favorites"
+                onClick={() => setOpen(false)}
+              >
+                View all favorites
+              </Link>
             </>
-          ) : (
-            <p className="favorites-empty">
-              There is nothing in your favorites yet.
-            </p>
           )}
         </div>
       )}

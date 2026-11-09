@@ -1,14 +1,12 @@
+import { Link } from 'react-router-dom';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductCard from '../components/catalog/ProductCard';
 import { useFavorites } from '../hooks/useFavorites';
-import { useProductsByIds } from '../hooks/useProductsByIds';
 
 export default function FavoritesPage() {
-  const { favorites, toggleFavorite } = useFavorites();
-  const { products, loading } = useProductsByIds([...favorites]);
-  const favoriteProducts = products.filter((product) =>
-    favorites.has(product.id),
-  );
+  const { favoriteProducts, toggleFavorite, isLoggedIn, isPending } =
+    useFavorites();
+  const count = favoriteProducts.length;
 
   return (
     <div className="listing-page">
@@ -20,15 +18,25 @@ export default function FavoritesPage() {
             <div>
               <h1 className="section-title">Favorites</h1>
               <p className="subheading">
-                {loading
+                {isPending
                   ? 'Loading favorites…'
-                  : favoriteProducts.length
-                    ? `${favoriteProducts.length} saved product${favoriteProducts.length === 1 ? '' : 's'}.`
-                    : 'There is nothing in your favorites yet.'}
+                  : !isLoggedIn
+                    ? 'Sign in to see your favorites.'
+                    : count
+                      ? `${count} saved product${count === 1 ? '' : 's'}.`
+                      : 'There is nothing in your favorites yet.'}
               </p>
             </div>
           </div>
-          {loading ? null : favoriteProducts.length ? (
+          {isPending ? null : !isLoggedIn ? (
+            <div className="favorites-empty-state">
+              <h2>Your favorites are saved to your account</h2>
+              <p>
+                <Link to="/login">Sign in</Link> to see and save your favorite
+                products.
+              </p>
+            </div>
+          ) : count ? (
             <div className="product-grid">
               {favoriteProducts.map((product) => (
                 <ProductCard

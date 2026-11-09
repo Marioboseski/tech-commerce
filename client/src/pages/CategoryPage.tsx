@@ -15,7 +15,7 @@ const parsePrice = (value: string | null) =>
 export default function CategoryPage() {
   const { slug } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { favorites, toggleFavorite } = useFavorites();
+  const { favoriteIds, toggleFavorite } = useFavorites();
   const { categories, categoriesLoaded } = useCategories();
   const [minPrice, setMinPrice] = useState(
     () => searchParams.get('minPrice') ?? '',
@@ -166,7 +166,7 @@ export default function CategoryPage() {
                         <ProductCard
                           key={product.id}
                           product={product}
-                          isFavorite={favorites.has(product.id)}
+                          isFavorite={favoriteIds.has(product.id)}
                           onFavorite={toggleFavorite}
                         />
                       ))}

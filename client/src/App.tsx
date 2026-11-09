@@ -8,7 +8,6 @@ import AccountPage from './pages/AccountPage';
 import AccountDashboardPage from './pages/AccountDashboardPage';
 import CheckoutPage from './pages/CheckoutPage';
 import { CartProvider } from './context/CartProvider';
-import { FavoritesProvider } from './context/FavoritesProvider';
 import { useCart } from './hooks/useCart';
 
 function AppRoutes() {
@@ -41,11 +40,9 @@ function AppRoutes() {
 }
 
 const App = () => (
-  <FavoritesProvider>
-    <CartProvider>
-      <AppRoutes />
-    </CartProvider>
-  </FavoritesProvider>
+  <CartProvider>
+    <AppRoutes />
+  </CartProvider>
 );
 
 export default App;

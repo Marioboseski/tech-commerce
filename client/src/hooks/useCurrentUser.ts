@@ -40,6 +40,12 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: logoutUser,
-    onSuccess: () => queryClient.setQueryData(authKeys.me, null),
+    onSuccess: () => {
+      queryClient.setQueryData(authKeys.me, null);
+      // Forget the user's private data (their favorites) on this computer.
+      // Same key as favoriteKeys.all in useFavorites.ts; written out here
+      // because importing it would make the two files import each other.
+      queryClient.removeQueries({ queryKey: ['favorites'] });
+    },
   });
 }

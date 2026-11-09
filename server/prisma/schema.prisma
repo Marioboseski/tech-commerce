@@ -20,6 +20,7 @@ model User {
   role Role @default(CUSTOMER)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
+  favorites    Favorite[]
 
   @@map("users")
 }
@@ -51,10 +52,25 @@ model Product {
   tabletDetails      TabletDetails?
   createdAt          DateTime             @default(now()) @map("created_at")
   updatedAt          DateTime             @updatedAt @map("updated_at")
+  favorites          Favorite[]
 
   @@index([categoryId])
   @@index([name])
   @@map("products")
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  productId Int      @map("product_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([productId])
+  @@map("favorites")
 }
 
 model LaptopDetails {

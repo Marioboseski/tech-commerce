@@ -1,23 +1,21 @@
 import { money } from '../../lib/formatters';
-import { getCartEntries, getCartTotals } from '../../lib/cart';
 import { getProductImage } from '../../lib/productImage';
-import { useCartProducts } from '../../hooks/useCartProducts';
+import { useCart } from '../../hooks/useCart';
+import { MAX_CART_QUANTITY } from '../../services/cartApi';
 import { Link } from 'react-router-dom';
 type Props = {
-  cart: Record<number, number>;
   onClose: () => void;
-  onQuantityChange: (id: number, delta: number) => void;
-  onRemove: (id: number) => void;
 };
-export default function CartDrawer({
-  cart,
-  onClose,
-  onQuantityChange,
-  onRemove,
-}: Props) {
-  const { products, loading } = useCartProducts(cart);
-  const entries = getCartEntries(cart, products);
-  const { subtotal, shipping, total } = getCartTotals(cart, products);
+export default function CartDrawer({ onClose }: Props) {
+  const {
+    cartItems,
+    totals,
+    isLoggedIn,
+    isPending,
+    changeQuantity,
+    removeFromCart,
+  } = useCart();
+  const { subtotal, shipping, total } = totals;
   return (
     <>
       <button className="backdrop" aria-label="Close cart" onClick={onClose} />
@@ -32,10 +30,17 @@ export default function CartDrawer({
           </button>
         </div>
         <div className="cart-items">
-          {loading ? (
+          {isPending ? (
             <p>Loading cart…</p>
-          ) : entries.length ? (
-            entries.map(({ product, quantity }) => {
+          ) : !isLoggedIn ? (
+            <p>
+              <Link to="/login" onClick={onClose}>
+                Sign in
+              </Link>{' '}
+              to see your cart.
+            </p>
+          ) : cartItems.length ? (
+            cartItems.map(({ product, quantity }) => {
               return (
                 <div className="cart-item" key={product.id}>
                   <div className="thumb">
@@ -45,18 +50,28 @@ export default function CartDrawer({
                     <strong>{product.name}</strong>
                     <p>{money(product.price)}</p>
                     <div className="quantity">
-                      <button onClick={() => onQuantityChange(product.id, -1)}>
+                      {/* At 1, use × to remove the product. */}
+                      <button
+                        aria-label="Decrease quantity"
+                        disabled={quantity <= 1}
+                        onClick={() => changeQuantity(product.id, quantity - 1)}
+                      >
                         −
                       </button>{' '}
                       {quantity}{' '}
-                      <button onClick={() => onQuantityChange(product.id, 1)}>
+                      <button
+                        aria-label="Increase quantity"
+                        disabled={quantity >= MAX_CART_QUANTITY}
+                        onClick={() => changeQuantity(product.id, quantity + 1)}
+                      >
                         +
                       </button>
                     </div>
                   </div>
                   <button
                     className="remove"
-                    onClick={() => onRemove(product.id)}
+                    aria-label="Remove from cart"
+                    onClick={() => removeFromCart(product.id)}
                   >
                     ×
                   </button>
@@ -84,7 +99,7 @@ export default function CartDrawer({
             <span>Total</span>
             <strong>{money(total)}</strong>
           </div>
-          {entries.length ? (
+          {cartItems.length ? (
             <Link className="checkout-button" to="/checkout" onClick={onClose}>
               Continue to checkout
             </Link>

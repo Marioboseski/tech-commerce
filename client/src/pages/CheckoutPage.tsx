@@ -3,16 +3,12 @@ import { Link } from 'react-router-dom';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
 import { money } from '../lib/formatters';
-import { getCartEntries, getCartTotals } from '../lib/cart';
 import { useCart } from '../hooks/useCart';
-import { useCartProducts } from '../hooks/useCartProducts';
 
 export default function CheckoutPage() {
   const [submitted, setSubmitted] = useState(false);
-  const { cart } = useCart();
-  const { products, loading } = useCartProducts(cart);
-  const entries = getCartEntries(cart, products);
-  const { subtotal, shipping, total } = getCartTotals(cart, products);
+  const { cartItems, totals, isLoggedIn, isPending } = useCart();
+  const { subtotal, shipping, total } = totals;
 
   return (
     <div className="checkout-page">
@@ -20,9 +16,17 @@ export default function CheckoutPage() {
       <main className="container section">
         <p className="eyebrow">CHECKOUT</p>
         <h1 className="section-title">Complete your order</h1>
-        {loading ? (
+        {isPending ? (
           <p className="subheading">Loading your order…</p>
-        ) : entries.length ? (
+        ) : !isLoggedIn ? (
+          <div className="favorites-empty-state">
+            <h2>Sign in to check out</h2>
+            <p>Your cart is saved to your account.</p>
+            <Link className="primary-button" to="/login">
+              Sign in
+            </Link>
+          </div>
+        ) : cartItems.length ? (
           <div className="checkout-layout">
             <form
               className="checkout-form"
@@ -66,7 +70,7 @@ export default function CheckoutPage() {
             </form>
             <aside className="checkout-summary">
               <h2>Order summary</h2>
-              {entries.map(({ product, quantity }) => {
+              {cartItems.map(({ product, quantity }) => {
                 return (
                   <div className="checkout-item" key={product.id}>
                     <span>

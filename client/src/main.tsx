@@ -7,12 +7,13 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/queryClient';
 
 // Remove data from the old demo version: the demo login stored passwords in
-// plain text, and favorites are now saved in the database (per account).
-// Safe to delete this later.
+// plain text, and favorites and the cart are now saved in the database
+// (per account). Safe to delete this later.
 try {
   window.localStorage.removeItem('techstore-demo-users');
   window.localStorage.removeItem('techstore-demo-session');
   window.localStorage.removeItem('techstore-favorites');
+  window.localStorage.removeItem('techstore-cart');
 } catch {
   // localStorage can be blocked (e.g. private mode); nothing to clean then.
 }

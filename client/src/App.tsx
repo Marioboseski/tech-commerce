@@ -7,12 +7,11 @@ import CartDrawer from './components/cart/CartDrawer';
 import AccountPage from './pages/AccountPage';
 import AccountDashboardPage from './pages/AccountDashboardPage';
 import CheckoutPage from './pages/CheckoutPage';
-import { CartProvider } from './context/CartProvider';
-import { useCart } from './hooks/useCart';
+import { CartDrawerProvider } from './context/CartDrawerProvider';
+import { useCartDrawer } from './hooks/useCartDrawer';
 
 function AppRoutes() {
-  const { cart, cartOpen, changeQuantity, removeFromCart, setCartOpen } =
-    useCart();
+  const { cartOpen, setCartOpen } = useCartDrawer();
 
   return (
     <>
@@ -27,22 +26,15 @@ function AppRoutes() {
         <Route path="/categories/:slug" element={<CategoryPage />} />
         <Route path="/products/:id" element={<StoreProductPage />} />
       </Routes>
-      {cartOpen && (
-        <CartDrawer
-          cart={cart}
-          onClose={() => setCartOpen(false)}
-          onQuantityChange={changeQuantity}
-          onRemove={removeFromCart}
-        />
-      )}
+      {cartOpen && <CartDrawer onClose={() => setCartOpen(false)} />}
     </>
   );
 }
 
 const App = () => (
-  <CartProvider>
+  <CartDrawerProvider>
     <AppRoutes />
-  </CartProvider>
+  </CartDrawerProvider>
 );
 
 export default App;

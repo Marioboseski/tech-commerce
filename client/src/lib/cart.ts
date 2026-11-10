@@ -1,27 +1,22 @@
-import type { ApiProduct } from '../types/product';
+import type { CartItem } from '../types/cart';
 
-export const getCartQuantity = (cart: Record<number, number>) =>
-  Object.values(cart).reduce((total, quantity) => total + quantity, 0);
+// Free delivery from this subtotal; below it delivery costs SHIPPING_PRICE.
+const FREE_SHIPPING_FROM = 75;
+const SHIPPING_PRICE = 9.9;
 
-export const getCartEntries = (
-  cart: Record<number, number>,
-  products: ApiProduct[],
-) =>
-  Object.entries(cart)
-    .filter(([, quantity]) => quantity > 0)
-    .flatMap(([id, quantity]) => {
-      const product = products.find((item) => item.id === Number(id));
-      return product ? [{ product, quantity }] : [];
-    });
+// How many pieces are in the cart in total (the number on the cart icon).
+export const getCartQuantity = (items: CartItem[]) =>
+  items.reduce((total, item) => total + item.quantity, 0);
 
-export const getCartTotals = (
-  cart: Record<number, number>,
-  products: ApiProduct[],
-) => {
-  const subtotal = getCartEntries(cart, products).reduce(
-    (total, { product, quantity }) => total + product.price * quantity,
+// Only for showing the cart. The real order total will be calculated by
+// the server when orders are added, because prices on the client can be
+// old or changed by the user.
+export const getCartTotals = (items: CartItem[]) => {
+  const subtotal = items.reduce(
+    (total, item) => total + item.product.price * item.quantity,
     0,
   );
-  const shipping = subtotal === 0 || subtotal >= 75 ? 0 : 9.9;
+  const shipping =
+    subtotal === 0 || subtotal >= FREE_SHIPPING_FROM ? 0 : SHIPPING_PRICE;
   return { subtotal, shipping, total: subtotal + shipping };
 };

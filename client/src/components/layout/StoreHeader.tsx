@@ -3,8 +3,8 @@ import type { FormEvent, ReactNode } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../../hooks/useCart';
+import { useCartDrawer } from '../../hooks/useCartDrawer';
 import { useCategories } from '../../hooks/useCategories';
-import { getCartQuantity } from '../../lib/cart';
 import SearchBar from '../catalog/SearchBar';
 import FavoritesMenu from './FavoritesMenu';
 import ProfileMenu from './ProfileMenu';
@@ -17,10 +17,10 @@ type StoreHeaderProps = {
 export default function StoreHeader({ middle, actions }: StoreHeaderProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { cart, setCartOpen } = useCart();
+  const { cartCount: cartQuantity } = useCart();
+  const { setCartOpen } = useCartDrawer();
   const { categories } = useCategories();
   const [headerQuery, setHeaderQuery] = useState('');
-  const cartQuantity = getCartQuantity(cart);
 
   const submitHeaderSearch = (event: FormEvent) => {
     event.preventDefault();

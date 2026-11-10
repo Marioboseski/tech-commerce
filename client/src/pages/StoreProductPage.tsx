@@ -85,17 +85,26 @@ export default function StoreProductPage() {
               <div className="detail-actions">
                 <button
                   className="primary-button"
+                  disabled={addToCart.isPending}
                   onClick={() => {
                     if (!user) {
                       navigate('/login');
                       return;
                     }
-                    addToCart(product.id);
-                    setAddedToCart(true);
-                    window.setTimeout(() => setAddedToCart(false), 2200);
+                    // "Added to cart" only after the server saved it.
+                    addToCart.mutate(product.id, {
+                      onSuccess: () => {
+                        setAddedToCart(true);
+                        window.setTimeout(() => setAddedToCart(false), 2200);
+                      },
+                    });
                   }}
                 >
-                  {user ? 'Add to cart' : 'Sign in to add to cart'}
+                  {!user
+                    ? 'Sign in to add to cart'
+                    : addToCart.isPending
+                      ? 'Adding…'
+                      : 'Add to cart'}
                 </button>
                 <button
                   className="ghost-button"
@@ -106,6 +115,13 @@ export default function StoreProductPage() {
                     : 'Save to favorites'}
                 </button>
               </div>
+              {/* e.g. "You can add at most 10 of one product". Only for this
+                  product, not for one opened before on the same page. */}
+              {addToCart.error && addToCart.variables === product.id && (
+                <p className="account-error" role="alert">
+                  {addToCart.error.message}
+                </p>
+              )}
               <div className="detail-note">
                 Free delivery on demo orders over €75. Checkout will be
                 connected when we introduce the API.

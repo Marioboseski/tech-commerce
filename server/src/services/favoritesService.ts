@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import { toImageUrl } from "../lib/imageUrl.js";
+import { toApiProduct } from "../lib/apiProduct.js";
 
 export const getFavoriteProducts = async (userId: number) => {
   const favorites = await prisma.favorite.findMany({
@@ -19,11 +19,7 @@ export const getFavoriteProducts = async (userId: number) => {
     },
   });
 
-  return favorites.map(({ product }) => ({
-    ...product,
-    price: product.price.toNumber(),
-    imageUrl: toImageUrl(product.imageUrl),
-  }));
+  return favorites.map(({ product }) => toApiProduct(product));
 };
 
 export const addFavorite = async (userId: number, productId: number) => {

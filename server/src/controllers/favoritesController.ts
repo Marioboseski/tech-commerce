@@ -1,8 +1,6 @@
 import * as favoritesService from "../services/favoritesService.js";
+import { isValidId } from "../lib/validation.js";
 import type { Request, Response } from "express";
-
-const isValidId = (value: unknown): value is number =>
-  typeof value === "number" && Number.isInteger(value) && value > 0;
 
 export const getFavorites = async (req: Request, res: Response) => {
   if (!req.auth) {

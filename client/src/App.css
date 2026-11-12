@@ -1450,6 +1450,16 @@
   border-radius: 10px;
   color: var(--text);
 }
+/* A field with a mistake: red border + the message under it. */
+.checkout-form input[aria-invalid='true'],
+.account-card input[aria-invalid='true'] {
+  border-color: #b53850;
+}
+.field-error {
+  color: #b53850;
+  font-size: 12px;
+  font-weight: 600;
+}
 .checkout-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

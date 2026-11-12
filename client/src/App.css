@@ -1093,6 +1093,17 @@
   color: #fff;
   box-shadow: var(--shadow);
 }
+.toast-error {
+  background: #b53850;
+}
+.toast-close {
+  margin-left: 12px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
 .listing-page,
 .detail-page {
   min-height: 100vh;

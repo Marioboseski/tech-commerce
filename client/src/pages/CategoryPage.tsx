@@ -5,6 +5,7 @@ import ProductCard from '../components/catalog/ProductCard';
 import { useCategories } from '../hooks/useCategories';
 import { useFavorites } from '../hooks/useFavorites';
 import { useProducts } from '../hooks/useProducts';
+import ErrorState from '../components/feedback/ErrorState';
 import { getCategoryMeta } from '../lib/categoryMeta';
 
 // Same rule as the API: a non-negative number such as "100" or "99.99".
@@ -16,7 +17,8 @@ export default function CategoryPage() {
   const { slug } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const { favoriteIds, toggleFavorite } = useFavorites();
-  const { categories, categoriesLoaded } = useCategories();
+  const { categories, categoriesLoaded, categoriesError, refetchCategories } =
+    useCategories();
   const [minPrice, setMinPrice] = useState(
     () => searchParams.get('minPrice') ?? '',
   );
@@ -35,10 +37,27 @@ export default function CategoryPage() {
     appliedMinPrice > appliedMaxPrice;
   // Each category + price range is a separate cache entry, so results from a
   // previous category or range are never shown for the current one.
-  const { data: products } = useProducts(
+  const {
+    data: products,
+    isError: productsError,
+    refetch: refetchProducts,
+  } = useProducts(
     { categoryId, minPrice: appliedMinPrice, maxPrice: appliedMaxPrice },
     { enabled: categoryId !== undefined && !invalidRange },
   );
+
+  if (categoriesError) {
+    return (
+      <div className="listing-page">
+        <StoreHeader />
+        <main>
+          <section className="container section">
+            <ErrorState what="this category" onRetry={refetchCategories} />
+          </section>
+        </main>
+      </div>
+    );
+  }
 
   if (!categoriesLoaded) {
     return (
@@ -58,9 +77,9 @@ export default function CategoryPage() {
   }
 
   const meta = getCategoryMeta(category.slug);
-  // products is undefined while loading. A failed request stays here too
-  // until error handling is added.
-  const productsLoading = !invalidRange && products === undefined;
+  // products is undefined while loading (and after an error, see below).
+  const productsLoading =
+    !invalidRange && !productsError && products === undefined;
   const filteredProducts = invalidRange ? [] : (products ?? []);
 
   return (
@@ -152,7 +171,9 @@ export default function CategoryPage() {
               </form>
             </aside>
             <div className="category-product-results">
-              {productsLoading ? (
+              {productsError ? (
+                <ErrorState what="the products" onRetry={refetchProducts} />
+              ) : productsLoading ? (
                 <p className="subheading">Loading products…</p>
               ) : (
                 <>

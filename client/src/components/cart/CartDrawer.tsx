@@ -1,6 +1,7 @@
 import { money } from '../../lib/formatters';
 import { getProductImage } from '../../lib/productImage';
 import { useCart } from '../../hooks/useCart';
+import ErrorState from '../feedback/ErrorState';
 import { MAX_CART_QUANTITY } from '../../services/cartApi';
 import { Link } from 'react-router-dom';
 type Props = {
@@ -12,6 +13,8 @@ export default function CartDrawer({ onClose }: Props) {
     totals,
     isLoggedIn,
     isPending,
+    isError,
+    refetch,
     changeQuantity,
     removeFromCart,
   } = useCart();
@@ -32,6 +35,8 @@ export default function CartDrawer({ onClose }: Props) {
         <div className="cart-items">
           {isPending ? (
             <p>Loading cart…</p>
+          ) : isError ? (
+            <ErrorState what="your cart" onRetry={refetch} />
           ) : !isLoggedIn ? (
             <p>
               <Link to="/login" onClick={onClose}>

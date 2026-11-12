@@ -12,7 +12,7 @@ const NO_CATEGORIES: ApiCategory[] = [];
 // Categories from GET /api/categories. Every component that calls this hook
 // shares one cached request instead of fetching on its own.
 export function useCategories() {
-  const { data, isSuccess } = useQuery({
+  const { data, isSuccess, isError, refetch } = useQuery({
     queryKey: ['categories'],
     queryFn: getCategories,
     staleTime: CATEGORIES_STALE_TIME,
@@ -21,5 +21,8 @@ export function useCategories() {
   return {
     categories: data ?? NO_CATEGORIES,
     categoriesLoaded: isSuccess,
+    // The request failed (after retries). refetch() = "Try again".
+    categoriesError: isError,
+    refetchCategories: refetch,
   };
 }

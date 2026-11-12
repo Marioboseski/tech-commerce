@@ -9,13 +9,15 @@ import StoreHeader from '../components/layout/StoreHeader';
 import { useFavorites } from '../hooks/useFavorites';
 import { useCategories } from '../hooks/useCategories';
 import { useProducts } from '../hooks/useProducts';
+import ErrorState from '../components/feedback/ErrorState';
 import type { ApiProduct } from '../types/product';
 
 // Stable empty list while the first request is loading.
 const NO_PRODUCTS: ApiProduct[] = [];
 
 export default function StorefrontPage() {
-  const { categories, categoriesLoaded } = useCategories();
+  const { categories, categoriesLoaded, categoriesError, refetchCategories } =
+    useCategories();
   const [searchParams, setSearchParams] = useSearchParams();
   const { favoriteIds, toggleFavorite } = useFavorites();
   const requestedCategory = searchParams.get('category');
@@ -29,7 +31,12 @@ export default function StorefrontPage() {
 
   // Waits for the categories, because ?category=<slug> in the URL is turned
   // into a category id. The previous list stays visible while switching.
-  const { data: products = NO_PRODUCTS } = useProducts(
+  const {
+    data: products = NO_PRODUCTS,
+    isPending: productsPending,
+    isError: productsError,
+    refetch: refetchProducts,
+  } = useProducts(
     { categoryId: selectedCategoryId },
     { enabled: categoriesLoaded, keepPrevious: true },
   );
@@ -214,7 +221,13 @@ export default function StorefrontPage() {
               </select>
             </div>
           </div>
-          {shown.length ? (
+          {categoriesError ? (
+            <ErrorState what="the categories" onRetry={refetchCategories} />
+          ) : productsError ? (
+            <ErrorState what="the products" onRetry={refetchProducts} />
+          ) : productsPending ? (
+            <p className="subheading">Loading products…</p>
+          ) : shown.length ? (
             <div className="product-grid">
               {shown.map((product) => (
                 <ProductCard

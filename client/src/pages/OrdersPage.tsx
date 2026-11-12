@@ -3,10 +3,11 @@ import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
 import OrderStatusBadge from '../components/orders/OrderStatusBadge';
 import { formatDate, money } from '../lib/formatters';
+import ErrorState from '../components/feedback/ErrorState';
 import { useOrders } from '../hooks/useOrders';
 
 export default function OrdersPage() {
-  const { orders, isLoggedIn, isPending } = useOrders();
+  const { orders, isLoggedIn, isPending, isError, refetch } = useOrders();
 
   // Wait until we know who is logged in (e.g. right after a refresh).
   if (!isPending && !isLoggedIn) {
@@ -21,6 +22,8 @@ export default function OrdersPage() {
         <h1 className="section-title">My orders</h1>
         {isPending ? (
           <p className="subheading">Loading your orders…</p>
+        ) : isError ? (
+          <ErrorState what="your orders" onRetry={refetch} />
         ) : orders.length ? (
           <div className="orders-list">
             {orders.map((order) => {

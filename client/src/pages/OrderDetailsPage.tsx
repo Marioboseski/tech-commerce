@@ -4,6 +4,7 @@ import StoreHeader from '../components/layout/StoreHeader';
 import OrderStatusBadge from '../components/orders/OrderStatusBadge';
 import { formatDate, money } from '../lib/formatters';
 import { defaultPlaceholder } from '../lib/productImage';
+import ErrorState from '../components/feedback/ErrorState';
 import { useOrder } from '../hooks/useOrders';
 
 export default function OrderDetailsPage() {
@@ -11,7 +12,7 @@ export default function OrderDetailsPage() {
   const { state } = useLocation();
   // Only a whole number > 0 is a valid order number in the URL.
   const id = orderId && /^[1-9]\d*$/.test(orderId) ? Number(orderId) : null;
-  const { order, isLoggedIn, isPending } = useOrder(id);
+  const { order, isLoggedIn, isPending, isError, refetch } = useOrder(id);
   // Set by the checkout page: navigate(..., { state: { justPlaced: true } }).
   const justPlaced =
     (state as { justPlaced?: boolean } | null)?.justPlaced === true;
@@ -29,9 +30,10 @@ export default function OrderDetailsPage() {
     <div className="checkout-page">
       <StoreHeader />
       <main className="container section">
-        {isPending || order === undefined ? (
-          // undefined = still loading. A failed request stays here too
-          // until error handling is added.
+        {isError ? (
+          <ErrorState what="this order" onRetry={refetch} />
+        ) : isPending || order === undefined ? (
+          // undefined = still loading.
           <p className="subheading">Loading your order…</p>
         ) : order === null ? (
           <div className="favorites-empty-state">

@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
 import { money } from '../lib/formatters';
+import ErrorState from '../components/feedback/ErrorState';
 import { useCart } from '../hooks/useCart';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useCreateOrder } from '../hooks/useOrders';
@@ -121,7 +122,8 @@ function DeliveryForm({ defaultFullName }: DeliveryFormProps) {
 
 export default function CheckoutPage() {
   const { user } = useCurrentUser();
-  const { cartItems, totals, isLoggedIn, isPending } = useCart();
+  const { cartItems, totals, isLoggedIn, isPending, isError, refetch } =
+    useCart();
   const { subtotal, shipping, total } = totals;
 
   return (
@@ -132,6 +134,8 @@ export default function CheckoutPage() {
         <h1 className="section-title">Complete your order</h1>
         {isPending ? (
           <p className="subheading">Loading your order…</p>
+        ) : isError ? (
+          <ErrorState what="your cart" onRetry={refetch} />
         ) : !isLoggedIn || !user ? (
           <div className="favorites-empty-state">
             <h2>Sign in to check out</h2>

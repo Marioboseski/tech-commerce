@@ -51,6 +51,8 @@ export default function AccountPage() {
 
   const registerMutation = useMutation({
     mutationFn: registerUser,
+    // The form shows the error itself (e.g. "email already exists").
+    meta: { inlineError: true },
     onSuccess: () => {
       // Keep the email so the user does not have to type it again on login.
       setFormData((prev) => ({ ...prev, fullName: '', password: '' }));

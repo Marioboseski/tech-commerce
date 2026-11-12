@@ -1,0 +1,75 @@
+const API_URL = import.meta.env.VITE_API_URL;
+
+// One problem with one form field, from the server's Zod validation.
+export type FieldError = {
+  field: string;
+  message: string;
+};
+
+// Every failed API request becomes an ApiError, so the rest of the app can
+// ask: which status? (401, 404...) and which fields were wrong?
+export class ApiError extends Error {
+  readonly status: number;
+  readonly errors: FieldError[];
+
+  constructor(status: number, message: string, errors: FieldError[] = []) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.errors = errors;
+  }
+}
+
+type ApiRequestOptions = {
+  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  // Sent as JSON. Leave out for requests without a body.
+  body?: unknown;
+};
+
+// The ONE function that talks to our API. Every services/*Api.ts file uses it.
+// - adds the base URL and the login cookie (credentials: 'include')
+// - sends `body` as JSON
+// - turns any error answer into an ApiError with the server's message
+// - returns the JSON answer (or undefined for 204 No Content)
+export const apiRequest = async <T>(
+  path: string,
+  { method = 'GET', body }: ApiRequestOptions = {},
+): Promise<T> => {
+  if (!API_URL) {
+    throw new Error('Missing VITE_API_URL environment variable');
+  }
+
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method,
+      credentials: 'include',
+      ...(body !== undefined && {
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }),
+    });
+  } catch {
+    // fetch itself only fails when there is no answer at all:
+    // the server is down, no internet, CORS blocked... Status 0 = "no answer".
+    throw new ApiError(0, 'Cannot reach the server. Please try again.');
+  }
+
+  if (!res.ok) {
+    // Our server always answers { message, errors? }. The body may still not
+    // be JSON (e.g. a proxy error page), so parsing can fail.
+    const data = await res.json().catch(() => null);
+    throw new ApiError(
+      res.status,
+      data?.message ?? `Request failed (${res.status})`,
+      Array.isArray(data?.errors) ? data.errors : [],
+    );
+  }
+
+  // 204 No Content (e.g. DELETE, logout) has no body to read.
+  if (res.status === 204) {
+    return undefined as T;
+  }
+
+  return res.json() as Promise<T>;
+};

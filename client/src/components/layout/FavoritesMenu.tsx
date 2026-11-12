@@ -11,7 +11,7 @@ export default function FavoritesMenu() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   // Same cached list as the favorites page, so no extra request here.
-  const { favoriteProducts, isLoggedIn, isPending } = useFavorites();
+  const { favoriteProducts, isLoggedIn, isPending, isError } = useFavorites();
   // The list is newest first, so the preview shows the latest saved products.
   const previewProducts = favoriteProducts.slice(0, PREVIEW_COUNT);
   const favoritesCount = favoriteProducts.length;
@@ -64,6 +64,8 @@ export default function FavoritesMenu() {
         >
           {isPending ? (
             <p className="favorites-empty">Loading favorites…</p>
+          ) : isError ? (
+            <p className="favorites-empty">Could not load your favorites.</p>
           ) : !isLoggedIn ? (
             <p className="favorites-empty">
               <Link to="/login" onClick={() => setOpen(false)}>

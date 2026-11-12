@@ -75,6 +75,8 @@ export function useCart() {
     mutationKey: cartKeys.all,
     scope: cartScope,
     mutationFn: addToCart,
+    // The product page shows the error itself (e.g. the limit of 10).
+    meta: { inlineError: true },
     // The answer has no product data, so load the full cart again.
     onSuccess: () => queryClient.invalidateQueries({ queryKey }),
   });
@@ -117,6 +119,9 @@ export function useCart() {
     isLoggedIn: user !== null,
     // True while we do not know yet: who is logged in, or their cart.
     isPending: userPending || (user !== null && cartQuery.isPending),
+    // The request failed (after retries). refetch() = "Try again".
+    isError: user !== null && cartQuery.isError,
+    refetch: cartQuery.refetch,
     // The whole mutation, so the page can use .mutate, .isPending and .error.
     addToCart: addMutation,
     changeQuantity: (productId: number, quantity: number) =>

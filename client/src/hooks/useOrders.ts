@@ -27,6 +27,9 @@ export function useOrders() {
     orders: ordersQuery.data ?? [],
     isLoggedIn: user !== null,
     isPending: userPending || (user !== null && ordersQuery.isPending),
+    // The request failed (after retries). refetch() = "Try again".
+    isError: user !== null && ordersQuery.isError,
+    refetch: ordersQuery.refetch,
   };
 }
 
@@ -45,6 +48,9 @@ export function useOrder(orderId: number | null) {
     order: orderQuery.data,
     isLoggedIn: user !== null,
     isPending: userPending || (user !== null && orderQuery.isPending),
+    // The request failed (after retries). refetch() = "Try again".
+    isError: user !== null && orderQuery.isError,
+    refetch: orderQuery.refetch,
   };
 }
 
@@ -56,6 +62,8 @@ export function useCreateOrder() {
 
   return useMutation({
     mutationFn: createOrder,
+    // The checkout form shows the error itself.
+    meta: { inlineError: true },
     onSuccess: (order: Order) => {
       // The server emptied the cart: load it again (it comes back empty).
       // Not set to [] by hand here, because then the checkout page would

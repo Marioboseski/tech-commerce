@@ -86,5 +86,8 @@ export function useFavorites() {
     isLoggedIn: user !== null,
     // True while we do not know yet: who is logged in, or their favorites.
     isPending: userPending || (user !== null && favoritesQuery.isPending),
+    // The request failed (after retries). refetch() = "Try again".
+    isError: user !== null && favoritesQuery.isError,
+    refetch: favoritesQuery.refetch,
   };
 }

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { money } from '../lib/formatters';
 import { getProductImage } from '../lib/productImage';
@@ -6,10 +5,12 @@ import { getProductSpecs } from '../lib/productSpecs';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductGallery from '../components/product/ProductGallery';
 import ProductCard from '../components/catalog/ProductCard';
+import ErrorState from '../components/feedback/ErrorState';
 import { useCart } from '../hooks/useCart';
 import { useFavorites } from '../hooks/useFavorites';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useProduct, useProducts } from '../hooks/useProducts';
+import { showToast } from '../stores/toastStore';
 
 export default function StoreProductPage() {
   const { id } = useParams();
@@ -17,10 +18,13 @@ export default function StoreProductPage() {
   const { addToCart } = useCart();
   const { user } = useCurrentUser();
   const navigate = useNavigate();
-  const [addedToCart, setAddedToCart] = useState(false);
 
   const productId = id && /^[1-9]\d*$/.test(id) ? Number(id) : null;
-  const { data: product } = useProduct(productId);
+  const {
+    data: product,
+    isError: productError,
+    refetch: refetchProduct,
+  } = useProduct(productId);
   // Related products are requested only once the product (and so its
   // category) is known.
   const { data: sameCategory = [] } = useProducts(
@@ -32,15 +36,19 @@ export default function StoreProductPage() {
     return <Navigate to="/" replace />;
   }
 
-  // undefined: still loading (also after switching to another product).
-  // A failed request stays here too until error handling is added.
+  // undefined: still loading (also after switching to another product),
+  // or the request failed.
   if (product === undefined) {
     return (
       <div className="detail-page">
         <StoreHeader />
         <main>
           <section className="container section">
-            <p className="subheading">Loading product…</p>
+            {productError ? (
+              <ErrorState what="this product" onRetry={refetchProduct} />
+            ) : (
+              <p className="subheading">Loading product…</p>
+            )}
           </section>
         </main>
       </div>
@@ -93,10 +101,7 @@ export default function StoreProductPage() {
                     }
                     // "Added to cart" only after the server saved it.
                     addToCart.mutate(product.id, {
-                      onSuccess: () => {
-                        setAddedToCart(true);
-                        window.setTimeout(() => setAddedToCart(false), 2200);
-                      },
+                      onSuccess: () => showToast('Added to cart'),
                     });
                   }}
                 >
@@ -175,11 +180,6 @@ export default function StoreProductPage() {
           )}
         </section>
       </main>
-      {addedToCart && (
-        <div className="toast show" role="status">
-          Added to cart
-        </div>
-      )}
     </div>
   );
 }

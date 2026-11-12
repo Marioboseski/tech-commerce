@@ -1,11 +1,18 @@
 import { Link } from 'react-router-dom';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductCard from '../components/catalog/ProductCard';
+import ErrorState from '../components/feedback/ErrorState';
 import { useFavorites } from '../hooks/useFavorites';
 
 export default function FavoritesPage() {
-  const { favoriteProducts, toggleFavorite, isLoggedIn, isPending } =
-    useFavorites();
+  const {
+    favoriteProducts,
+    toggleFavorite,
+    isLoggedIn,
+    isPending,
+    isError,
+    refetch,
+  } = useFavorites();
   const count = favoriteProducts.length;
 
   return (
@@ -20,15 +27,19 @@ export default function FavoritesPage() {
               <p className="subheading">
                 {isPending
                   ? 'Loading favorites…'
-                  : !isLoggedIn
-                    ? 'Sign in to see your favorites.'
-                    : count
-                      ? `${count} saved product${count === 1 ? '' : 's'}.`
-                      : 'There is nothing in your favorites yet.'}
+                  : isError
+                    ? ''
+                    : !isLoggedIn
+                      ? 'Sign in to see your favorites.'
+                      : count
+                        ? `${count} saved product${count === 1 ? '' : 's'}.`
+                        : 'There is nothing in your favorites yet.'}
               </p>
             </div>
           </div>
-          {isPending ? null : !isLoggedIn ? (
+          {isPending ? null : isError ? (
+            <ErrorState what="your favorites" onRetry={refetch} />
+          ) : !isLoggedIn ? (
             <div className="favorites-empty-state">
               <h2>Your favorites are saved to your account</h2>
               <p>

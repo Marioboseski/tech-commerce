@@ -24,13 +24,13 @@ export default function SearchBar({ query, onQueryChange, onSubmit }: Props) {
   const normalizedQuery = query.trim().toLowerCase();
   const debouncedQuery = useDebouncedValue(normalizedQuery, SEARCH_DELAY_MS);
   // Requested only while the dropdown is open and there is text to search.
-  const { data } = useProducts(
+  const { data, isError } = useProducts(
     { search: debouncedQuery, limit: MAX_RESULTS },
     { enabled: open && debouncedQuery !== '' },
   );
-  // True while waiting for the delay or for the API response. A failed
-  // request stays here too until error handling is added.
-  const searching = debouncedQuery !== normalizedQuery || data === undefined;
+  // True while waiting for the delay or for the API response.
+  const searching =
+    debouncedQuery !== normalizedQuery || (data === undefined && !isError);
   const results = data ?? [];
 
   useEffect(() => {
@@ -91,6 +91,8 @@ export default function SearchBar({ query, onQueryChange, onSubmit }: Props) {
         >
           {searching ? (
             <p className="search-empty">Searching…</p>
+          ) : isError ? (
+            <p className="search-empty">Search is not available right now.</p>
           ) : results.length ? (
             results.map((product) => (
               <Link

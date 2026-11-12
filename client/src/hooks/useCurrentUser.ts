@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCurrentUser, loginUser, logoutUser } from '../services/authApi';
+import { clearSession } from '../lib/session';
 
 // One cache entry for "who is logged in", shared by every component.
 export const authKeys = {
@@ -29,6 +30,8 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: loginUser,
+    // The login form shows "Email or password is incorrect" itself.
+    meta: { inlineError: true },
     // The server already sent us the user, so put it straight in the cache:
     // the header updates immediately, without another /me request.
     onSuccess: (user) => queryClient.setQueryData(authKeys.me, user),
@@ -40,15 +43,7 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: logoutUser,
-    onSuccess: () => {
-      queryClient.setQueryData(authKeys.me, null);
-      // Forget the user's private data (favorites, cart, orders) on this
-      // computer. Same keys as favoriteKeys.all / cartKeys.all /
-      // orderKeys.all; written out here because importing them would make
-      // the files import each other.
-      queryClient.removeQueries({ queryKey: ['favorites'] });
-      queryClient.removeQueries({ queryKey: ['cart'] });
-      queryClient.removeQueries({ queryKey: ['orders'] });
-    },
+    // Forget the user and their favorites, cart and orders on this computer.
+    onSuccess: () => clearSession(queryClient),
   });
 }

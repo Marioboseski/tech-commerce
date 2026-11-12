@@ -38,6 +38,10 @@ export const getProductById = async (id: number): Promise<ApiProductDetails | nu
   }
 
   const res = await fetch(`${API_URL}/api/products/${id}`);
+  // The server answers 404 for a product that does not exist.
+  if (res.status === 404) {
+    return null;
+  }
   if (!res.ok) {
     throw new Error(`Failed to fetch product: ${res.status}`);
   }

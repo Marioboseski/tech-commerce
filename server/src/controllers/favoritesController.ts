@@ -1,47 +1,42 @@
 import * as favoritesService from "../services/favoritesService.js";
 import { isValidId } from "../lib/validation.js";
+import { HttpError } from "../lib/httpError.js";
+import { getAuthUserId } from "../middleware/requireAuth.js";
 import type { Request, Response } from "express";
 
+// GET /api/favorites
 export const getFavorites = async (req: Request, res: Response) => {
-  if (!req.auth) {
-    return res.status(401).json({ message: "Not logged in" });
-  }
-
-  const products = await favoritesService.getFavoriteProducts(req.auth.userId);
+  const products = await favoritesService.getFavoriteProducts(getAuthUserId(req));
   return res.status(200).json(products);
 };
 
+// POST /api/favorites   body: { "productId": 5 }
 export const addFavorite = async (req: Request, res: Response) => {
-  if (!req.auth) {
-    return res.status(401).json({ message: "Not logged in" });
-  }
-
+  const userId = getAuthUserId(req);
   const { productId } = req.body ?? {};
 
   if (!isValidId(productId)) {
-    return res.status(400).json({ message: "productId must be a positive integer" });
+    throw new HttpError(400, "productId must be a positive integer");
   }
 
-  const favorite = await favoritesService.addFavorite(req.auth.userId, productId);
+  const favorite = await favoritesService.addFavorite(userId, productId);
 
   if (!favorite) {
-    return res.status(404).json({ message: "Product not found" });
+    throw new HttpError(404, "Product not found");
   }
 
   return res.status(201).json(favorite);
 };
 
+// DELETE /api/favorites/:productId
 export const removeFavorite = async (req: Request, res: Response) => {
-  if (!req.auth) {
-    return res.status(401).json({ message: "Not logged in" });
-  }
-
+  const userId = getAuthUserId(req);
   const productId = Number(req.params.productId);
 
   if (!isValidId(productId)) {
-    return res.status(400).json({ message: "productId must be a positive integer" });
+    throw new HttpError(400, "productId must be a positive integer");
   }
 
-  await favoritesService.removeFavorite(req.auth.userId, productId);
+  await favoritesService.removeFavorite(userId, productId);
   return res.status(204).end();
 };

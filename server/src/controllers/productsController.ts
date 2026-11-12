@@ -1,4 +1,6 @@
 import * as productService from "../services/productsService.js";
+import { HttpError } from "../lib/httpError.js";
+import { isValidId } from "../lib/validation.js";
 import type { Request, Response } from "express";
 
 const MAX_IDS = 100;
@@ -23,9 +25,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
   if (categoryIdParam !== undefined) {
     if (typeof categoryIdParam !== "string" || !/^[1-9]\d*$/.test(categoryIdParam)) {
-      return res.status(400).json({
-        message: "categoryId must be a positive integer"
-      })
+      throw new HttpError(400, "categoryId must be a positive integer");
     }
     categoryId = Number(categoryIdParam);
   }
@@ -34,15 +34,11 @@ export const getProducts = async (req: Request, res: Response) => {
   const maxPrice = parsePriceParam(req.query.maxPrice);
 
   if (minPrice === null || maxPrice === null) {
-    return res.status(400).json({
-      message: "minPrice and maxPrice must be non-negative numbers"
-    })
+    throw new HttpError(400, "minPrice and maxPrice must be non-negative numbers");
   }
 
   if (minPrice !== undefined && maxPrice !== undefined && minPrice > maxPrice) {
-    return res.status(400).json({
-      message: "minPrice cannot be greater than maxPrice"
-    })
+    throw new HttpError(400, "minPrice cannot be greater than maxPrice");
   }
 
   // Comma-separated product ids, e.g. "1,5,12" (used by the cart).
@@ -52,15 +48,11 @@ export const getProducts = async (req: Request, res: Response) => {
 
   if (idsParam !== undefined) {
     if (typeof idsParam !== "string" || !/^[1-9]\d*(,[1-9]\d*)*$/.test(idsParam)) {
-      return res.status(400).json({
-        message: "ids must be a comma-separated list of positive integers"
-      })
+      throw new HttpError(400, "ids must be a comma-separated list of positive integers");
     }
     ids = idsParam.split(",").map(Number);
     if (ids.length > MAX_IDS) {
-      return res.status(400).json({
-        message: `ids can contain at most ${MAX_IDS} values`
-      })
+      throw new HttpError(400, `ids can contain at most ${MAX_IDS} values`);
     }
   }
 
@@ -71,9 +63,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
   if (searchParam !== undefined) {
     if (typeof searchParam !== "string" || searchParam.trim().length === 0 || searchParam.trim().length > MAX_SEARCH_LENGTH) {
-      return res.status(400).json({
-        message: `search must be between 1 and ${MAX_SEARCH_LENGTH} characters`
-      })
+      throw new HttpError(400, `search must be between 1 and ${MAX_SEARCH_LENGTH} characters`);
     }
     search = searchParam.trim();
   }
@@ -85,9 +75,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
   if (limitParam !== undefined) {
     if (typeof limitParam !== "string" || !/^[1-9]\d*$/.test(limitParam) || Number(limitParam) > MAX_LIMIT) {
-      return res.status(400).json({
-        message: `limit must be an integer between 1 and ${MAX_LIMIT}`
-      })
+      throw new HttpError(400, `limit must be an integer between 1 and ${MAX_LIMIT}`);
     }
     limit = Number(limitParam);
   }
@@ -97,7 +85,19 @@ export const getProducts = async (req: Request, res: Response) => {
 }
 
 export const getProductById = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const product = await productService.getProductById(Number(id));
+  // Values from the URL are always text ("5"), so turn them into a number.
+  // "abc" → NaN, "1.5", "0" and too big numbers are all rejected.
+  const id = Number(req.params.id);
+
+  if (!isValidId(id)) {
+    throw new HttpError(400, "id must be a positive integer");
+  }
+
+  const product = await productService.getProductById(id);
+
+  if (!product) {
+    throw new HttpError(404, "Product not found");
+  }
+
   return res.json(product);
-}
+};

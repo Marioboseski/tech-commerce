@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { AUTH_COOKIE_NAME, clearAuthCookieOptions, verifyAuthToken } from "../lib/authToken.js";
 import type { AuthTokenPayload } from "../lib/authToken.js";
+import { HttpError } from "../lib/httpError.js";
 
 // Teach TypeScript that req.auth exists (it is set below).
 declare global {
@@ -18,7 +19,7 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
   const token: unknown = req.cookies?.[AUTH_COOKIE_NAME];
 
   if (typeof token !== "string") {
-    return res.status(401).json({ message: "Not logged in" });
+    throw new HttpError(401, "Not logged in");
   }
 
   const auth = verifyAuthToken(token);
@@ -26,9 +27,18 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
   if (!auth) {
     // The cookie is fake or expired, so remove it from the browser.
     res.clearCookie(AUTH_COOKIE_NAME, clearAuthCookieOptions);
-    return res.status(401).json({ message: "Not logged in" });
+    throw new HttpError(401, "Not logged in");
   }
 
   req.auth = auth;
   next();
+};
+
+// For controllers behind requireAuth: the logged-in user's id.
+// Throws 401 if the route was (by mistake) added without requireAuth.
+export const getAuthUserId = (req: Request): number => {
+  if (!req.auth) {
+    throw new HttpError(401, "Not logged in");
+  }
+  return req.auth.userId;
 };

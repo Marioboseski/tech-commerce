@@ -20,7 +20,8 @@ export const cartKeys = {
 // (quantity 2, 3, 4) could reach the server in the wrong order.
 const cartScope = { id: 'cart' };
 
-type CartContext = { previous?: CartItem[] };
+// What onMutate remembers, so onError can put the cart back ("roll back").
+type RollbackContext = { previous?: CartItem[] };
 
 // The logged-in user's cart, read from GET /api/cart, plus the actions.
 export function useCart() {
@@ -52,7 +53,7 @@ export function useCart() {
   const undoCacheChange = (
     _error: Error,
     _variables: unknown,
-    context: CartContext | undefined,
+    context: RollbackContext | undefined,
   ) => {
     queryClient.setQueryData(queryKey, context?.previous);
   };
@@ -82,7 +83,7 @@ export function useCart() {
     void,
     Error,
     { productId: number; quantity: number },
-    CartContext
+    RollbackContext
   >({
     mutationKey: cartKeys.all,
     scope: cartScope,
@@ -97,7 +98,7 @@ export function useCart() {
     onSettled: reloadWhenLastChange,
   });
 
-  const removeMutation = useMutation<void, Error, number, CartContext>({
+  const removeMutation = useMutation<void, Error, number, RollbackContext>({
     mutationKey: cartKeys.all,
     scope: cartScope,
     mutationFn: removeFromCart,

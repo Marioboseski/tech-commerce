@@ -9,11 +9,13 @@ import AccountDashboardPage from './pages/AccountDashboardPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrdersPage from './pages/OrdersPage';
 import OrderDetailsPage from './pages/OrderDetailsPage';
-import { CartDrawerProvider } from './context/CartDrawerProvider';
-import { useCartDrawer } from './hooks/useCartDrawer';
+import { useCartDrawerStore } from './stores/cartDrawerStore';
 
-function AppRoutes() {
-  const { cartOpen, setCartOpen } = useCartDrawer();
+export default function App() {
+  // Take only what this component needs from the store (a "selector"),
+  // so App re-renders only when these values change.
+  const cartOpen = useCartDrawerStore((state) => state.cartOpen);
+  const closeCart = useCartDrawerStore((state) => state.closeCart);
 
   return (
     <>
@@ -29,15 +31,7 @@ function AppRoutes() {
         <Route path="/categories/:slug" element={<CategoryPage />} />
         <Route path="/products/:id" element={<StoreProductPage />} />
       </Routes>
-      {cartOpen && <CartDrawer onClose={() => setCartOpen(false)} />}
+      {cartOpen && <CartDrawer onClose={closeCart} />}
     </>
   );
 }
-
-const App = () => (
-  <CartDrawerProvider>
-    <AppRoutes />
-  </CartDrawerProvider>
-);
-
-export default App;

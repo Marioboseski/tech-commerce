@@ -3,8 +3,8 @@ import type { FormEvent, ReactNode } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../../hooks/useCart';
-import { useCartDrawer } from '../../hooks/useCartDrawer';
 import { useCategories } from '../../hooks/useCategories';
+import { useCartDrawerStore } from '../../stores/cartDrawerStore';
 import SearchBar from '../catalog/SearchBar';
 import FavoritesMenu from './FavoritesMenu';
 import ProfileMenu from './ProfileMenu';
@@ -18,7 +18,7 @@ export default function StoreHeader({ middle, actions }: StoreHeaderProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { cartCount: cartQuantity } = useCart();
-  const { setCartOpen } = useCartDrawer();
+  const openCart = useCartDrawerStore((state) => state.openCart);
   const { categories } = useCategories();
   const [headerQuery, setHeaderQuery] = useState('');
 
@@ -33,7 +33,7 @@ export default function StoreHeader({ middle, actions }: StoreHeaderProps) {
       className="icon-button header-action"
       type="button"
       aria-label="Open shopping cart"
-      onClick={() => setCartOpen(true)}
+      onClick={openCart}
     >
       <span className="icon-wrap">
         <ShoppingCart className="header-action-icon" aria-hidden="true" />

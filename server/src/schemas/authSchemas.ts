@@ -5,8 +5,7 @@ const MIN_PASSWORD_LENGTH = 8;
 // bcrypt only uses the first 72 bytes of a password.
 const MAX_PASSWORD_LENGTH = 72;
 
-// trim + lower case first, so Marko@Gmail.com and marko@gmail.com are the
-// same account; then check that it looks like an email.
+// Lower case first, so Marko@Gmail.com and marko@gmail.com are one account.
 const emailSchema = z
   .string("Email is required")
   .trim()
@@ -17,9 +16,7 @@ const emailSchema = z
       .max(255, "Email can be at most 255 characters"),
   );
 
-// POST /api/auth/register
-// Only these 3 fields are kept: role, id, createdAt... from the client are
-// silently dropped, because z.object ignores unknown keys.
+// z.object drops unknown keys, so a client cannot send role, id, etc.
 export const registerSchema = z.object({
   fullName: requiredText("Full name", 100),
   email: emailSchema,
@@ -30,8 +27,7 @@ export const registerSchema = z.object({
     .max(MAX_PASSWORD_LENGTH, `Password can be at most ${MAX_PASSWORD_LENGTH} characters`),
 });
 
-// POST /api/auth/login
-// No length rules here: we only compare with the saved hash.
+// No length rules on login: we only compare with the saved hash.
 export const loginSchema = z.object({
   email: z
     .string("Email is required")

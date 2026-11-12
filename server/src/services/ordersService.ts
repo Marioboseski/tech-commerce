@@ -1,7 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 import { toImageUrl } from "../lib/imageUrl.js";
 import { Prisma } from "../../generated/prisma/client.js";
-// The type comes from the Zod schema, so it always matches the validation.
 import type { DeliveryAddress } from "../schemas/ordersSchemas.js";
 
 const FREE_SHIPPING_FROM = new Prisma.Decimal(75);
@@ -99,7 +98,6 @@ export const createOrder = async (
         select: orderSelect,
       });
 
-      // 4. Empty the cart: exactly the rows we just ordered.
       const { count } = await tx.cartItem.deleteMany({
         where: { id: { in: cartItems.map((item) => item.id) } },
       });
@@ -120,7 +118,6 @@ export const createOrder = async (
   }
 };
 
-// All orders of one user, newest first.
 export const getOrders = async (userId: number) => {
   const orders = await prisma.order.findMany({
     where: { userId },

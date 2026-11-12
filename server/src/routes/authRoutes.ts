@@ -6,7 +6,6 @@ const router = Router();
 
 router.post("/register", register);
 router.post("/login", login);
-// requireAuth runs first; me only runs for a logged-in user.
 router.get("/me", requireAuth, me);
 router.post("/logout", logout);
 

@@ -3,7 +3,6 @@ import { AUTH_COOKIE_NAME, clearAuthCookieOptions, verifyAuthToken } from "../li
 import type { AuthTokenPayload } from "../lib/authToken.js";
 import { HttpError } from "../lib/httpError.js";
 
-// Teach TypeScript that req.auth exists (it is set below).
 declare global {
   namespace Express {
     interface Request {
@@ -12,9 +11,7 @@ declare global {
   }
 }
 
-// Put this in front of any route that needs a logged-in user.
-// It lets the request through only with a valid login cookie and stores
-// who the user is in req.auth.
+// Lets the request through only with a valid login cookie; sets req.auth.
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   const token: unknown = req.cookies?.[AUTH_COOKIE_NAME];
 
@@ -34,7 +31,6 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
   next();
 };
 
-// For controllers behind requireAuth: the logged-in user's id.
 // Throws 401 if the route was (by mistake) added without requireAuth.
 export const getAuthUserId = (req: Request): number => {
   if (!req.auth) {

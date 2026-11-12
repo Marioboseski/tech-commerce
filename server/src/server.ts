@@ -24,10 +24,8 @@ if (!CLIENT_URL) {
 // the exact origin (not "*") and allows credentials.
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
 app.use(express.json());
-// Reads the Cookie header into req.cookies (needed for the login cookie).
 app.use(cookieParser());
 
-// Product images, e.g. /images/products/laptops-001.webp
 app.use("/images", express.static(path.join(import.meta.dirname, "..", "public", "images")));
 
 app.use("/api/products", productRoutes);
@@ -38,10 +36,8 @@ app.use("/api/favorites", favoriteRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 
-// These two must be LAST, after all routes:
-// 1. no route matched → 404 JSON (instead of Express's HTML page)
+// Must come after all routes.
 app.use("/api", notFound);
-// 2. every error from any route ends up here (it has 4 parameters)
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

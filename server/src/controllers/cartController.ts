@@ -10,13 +10,11 @@ import {
 } from "../schemas/cartSchemas.js";
 import type { Request, Response } from "express";
 
-// GET /api/cart
 export const getCart = async (req: Request, res: Response) => {
   const items = await cartService.getCartItems(getAuthUserId(req));
   return res.status(200).json(items);
 };
 
-// POST /api/cart   body: { "productId": 5 }   → adds 1 piece
 export const addToCart = async (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
   const { productId } = parseInput(addToCartSchema, req.body);
@@ -35,7 +33,6 @@ export const addToCart = async (req: Request, res: Response) => {
   return res.status(200).json(result.item);
 };
 
-// PATCH /api/cart/:productId   body: { "quantity": 3 }
 export const updateCartItem = async (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
   const { productId } = parseInput(cartParamsSchema, req.params);
@@ -50,12 +47,10 @@ export const updateCartItem = async (req: Request, res: Response) => {
   return res.status(200).json(item);
 };
 
-// DELETE /api/cart/:productId
 export const removeFromCart = async (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
   const { productId } = parseInput(cartParamsSchema, req.params);
 
   await cartService.removeCartItem(userId, productId);
-  // 204 = done, nothing to send back.
   return res.status(204).end();
 };

@@ -4,7 +4,6 @@ import { requireAuth } from "../middleware/requireAuth.js";
 
 const router = Router();
 
-// Every orders route needs a logged-in user.
 router.use(requireAuth);
 
 router.post("/", createOrder);

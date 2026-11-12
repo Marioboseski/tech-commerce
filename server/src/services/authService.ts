@@ -22,7 +22,6 @@ const publicUserSelect = {
   createdAt: true,
 } as const;
 
-// Creates a user with a hashed password.
 // Returns null when the email is already registered.
 export const registerUser = async ({ fullName, email, password }: RegisterInput) => {
   const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -38,7 +37,6 @@ export const registerUser = async ({ fullName, email, password }: RegisterInput)
   });
 };
 
-// Returns null when the user does not exist (e.g. was deleted).
 export const getUserById = (id: number) =>
   prisma.user.findUnique({
     where: { id },
@@ -55,7 +53,6 @@ type LoginInput = {
 // cannot guess from the response time which emails are registered.
 const DUMMY_PASSWORD_HASH = bcrypt.hashSync(crypto.randomUUID(), PASSWORD_SALT_ROUNDS);
 
-// Checks email + password and creates a login token.
 // Returns null when the email or the password is wrong.
 export const loginUser = async ({ email, password }: LoginInput) => {
   const user = await prisma.user.findUnique({

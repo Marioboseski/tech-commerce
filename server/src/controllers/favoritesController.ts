@@ -5,13 +5,11 @@ import { getAuthUserId } from "../middleware/requireAuth.js";
 import { addFavoriteSchema, favoriteParamsSchema } from "../schemas/favoritesSchemas.js";
 import type { Request, Response } from "express";
 
-// GET /api/favorites
 export const getFavorites = async (req: Request, res: Response) => {
   const products = await favoritesService.getFavoriteProducts(getAuthUserId(req));
   return res.status(200).json(products);
 };
 
-// POST /api/favorites   body: { "productId": 5 }
 export const addFavorite = async (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
   const { productId } = parseInput(addFavoriteSchema, req.body);
@@ -25,7 +23,6 @@ export const addFavorite = async (req: Request, res: Response) => {
   return res.status(201).json(favorite);
 };
 
-// DELETE /api/favorites/:productId
 export const removeFavorite = async (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
   const { productId } = parseInput(favoriteParamsSchema, req.params);

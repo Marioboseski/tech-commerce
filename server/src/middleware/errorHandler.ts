@@ -20,27 +20,22 @@ const prismaErrors: Record<string, { status: number; message: string }> = {
   P2025: { status: 404, message: "Not found" },
 };
 
-// THE one place where every error ends up. Express knows this is an error
-// handler because it has 4 parameters (error, req, res, next).
-// Express 5 sends errors from async routes here by itself, so controllers
-// do not need try/catch.
+// Must have 4 parameters, so Express treats it as the error handler.
+// Express 5 forwards errors from async routes here, so controllers need
+// no try/catch.
 export const errorHandler: ErrorRequestHandler = (error, _req, res, next) => {
-  // The answer was already (partly) sent, e.g. a stream broke halfway.
-  // Then we cannot send JSON any more; let Express close the connection.
+  // Too late for a JSON answer (already partly sent): let Express close it.
   if (res.headersSent) {
     return next(error);
   }
 
-  // 1. Our own expected errors: throw new HttpError(404, "...").
   if (error instanceof HttpError) {
     return res.status(error.status).json({
       message: error.message,
-      // Only add "errors" when there are field errors.
       ...(error.errors && { errors: error.errors }),
     });
   }
 
-  // 2. Bad request body from express.json().
   if (isBodyParserError(error)) {
     if (error.type === "entity.parse.failed") {
       return res.status(400).json({ message: "Invalid JSON in request body" });
@@ -50,7 +45,6 @@ export const errorHandler: ErrorRequestHandler = (error, _req, res, next) => {
     }
   }
 
-  // 3. Known database errors.
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     const known = prismaErrors[error.code];
     if (known) {
@@ -58,9 +52,8 @@ export const errorHandler: ErrorRequestHandler = (error, _req, res, next) => {
     }
   }
 
-  // 4. Everything else is a bug or a broken database connection.
-  // Log the full error for us in the terminal, but never send details
-  // (stack trace, SQL, file paths) to the client: they help attackers.
+  // A bug or a broken database connection: log it for us, but never send
+  // details (stack trace, SQL, file paths) to the client.
   console.error(error);
   return res.status(500).json({ message: "Something went wrong" });
 };

@@ -5,21 +5,17 @@ const MAX_IDS = 100;
 const MAX_SEARCH_LENGTH = 100;
 const MAX_LIMIT = 100;
 
-// Non-negative number as text, such as "100" or "99.99".
 const priceText = (name: string) =>
   z
     .string(`${name} must be a non-negative number`)
     .regex(/^\d+(\.\d+)?$/, `${name} must be a non-negative number`)
     .transform(Number);
 
-// GET /api/products?categoryId=&minPrice=&maxPrice=&ids=&search=&limit=
-// Every filter is optional. Query values are always text.
 export const productsQuerySchema = z
   .object({
     categoryId: idTextSchema("categoryId").optional(),
     minPrice: priceText("minPrice").optional(),
     maxPrice: priceText("maxPrice").optional(),
-    // Comma-separated product ids, e.g. "1,5,12" → [1, 5, 12].
     ids: z
       .string("ids must be a comma-separated list of positive integers")
       .regex(/^\d+(,\d+)*$/, "ids must be a comma-separated list of positive integers")
@@ -36,7 +32,6 @@ export const productsQuerySchema = z
           .max(MAX_IDS, `ids can contain at most ${MAX_IDS} values`),
       )
       .optional(),
-    // Free-text search in product name, description and category name.
     search: z
       .string(`search must be between 1 and ${MAX_SEARCH_LENGTH} characters`)
       .trim()
@@ -56,14 +51,12 @@ export const productsQuerySchema = z
       )
       .optional(),
   })
-  // A rule about TWO fields together, checked after each field is valid.
   .refine(
     ({ minPrice, maxPrice }) =>
       minPrice === undefined || maxPrice === undefined || minPrice <= maxPrice,
     { message: "minPrice cannot be greater than maxPrice", path: ["minPrice"] },
   );
 
-// GET /api/products/:id
 export const productParamsSchema = z.object({
   id: idTextSchema("id"),
 });

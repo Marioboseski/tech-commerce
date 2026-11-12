@@ -9,7 +9,6 @@ import { requireAuth } from "../middleware/requireAuth.js";
 
 const router = Router();
 
-// Every cart route needs a logged-in user.
 router.use(requireAuth);
 
 router.get("/", getCart);

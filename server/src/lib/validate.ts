@@ -1,12 +1,8 @@
 import type { z } from "zod";
 import { HttpError } from "./httpError.js";
 
-// Checks `value` (req.body, req.params or req.query) against a Zod schema.
-// - valid:   returns the cleaned value, with the right TypeScript type
-//            (trimmed strings, numbers instead of "5", ...)
-// - invalid: throws a 400 HttpError with one message per wrong field;
-//            the global errorHandler sends it as
-//            { message, errors: [{ field, message }] }
+// Returns the parsed (typed, trimmed) value, or throws a 400 HttpError
+// with one { field, message } per invalid field.
 export const parseInput = <Schema extends z.ZodType>(
   schema: Schema,
   value: unknown,
@@ -19,7 +15,6 @@ export const parseInput = <Schema extends z.ZodType>(
   }
 
   const errors = result.error.issues.map((issue) => ({
-    // ["productId"] → "productId"; a problem with the whole object → "".
     field: issue.path.join("."),
     message: issue.message,
   }));

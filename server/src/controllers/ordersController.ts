@@ -1,46 +1,15 @@
 import * as ordersService from "../services/ordersService.js";
-import type { DeliveryAddress } from "../services/ordersService.js";
-import { isValidId } from "../lib/validation.js";
 import { HttpError } from "../lib/httpError.js";
+import { parseInput } from "../lib/validate.js";
 import { getAuthUserId } from "../middleware/requireAuth.js";
+import { deliveryAddressSchema, orderParamsSchema } from "../schemas/ordersSchemas.js";
 import type { Request, Response } from "express";
 
-// Same lengths as the columns in the orders table (schema.prisma).
-const ADDRESS_MAX_LENGTHS: Record<keyof DeliveryAddress, number> = {
-  fullName: 100,
-  street: 255,
-  city: 100,
-  postalCode: 20,
-};
-
-// Checks the delivery address from the body and returns it cleaned.
-// Throws a 400 when a field is missing or too long.
-const readDeliveryAddress = (body: unknown): DeliveryAddress => {
-  const input = (body ?? {}) as Record<string, unknown>;
-  const address = {} as DeliveryAddress;
-
-  for (const [field, maxLength] of Object.entries(ADDRESS_MAX_LENGTHS)) {
-    const value = input[field];
-    if (typeof value !== "string") {
-      throw new HttpError(400, `${field} is required`);
-    }
-
-    const trimmed = value.trim();
-    if (trimmed.length === 0 || trimmed.length > maxLength) {
-      throw new HttpError(400, `${field} must be between 1 and ${maxLength} characters`);
-    }
-
-    address[field as keyof DeliveryAddress] = trimmed;
-  }
-
-  return address;
-};
-
 // POST /api/orders   body: { fullName, street, city, postalCode }
-// No products and no prices: the server takes them from the user's cart.
 export const createOrder = async (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
-  const address = readDeliveryAddress(req.body);
+  // Trimmed, every field 1..max characters (see ordersSchemas.ts).
+  const address = parseInput(deliveryAddressSchema, req.body);
 
   const created = await ordersService.createOrder(userId, address);
 
@@ -66,12 +35,7 @@ export const getOrders = async (req: Request, res: Response) => {
 // GET /api/orders/:orderId
 export const getOrder = async (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
-  // Values from the URL are always text ("12"), so turn them into a number.
-  const orderId = Number(req.params.orderId);
-
-  if (!isValidId(orderId)) {
-    throw new HttpError(400, "orderId must be a positive integer");
-  }
+  const { orderId } = parseInput(orderParamsSchema, req.params);
 
   const order = await ordersService.getOrderById(userId, orderId);
 

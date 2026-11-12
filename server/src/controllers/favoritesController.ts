@@ -1,7 +1,8 @@
 import * as favoritesService from "../services/favoritesService.js";
-import { isValidId } from "../lib/validation.js";
 import { HttpError } from "../lib/httpError.js";
+import { parseInput } from "../lib/validate.js";
 import { getAuthUserId } from "../middleware/requireAuth.js";
+import { addFavoriteSchema, favoriteParamsSchema } from "../schemas/favoritesSchemas.js";
 import type { Request, Response } from "express";
 
 // GET /api/favorites
@@ -13,11 +14,7 @@ export const getFavorites = async (req: Request, res: Response) => {
 // POST /api/favorites   body: { "productId": 5 }
 export const addFavorite = async (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
-  const { productId } = req.body ?? {};
-
-  if (!isValidId(productId)) {
-    throw new HttpError(400, "productId must be a positive integer");
-  }
+  const { productId } = parseInput(addFavoriteSchema, req.body);
 
   const favorite = await favoritesService.addFavorite(userId, productId);
 
@@ -31,11 +28,7 @@ export const addFavorite = async (req: Request, res: Response) => {
 // DELETE /api/favorites/:productId
 export const removeFavorite = async (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
-  const productId = Number(req.params.productId);
-
-  if (!isValidId(productId)) {
-    throw new HttpError(400, "productId must be a positive integer");
-  }
+  const { productId } = parseInput(favoriteParamsSchema, req.params);
 
   await favoritesService.removeFavorite(userId, productId);
   return res.status(204).end();

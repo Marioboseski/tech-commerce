@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma.js";
 import { toApiProduct } from "../lib/apiProduct.js";
-
-export const MAX_CART_QUANTITY = 10;
+// One limit for the whole server, defined next to the cart rules.
+import { MAX_CART_QUANTITY } from "../schemas/cartSchemas.js";
 
 const toApiCartItem = (item: {
   productId: number;

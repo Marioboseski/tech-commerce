@@ -1,16 +1,11 @@
 import { prisma } from "../lib/prisma.js";
 import { toImageUrl } from "../lib/imageUrl.js";
 import { Prisma } from "../../generated/prisma/client.js";
+// The type comes from the Zod schema, so it always matches the validation.
+import type { DeliveryAddress } from "../schemas/ordersSchemas.js";
 
 const FREE_SHIPPING_FROM = new Prisma.Decimal(75);
 const SHIPPING_PRICE = new Prisma.Decimal("9.90");
-
-export type DeliveryAddress = {
-  fullName: string;
-  street: string;
-  city: string;
-  postalCode: string;
-};
 
 const orderSelect = {
   id: true,

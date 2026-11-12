@@ -1,47 +1,16 @@
 import * as authService from "../services/authService.js";
 import { AUTH_COOKIE_NAME, authCookieOptions, clearAuthCookieOptions } from "../lib/authToken.js";
 import { HttpError } from "../lib/httpError.js";
+import { parseInput } from "../lib/validate.js";
+import { loginSchema, registerSchema } from "../schemas/authSchemas.js";
 import type { Request, Response } from "express";
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MAX_FULL_NAME_LENGTH = 100;
-const MAX_EMAIL_LENGTH = 255;
-const MIN_PASSWORD_LENGTH = 8;
-// bcrypt only uses the first 72 bytes of a password.
-const MAX_PASSWORD_LENGTH = 72;
-
+// POST /api/auth/register   body: { fullName, email, password }
 export const register = async (req: Request, res: Response) => {
-  // req.body is undefined when the request has no JSON body.
-  const { fullName, email, password } = req.body ?? {};
+  // Already trimmed, email in lower case; role etc. from the client dropped.
+  const input = parseInput(registerSchema, req.body);
 
-  if (typeof fullName !== "string" || typeof email !== "string" || typeof password !== "string") {
-    throw new HttpError(400, "fullName, email and password are required");
-  }
-
-  const normalizedFullName = fullName.trim();
-  // Marko@Gmail.com and marko@gmail.com are the same account.
-  const normalizedEmail = email.trim().toLowerCase();
-
-  if (normalizedFullName.length === 0 || normalizedFullName.length > MAX_FULL_NAME_LENGTH) {
-    throw new HttpError(400, `fullName must be between 1 and ${MAX_FULL_NAME_LENGTH} characters`);
-  }
-
-  if (!EMAIL_PATTERN.test(normalizedEmail) || normalizedEmail.length > MAX_EMAIL_LENGTH) {
-    throw new HttpError(400, "email must be a valid email address");
-  }
-
-  if (password.length < MIN_PASSWORD_LENGTH || password.length > MAX_PASSWORD_LENGTH) {
-    throw new HttpError(
-      400,
-      `password must be between ${MIN_PASSWORD_LENGTH} and ${MAX_PASSWORD_LENGTH} characters`,
-    );
-  }
-
-  const user = await authService.registerUser({
-    fullName: normalizedFullName,
-    email: normalizedEmail,
-    password,
-  });
+  const user = await authService.registerUser(input);
 
   if (!user) {
     throw new HttpError(409, "An account with this email already exists");
@@ -50,18 +19,11 @@ export const register = async (req: Request, res: Response) => {
   return res.status(201).json(user);
 };
 
+// POST /api/auth/login   body: { email, password }
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body ?? {};
+  const input = parseInput(loginSchema, req.body);
 
-  if (typeof email !== "string" || typeof password !== "string" || !email.trim() || !password) {
-    throw new HttpError(400, "email and password are required");
-  }
-
-  const result = await authService.loginUser({
-    // Same normalization as register, so Marko@Gmail.com can log in.
-    email: email.trim().toLowerCase(),
-    password,
-  });
+  const result = await authService.loginUser(input);
 
   // Same message for "no such email" and "wrong password", so nobody can
   // find out which emails have an account.

@@ -40,6 +40,9 @@ export default function ProfileMenu() {
     ? [
         { label: 'Profile', to: '/profile' },
         { label: 'My Orders', to: '/orders' },
+        ...(user.role === 'ADMIN'
+          ? [{ label: 'Admin panel', to: '/admin' }]
+          : []),
       ]
     : [
         { label: 'Login', to: '/login' },

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import CategoryPage from './pages/CategoryPage';
 import FavoritesPage from './pages/FavoritesPage';
@@ -12,6 +13,9 @@ import OrderDetailsPage from './pages/OrderDetailsPage';
 import ErrorBoundary from './components/feedback/ErrorBoundary';
 import Toaster from './components/feedback/Toaster';
 import { useCartDrawerStore } from './stores/cartDrawerStore';
+
+// Downloaded only when someone opens /admin, so the shop stays small.
+const AdminApp = lazy(() => import('./admin/AdminApp'));
 
 export default function App() {
   const cartOpen = useCartDrawerStore((state) => state.cartOpen);
@@ -35,6 +39,14 @@ export default function App() {
           <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
           <Route path="/categories/:slug" element={<CategoryPage />} />
           <Route path="/products/:id" element={<StoreProductPage />} />
+          <Route
+            path="/admin/*"
+            element={
+              <Suspense fallback={<p className="admin-loading">Loading…</p>}>
+                <AdminApp />
+              </Suspense>
+            }
+          />
         </Routes>
         {cartOpen && <CartDrawer onClose={closeCart} />}
       </ErrorBoundary>

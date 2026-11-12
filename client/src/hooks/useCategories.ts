@@ -9,8 +9,6 @@ const CATEGORIES_STALE_TIME = 10 * 60 * 1000;
 // Stable empty list while loading, so components get the same array every render.
 const NO_CATEGORIES: ApiCategory[] = [];
 
-// Categories from GET /api/categories. Every component that calls this hook
-// shares one cached request instead of fetching on its own.
 export function useCategories() {
   const { data, isSuccess, isError, refetch } = useQuery({
     queryKey: ['categories'],
@@ -21,7 +19,6 @@ export function useCategories() {
   return {
     categories: data ?? NO_CATEGORIES,
     categoriesLoaded: isSuccess,
-    // The request failed (after retries). refetch() = "Try again".
     categoriesError: isError,
     refetchCategories: refetch,
   };

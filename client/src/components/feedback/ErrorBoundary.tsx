@@ -4,20 +4,16 @@ import type { ErrorInfo, ReactNode } from 'react';
 type Props = { children: ReactNode };
 type State = { hasError: boolean };
 
-// Catches errors THROWN WHILE DRAWING components (a bug such as reading
-// a property of undefined). Without it React removes the whole page and the
-// user sees a white screen.
+// Catches errors thrown while rendering; without it the page goes white.
 // Error boundaries must be class components: function components have no
 // way (yet) to catch render errors.
 export default class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false };
 
-  // React calls this when a child throws: switch to the fallback screen.
   static getDerivedStateFromError(): State {
     return { hasError: true };
   }
 
-  // For us developers: the error and which component threw it.
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('Render error:', error, info.componentStack);
   }

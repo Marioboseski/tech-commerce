@@ -77,7 +77,6 @@ export default function CategoryPage() {
   }
 
   const meta = getCategoryMeta(category.slug);
-  // products is undefined while loading (and after an error, see below).
   const productsLoading =
     !invalidRange && !productsError && products === undefined;
   const filteredProducts = invalidRange ? [] : (products ?? []);

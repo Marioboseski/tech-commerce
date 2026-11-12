@@ -7,12 +7,10 @@ import { showServerFieldErrors } from '../../lib/formErrors';
 import { deliveryAddressSchema } from '../../schemas/checkoutSchema';
 
 type DeliveryFormProps = {
-  // The logged-in user's name, filled in (they can change it).
   defaultFullName: string;
 };
 
-// The checkout form. It is only created once we know the user, so the
-// name is already there when the form starts.
+// Mounted only once the user is known, so defaultValues already has the name.
 export default function DeliveryForm({ defaultFullName }: DeliveryFormProps) {
   const navigate = useNavigate();
   const createOrder = useCreateOrder();
@@ -34,7 +32,6 @@ export default function DeliveryForm({ defaultFullName }: DeliveryFormProps) {
 
   const onSubmit = handleSubmit(async (address) => {
     try {
-      // mutateAsync waits for the answer and gives us the new order.
       const order = await createOrder.mutateAsync(address);
       // "Thank you" is shown only when we come from here (state.justPlaced).
       navigate(`/orders/${order.id}`, { state: { justPlaced: true } });
@@ -47,7 +44,6 @@ export default function DeliveryForm({ defaultFullName }: DeliveryFormProps) {
           'postalCode',
         ])
       ) {
-        // e.g. "Your cart is empty" or "Your cart changed while ordering"
         setError('root.server', {
           message:
             error instanceof Error ? error.message : 'Something went wrong',

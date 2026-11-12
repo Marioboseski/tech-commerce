@@ -12,7 +12,6 @@ export const orderKeys = {
     ['orders', userId, 'detail', orderId] as const,
 };
 
-// My Orders: all orders of the logged-in user.
 export function useOrders() {
   const { user, isPending: userPending } = useCurrentUser();
 
@@ -27,13 +26,11 @@ export function useOrders() {
     orders: ordersQuery.data ?? [],
     isLoggedIn: user !== null,
     isPending: userPending || (user !== null && ordersQuery.isPending),
-    // The request failed (after retries). refetch() = "Try again".
     isError: user !== null && ordersQuery.isError,
     refetch: ordersQuery.refetch,
   };
 }
 
-// One order (the details / "Thank you" page).
 // order is undefined while loading and null when it does not exist.
 export function useOrder(orderId: number | null) {
   const { user, isPending: userPending } = useCurrentUser();
@@ -48,13 +45,11 @@ export function useOrder(orderId: number | null) {
     order: orderQuery.data,
     isLoggedIn: user !== null,
     isPending: userPending || (user !== null && orderQuery.isPending),
-    // The request failed (after retries). refetch() = "Try again".
     isError: user !== null && orderQuery.isError,
     refetch: orderQuery.refetch,
   };
 }
 
-// "Place order" on the checkout page.
 export function useCreateOrder() {
   const { user } = useCurrentUser();
   const queryClient = useQueryClient();
@@ -62,7 +57,6 @@ export function useCreateOrder() {
 
   return useMutation({
     mutationFn: createOrder,
-    // The checkout form shows the error itself.
     meta: { inlineError: true },
     onSuccess: (order: Order) => {
       // The server emptied the cart: load it again (it comes back empty).
@@ -71,7 +65,6 @@ export function useCreateOrder() {
       queryClient.invalidateQueries({ queryKey: cartKeys.list(userId) });
       // The details page can show the new order without loading it again.
       queryClient.setQueryData(orderKeys.detail(userId, order.id), order);
-      // My Orders has one more order now: load the list again next time.
       queryClient.invalidateQueries({ queryKey: orderKeys.list(userId) });
     },
   });

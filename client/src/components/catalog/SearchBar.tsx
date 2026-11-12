@@ -7,7 +7,6 @@ import { getProductImage } from '../../lib/productImage';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { useProducts } from '../../hooks/useProducts';
 
-// Wait until the user stops typing before calling the API.
 const SEARCH_DELAY_MS = 300;
 const MAX_RESULTS = 6;
 // Must match MAX_SEARCH_LENGTH on the server.
@@ -23,12 +22,10 @@ export default function SearchBar({ query, onQueryChange, onSubmit }: Props) {
   const searchRef = useRef<HTMLDivElement>(null);
   const normalizedQuery = query.trim().toLowerCase();
   const debouncedQuery = useDebouncedValue(normalizedQuery, SEARCH_DELAY_MS);
-  // Requested only while the dropdown is open and there is text to search.
   const { data, isError } = useProducts(
     { search: debouncedQuery, limit: MAX_RESULTS },
     { enabled: open && debouncedQuery !== '' },
   );
-  // True while waiting for the delay or for the API response.
   const searching =
     debouncedQuery !== normalizedQuery || (data === undefined && !isError);
   const results = data ?? [];

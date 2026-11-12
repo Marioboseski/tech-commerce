@@ -15,7 +15,6 @@ export const getCurrentUser = async (): Promise<ApiUser | null> => {
   try {
     return await apiRequest<ApiUser>('/api/auth/me');
   } catch (error) {
-    // "Not logged in" is a normal answer here, not an error.
     if (error instanceof ApiError && error.status === 401) {
       return null;
     }
@@ -23,6 +22,5 @@ export const getCurrentUser = async (): Promise<ApiUser | null> => {
   }
 };
 
-// Asks the server to delete the login cookie.
 export const logoutUser = () =>
   apiRequest<void>('/api/auth/logout', { method: 'POST' });

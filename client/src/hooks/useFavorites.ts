@@ -20,8 +20,7 @@ type ToggleVariables = {
   isFavorite: boolean;
 };
 
-// The logged-in user's favorites, read from GET /api/favorites.
-// toggleFavorite adds or removes a product (and sends guests to /login).
+// toggleFavorite sends guests to /login.
 export function useFavorites() {
   const { user, isPending: userPending } = useCurrentUser();
   const navigate = useNavigate();
@@ -43,12 +42,10 @@ export function useFavorites() {
     mutationFn: ({ product, isFavorite }: ToggleVariables) =>
       isFavorite ? removeFavorite(product.id) : addFavorite(product.id),
 
-    // Optimistic update: change the cache (and the heart) right away,
-    // before the server answers.
+    // Optimistic: change the cache (and the heart) before the server answers.
     onMutate: async ({ product, isFavorite }) => {
       // Stop a running GET, so its older answer does not overwrite our change.
       await queryClient.cancelQueries({ queryKey });
-      // Remember the list as it was, in case we need to undo.
       const previous = queryClient.getQueryData<ApiProduct[]>(queryKey);
 
       queryClient.setQueryData<ApiProduct[]>(queryKey, (old = []) =>
@@ -57,11 +54,9 @@ export function useFavorites() {
           : [product, ...old],
       );
 
-      // Whatever we return here is given to onError as `context`.
       return { previous };
     },
 
-    // The server said no: put the old list back, so the heart flips back.
     onError: (_error, _variables, context) => {
       queryClient.setQueryData(queryKey, context?.previous);
     },
@@ -86,7 +81,6 @@ export function useFavorites() {
     isLoggedIn: user !== null,
     // True while we do not know yet: who is logged in, or their favorites.
     isPending: userPending || (user !== null && favoritesQuery.isPending),
-    // The request failed (after retries). refetch() = "Try again".
     isError: user !== null && favoritesQuery.isError,
     refetch: favoritesQuery.refetch,
   };

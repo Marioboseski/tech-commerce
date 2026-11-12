@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 
-// How long a toast stays on screen.
 const TOAST_DURATION_MS = 3000;
 
 type ToastType = 'success' | 'error';
@@ -20,7 +19,6 @@ type ToastState = {
 };
 
 let nextId = 1;
-// The timer of the toast on screen, so a new toast can cancel it.
 let hideTimer: ReturnType<typeof setTimeout> | undefined;
 
 // One toast at a time: a new one replaces the old one.

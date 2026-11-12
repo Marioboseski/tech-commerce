@@ -10,7 +10,6 @@ import { useOrder } from '../hooks/useOrders';
 export default function OrderDetailsPage() {
   const { orderId } = useParams();
   const { state } = useLocation();
-  // Only a whole number > 0 is a valid order number in the URL.
   const id = orderId && /^[1-9]\d*$/.test(orderId) ? Number(orderId) : null;
   const { order, isLoggedIn, isPending, isError, refetch } = useOrder(id);
   // Set by the checkout page: navigate(..., { state: { justPlaced: true } }).
@@ -33,7 +32,6 @@ export default function OrderDetailsPage() {
         {isError ? (
           <ErrorState what="this order" onRetry={refetch} />
         ) : isPending || order === undefined ? (
-          // undefined = still loading.
           <p className="subheading">Loading your order…</p>
         ) : order === null ? (
           <div className="favorites-empty-state">
@@ -68,11 +66,9 @@ export default function OrderDetailsPage() {
                   // is part of the key.
                   <div className="cart-item" key={`${item.productId}-${index}`}>
                     <div className="thumb">
-                      {/* No picture, or the product was deleted. */}
                       <img src={item.imageUrl ?? defaultPlaceholder} alt="" />
                     </div>
                     <div>
-                      {/* Link only if the product still exists. */}
                       {item.productId !== null ? (
                         <Link to={`/products/${item.productId}`}>
                           <strong>{item.productName}</strong>

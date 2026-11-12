@@ -9,7 +9,7 @@ import { getCartQuantity, getCartTotals } from '../lib/cart';
 import type { CartItem } from '../types/cart';
 import { useCurrentUser } from './useCurrentUser';
 
-// Every user has their own cache entry (like favorites).
+// Keyed by user, so another user on this computer never sees this cart.
 export const cartKeys = {
   all: ['cart'] as const,
   list: (userId: number) => ['cart', userId] as const,
@@ -20,10 +20,8 @@ export const cartKeys = {
 // (quantity 2, 3, 4) could reach the server in the wrong order.
 const cartScope = { id: 'cart' };
 
-// What onMutate remembers, so onError can put the cart back ("roll back").
 type RollbackContext = { previous?: CartItem[] };
 
-// The logged-in user's cart, read from GET /api/cart, plus the actions.
 export function useCart() {
   const { user, isPending: userPending } = useCurrentUser();
   const queryClient = useQueryClient();
@@ -38,9 +36,6 @@ export function useCart() {
 
   const cartItems = cartQuery.data ?? [];
 
-  // --- Shared steps for the optimistic changes (− / + and ×) ---
-
-  // Change the cached cart right away and remember how it was before.
   const changeCacheNow = async (change: (items: CartItem[]) => CartItem[]) => {
     // Stop a running GET, so its older answer does not overwrite our change.
     await queryClient.cancelQueries({ queryKey });
@@ -49,7 +44,6 @@ export function useCart() {
     return { previous };
   };
 
-  // The server said no: put the cart back as it was.
   const undoCacheChange = (
     _error: Error,
     _variables: unknown,
@@ -67,15 +61,12 @@ export function useCart() {
     }
   };
 
-  // --- Actions ---
-
   // Waits for the server (no optimistic update), so the page can show
   // "Adding…", then "Added" or the server's error (e.g. the limit of 10).
   const addMutation = useMutation({
     mutationKey: cartKeys.all,
     scope: cartScope,
     mutationFn: addToCart,
-    // The product page shows the error itself (e.g. the limit of 10).
     meta: { inlineError: true },
     // The answer has no product data, so load the full cart again.
     onSuccess: () => queryClient.invalidateQueries({ queryKey }),
@@ -119,7 +110,6 @@ export function useCart() {
     isLoggedIn: user !== null,
     // True while we do not know yet: who is logged in, or their cart.
     isPending: userPending || (user !== null && cartQuery.isPending),
-    // The request failed (after retries). refetch() = "Try again".
     isError: user !== null && cartQuery.isError,
     refetch: cartQuery.refetch,
     // The whole mutation, so the page can use .mutate, .isPending and .error.

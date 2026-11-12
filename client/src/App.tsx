@@ -14,15 +14,12 @@ import Toaster from './components/feedback/Toaster';
 import { useCartDrawerStore } from './stores/cartDrawerStore';
 
 export default function App() {
-  // Take only what this component needs from the store (a "selector"),
-  // so App re-renders only when these values change.
   const cartOpen = useCartDrawerStore((state) => state.cartOpen);
   const closeCart = useCartDrawerStore((state) => state.closeCart);
   const { pathname } = useLocation();
 
   return (
-    // A crash while drawing a page shows a "Something went wrong" screen
-    // instead of a white page. The toast is outside, so it always works.
+    // Toaster is outside the boundary, so messages still work after a crash.
     <>
       {/* key: a new page gives a fresh boundary, so after a crash the user
           can still go to another page. */}

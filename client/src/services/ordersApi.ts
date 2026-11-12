@@ -6,7 +6,6 @@ import type { DeliveryAddress, Order } from '../types/order';
 export const createOrder = (address: DeliveryAddress) =>
   apiRequest<Order>('/api/orders', { method: 'POST', body: address });
 
-// The logged-in user's orders, newest first.
 export const getOrders = () => apiRequest<Order[]>('/api/orders');
 
 // One of the user's orders. Resolves to null when it does not exist

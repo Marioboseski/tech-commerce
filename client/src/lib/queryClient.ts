@@ -11,10 +11,8 @@ declare module '@tanstack/react-query' {
   }
 }
 
-// How many times a failed request is tried again.
 const MAX_RETRIES = 2;
 
-// Runs for EVERY failed request (queries and mutations).
 // 401 = the login cookie is gone or expired: show the user as logged out.
 const handleUnauthorized = (error: Error) => {
   if (error instanceof ApiError && error.status === 401) {
@@ -22,7 +20,6 @@ const handleUnauthorized = (error: Error) => {
   }
 };
 
-// One cache for all data loaded from the API (server state).
 export const queryClient: QueryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: handleUnauthorized,

@@ -2,13 +2,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCurrentUser, loginUser, logoutUser } from '../services/authApi';
 import { clearSession } from '../lib/session';
 
-// One cache entry for "who is logged in", shared by every component.
 export const authKeys = {
   me: ['auth', 'me'] as const,
 };
 
-// The logged-in user, or null. Asks GET /api/auth/me once; after that all
-// components read the same cached answer.
 // isPending is true while we do not know yet (e.g. right after a refresh).
 export function useCurrentUser() {
   const { data, isPending } = useQuery({
@@ -30,7 +27,6 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: loginUser,
-    // The login form shows "Email or password is incorrect" itself.
     meta: { inlineError: true },
     // The server already sent us the user, so put it straight in the cache:
     // the header updates immediately, without another /me request.
@@ -43,7 +39,6 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: logoutUser,
-    // Forget the user and their favorites, cart and orders on this computer.
     onSuccess: () => clearSession(queryClient),
   });
 }

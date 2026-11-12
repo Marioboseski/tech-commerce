@@ -15,7 +15,6 @@ const specLabels: Record<string, string> = {
   connectivity: 'Connectivity',
 };
 
-// Turns the category-specific details object into label/value rows.
 export const getProductSpecs = (product: ApiProductDetails) => {
   const details =
     product.laptopDetails ??

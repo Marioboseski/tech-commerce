@@ -25,9 +25,6 @@ const copy = {
 // Sent by RegisterForm: navigate('/login', { state: { registered, email } }).
 type AccountPageState = { registered?: boolean; email?: string } | null;
 
-// The frame around the login and register forms (title, links, redirects).
-// Each form is its own component, because they have different fields and
-// rules (see components/account/).
 export default function AccountPage() {
   const { pathname, state } = useLocation();
   const mode = pathname === '/register' ? 'register' : 'login';
@@ -35,7 +32,6 @@ export default function AccountPage() {
   const content = copy[mode];
   const { registered, email } = (state as AccountPageState) ?? {};
 
-  // Already logged in: no reason to see the login/register form.
   if (user) {
     return <Navigate to="/" replace />;
   }

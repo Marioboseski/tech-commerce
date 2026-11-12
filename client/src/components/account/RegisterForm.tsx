@@ -11,7 +11,6 @@ export default function RegisterForm() {
   const navigate = useNavigate();
   const registerMutation = useMutation({
     mutationFn: registerUser,
-    // The form shows the error itself, so no toast.
     meta: { inlineError: true },
   });
   const {
@@ -42,7 +41,6 @@ export default function RegisterForm() {
           'password',
         ])
       ) {
-        // e.g. "An account with this email already exists"
         setError('root.server', {
           message:
             error instanceof Error ? error.message : 'Something went wrong',

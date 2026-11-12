@@ -20,21 +20,16 @@ export default function LoginForm({ defaultEmail = '' }: LoginFormProps) {
     setError,
     formState: { errors },
   } = useForm({
-    // Zod checks the form before onSubmit runs.
     resolver: zodResolver(loginSchema),
     defaultValues: { email: defaultEmail, password: '' },
-    // Show a field's error once the user leaves it, then live while typing.
     mode: 'onTouched',
   });
 
-  // Runs only when the form is valid; values are already trimmed by Zod.
   const onSubmit = handleSubmit(async (values) => {
     try {
       await login.mutateAsync(values);
       navigate('/');
     } catch (error) {
-      // Field errors from the server go under the inputs; anything else
-      // (e.g. "Email or password is incorrect") in the box below the button.
       if (!showServerFieldErrors(error, setError, ['email', 'password'])) {
         setError('root.server', {
           message:

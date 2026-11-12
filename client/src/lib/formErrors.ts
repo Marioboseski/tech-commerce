@@ -1,8 +1,7 @@
 import type { FieldValues, Path, UseFormSetError } from 'react-hook-form';
 import { ApiError } from './apiClient';
 
-// Puts the server's field errors (from Zod on the server) under the right
-// input, e.g. { field: "email", message: "..." } → under the email input.
+// Shows the server's field errors under the matching inputs.
 // Returns true when at least one field got a message, so the form does not
 // also need the general error box.
 export const showServerFieldErrors = <Values extends FieldValues>(

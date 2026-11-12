@@ -24,7 +24,6 @@ export default function AccountDashboardPage() {
     return <Navigate to="/login" replace />;
   }
 
-  // /orders has its own page now (OrdersPage), so this is only /profile.
   return (
     <div className="account-page">
       <StoreHeader />

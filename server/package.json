@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "images:optimize": "tsx scripts/optimize-images.ts"
+    "images:optimize": "tsx scripts/optimize-images.ts",
+    "admin:create": "tsx scripts/set-admin.ts",
+    "admin:remove": "tsx scripts/set-admin.ts --remove"
   },
   "keywords": [],
   "author": "",

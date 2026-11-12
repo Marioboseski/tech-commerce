@@ -123,8 +123,7 @@ export default function StoreProductPage() {
                 </p>
               )}
               <div className="detail-note">
-                Free delivery on demo orders over €75. Checkout will be
-                connected when we introduce the API.
+                Free delivery on orders over €75. Pay on delivery.
               </div>
             </div>
           </div>

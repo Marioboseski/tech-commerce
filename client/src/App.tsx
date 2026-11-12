@@ -7,6 +7,8 @@ import CartDrawer from './components/cart/CartDrawer';
 import AccountPage from './pages/AccountPage';
 import AccountDashboardPage from './pages/AccountDashboardPage';
 import CheckoutPage from './pages/CheckoutPage';
+import OrdersPage from './pages/OrdersPage';
+import OrderDetailsPage from './pages/OrderDetailsPage';
 import { CartDrawerProvider } from './context/CartDrawerProvider';
 import { useCartDrawer } from './hooks/useCartDrawer';
 
@@ -22,7 +24,8 @@ function AppRoutes() {
         <Route path="/login" element={<AccountPage />} />
         <Route path="/register" element={<AccountPage />} />
         <Route path="/profile" element={<AccountDashboardPage />} />
-        <Route path="/orders" element={<AccountDashboardPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
         <Route path="/categories/:slug" element={<CategoryPage />} />
         <Route path="/products/:id" element={<StoreProductPage />} />
       </Routes>

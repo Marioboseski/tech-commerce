@@ -1495,6 +1495,61 @@
   color: #23784a;
   font-size: 13px;
 }
+/* Orders: status label, My Orders list, order details */
+.order-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #f0edff;
+  color: var(--purple);
+  font-size: 12px;
+  font-weight: 700;
+}
+.order-status-delivered {
+  background: #ecf8f0;
+  color: #23784a;
+}
+.order-status-cancelled {
+  background: #fff0f3;
+  color: #b53850;
+}
+.orders-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 26px;
+}
+.order-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 22px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--muted);
+  box-shadow: 0 12px 28px rgba(42, 49, 92, 0.06);
+}
+.order-row:hover {
+  border-color: var(--purple);
+}
+.order-row strong {
+  color: var(--text);
+}
+.order-row-total {
+  min-width: 110px;
+  text-align: right;
+}
+.order-address {
+  margin: 0 0 18px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.order-back-link {
+  display: block;
+  margin-top: 18px;
+  text-align: center;
+}
 .account-main {
   display: grid;
   min-height: 62vh;
@@ -1599,6 +1654,13 @@
 @media (max-width: 680px) {
   .container {
     width: min(100% - 32px, 1240px);
+  }
+  .order-row {
+    grid-template-columns: 1fr auto;
+    gap: 8px 16px;
+  }
+  .order-row-total {
+    min-width: 0;
   }
   .header-inner {
     min-height: 76px;

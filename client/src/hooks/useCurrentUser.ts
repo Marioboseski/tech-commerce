@@ -42,11 +42,13 @@ export function useLogout() {
     mutationFn: logoutUser,
     onSuccess: () => {
       queryClient.setQueryData(authKeys.me, null);
-      // Forget the user's private data (favorites, cart) on this computer.
-      // Same keys as favoriteKeys.all / cartKeys.all; written out here
-      // because importing them would make the files import each other.
+      // Forget the user's private data (favorites, cart, orders) on this
+      // computer. Same keys as favoriteKeys.all / cartKeys.all /
+      // orderKeys.all; written out here because importing them would make
+      // the files import each other.
       queryClient.removeQueries({ queryKey: ['favorites'] });
       queryClient.removeQueries({ queryKey: ['cart'] });
+      queryClient.removeQueries({ queryKey: ['orders'] });
     },
   });
 }

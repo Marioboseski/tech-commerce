@@ -9,7 +9,8 @@ const categoryPlaceholders: Record<string, string> = {
   computers: '/products/tower-core.jpg',
 };
 
-const defaultPlaceholder = '/products/studiodesk.jpg';
+// Also used for order items, which have no category.
+export const defaultPlaceholder = '/products/studiodesk.jpg';
 
 export const getProductImage = (
   product: Pick<ApiProduct, 'imageUrl' | 'category'>,

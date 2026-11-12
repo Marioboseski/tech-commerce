@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma.js";
+import { toImageUrl } from "../lib/imageUrl.js";
 import { Prisma } from "../../generated/prisma/client.js";
 
 const FREE_SHIPPING_FROM = new Prisma.Decimal(75);
@@ -29,6 +30,7 @@ const orderSelect = {
       productName: true,
       unitPrice: true,
       quantity: true,
+      product: { select: { imageUrl: true } },
     },
   },
 } satisfies Prisma.OrderSelect;
@@ -40,9 +42,10 @@ const toApiOrder = (order: DbOrder) => ({
   subtotal: order.subtotal.toNumber(),
   shippingCost: order.shippingCost.toNumber(),
   total: order.total.toNumber(),
-  items: order.items.map((item) => ({
+  items: order.items.map(({ product, ...item }) => ({
     ...item,
     unitPrice: item.unitPrice.toNumber(),
+    imageUrl: toImageUrl(product?.imageUrl ?? null),
   })),
 });
 

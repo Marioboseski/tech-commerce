@@ -2,6 +2,8 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import AdminLayout from './components/AdminLayout';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminProductsPage from './pages/AdminProductsPage';
+import AdminProductFormPage from './pages/AdminProductFormPage';
 import './admin.css';
 
 // Everything under /admin. Loaded with React.lazy (see App.tsx), so
@@ -30,6 +32,9 @@ export default function AdminApp() {
       {/* Paths here are relative to /admin. */}
       <Routes>
         <Route index element={<AdminDashboardPage />} />
+        <Route path="products" element={<AdminProductsPage />} />
+        <Route path="products/new" element={<AdminProductFormPage />} />
+        <Route path="products/:id/edit" element={<AdminProductFormPage />} />
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>
     </AdminLayout>

@@ -8,7 +8,12 @@ type AdminLayoutProps = {
 };
 
 // New admin sections (Products, Orders) are added to this list.
-const navItems = [{ label: 'Dashboard', to: '/admin' }];
+// end: Dashboard (/admin) is active only on /admin itself; Products stays
+// active on /admin/products/new and /admin/products/5/edit too.
+const navItems = [
+  { label: 'Dashboard', to: '/admin', end: true },
+  { label: 'Products', to: '/admin/products', end: false },
+];
 
 export default function AdminLayout({ user, children }: AdminLayoutProps) {
   return (
@@ -26,9 +31,7 @@ export default function AdminLayout({ user, children }: AdminLayoutProps) {
             <NavLink
               key={item.to}
               to={item.to}
-              // `end`: "Dashboard" (/admin) is active only on /admin itself,
-              // not on every /admin/... page.
-              end
+              end={item.end}
               className={({ isActive }) =>
                 `admin-nav-link ${isActive ? 'active' : ''}`
               }

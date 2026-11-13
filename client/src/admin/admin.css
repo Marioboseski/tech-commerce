@@ -121,3 +121,176 @@
     padding: 16px;
   }
 }
+
+/* Page header, filters, table, pagination */
+.admin-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.admin-page-header .admin-title {
+  margin: 0;
+}
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.admin-toolbar input,
+.admin-toolbar select {
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--text);
+}
+.admin-toolbar input {
+  flex: 1 1 260px;
+}
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fff;
+  transition: opacity 0.15s;
+}
+.admin-table-wrap.is-loading {
+  opacity: 0.6;
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.admin-table th,
+.admin-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+.admin-table th {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.admin-table tr:last-child td {
+  border-bottom: 0;
+}
+.admin-product-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+  font-weight: 600;
+}
+.admin-product-cell img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f0edff;
+  object-fit: cover;
+}
+.admin-row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+}
+.admin-row-actions a,
+.admin-row-actions button {
+  border: 0;
+  background: none;
+  color: var(--purple);
+  font-weight: 700;
+  cursor: pointer;
+}
+.admin-row-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+  color: var(--muted);
+}
+.admin-pagination span {
+  margin-right: auto;
+}
+.admin-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Product form */
+.admin-form {
+  display: grid;
+  gap: 20px;
+  max-width: 900px;
+}
+.admin-form-section {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fff;
+}
+.admin-form-section h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0 16px;
+}
+.admin-form label {
+  display: grid;
+  gap: 7px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  font-weight: 400;
+}
+.admin-form input:disabled {
+  background: var(--bg);
+  color: var(--muted);
+}
+.admin-form textarea {
+  resize: vertical;
+}
+.admin-form [aria-invalid='true'] {
+  border-color: #b53850;
+}
+.admin-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+.admin-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.admin-form-actions .account-error {
+  margin: 0;
+}

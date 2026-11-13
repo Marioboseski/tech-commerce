@@ -1,6 +1,7 @@
 import type { ApiProductDetails } from '../types/product';
 
-const specLabels: Record<string, string> = {
+// Also used by the admin product form.
+export const specLabels: Record<string, string> = {
   screenSize: 'Screen size',
   ram: 'RAM',
   processor: 'Processor',

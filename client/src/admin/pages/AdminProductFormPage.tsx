@@ -7,7 +7,9 @@ import {
   useAdminProduct,
   useCategorySpecFields,
   useCreateProduct,
+  useRemoveProductImage,
   useUpdateProduct,
+  useUploadProductImage,
 } from '../hooks/useAdminProducts';
 import type { AdminProduct, AdminProductInput } from '../types';
 
@@ -50,16 +52,41 @@ export default function AdminProductFormPage() {
   const product = useAdminProduct(isEdit ? productId : null);
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
+  const uploadImage = useUploadProductImage();
+  const removeImage = useRemoveProductImage();
 
-  const save = async (input: AdminProductInput) => {
-    if (isEdit && productId !== null) {
-      await updateProduct.mutateAsync({ id: productId, input });
-      showToast('Product saved');
-    } else {
-      await createProduct.mutateAsync(input);
-      showToast('Product created');
+  // 1. Save the product (a new one needs an id before it can get an image).
+  // 2. Upload the chosen image, if any.
+  const save = async (input: AdminProductInput, imageFile: File | null) => {
+    const saved =
+      isEdit && productId !== null
+        ? await updateProduct.mutateAsync({ id: productId, input })
+        : await createProduct.mutateAsync(input);
+
+    if (imageFile) {
+      try {
+        await uploadImage.mutateAsync({ id: saved.id, file: imageFile });
+      } catch (error) {
+        // The product itself is saved: open it, so the image can be tried
+        // again, and say clearly what failed.
+        const reason = error instanceof Error ? error.message : '';
+        showToast(`Product saved, but the image was not: ${reason}`, 'error');
+        navigate(`/admin/products/${saved.id}/edit`, { replace: true });
+        return;
+      }
     }
+
+    showToast(isEdit ? 'Product saved' : 'Product created');
     navigate('/admin/products');
+  };
+
+  const removeSavedImage = () => {
+    if (productId === null) {
+      return;
+    }
+    removeImage.mutate(productId, {
+      onSuccess: () => showToast('Image removed'),
+    });
   };
 
   const title = isEdit ? 'Edit product' : 'New product';
@@ -111,6 +138,9 @@ export default function AdminProductFormPage() {
               : emptyProduct
           }
           lockCategory={isEdit}
+          imageUrl={isEdit ? (product.data?.imageUrl ?? null) : null}
+          onRemoveImage={isEdit ? removeSavedImage : undefined}
+          removingImage={removeImage.isPending}
           submitLabel={isEdit ? 'Save changes' : 'Create product'}
           onSubmit={save}
         />

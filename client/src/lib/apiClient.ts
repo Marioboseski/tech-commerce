@@ -31,15 +31,24 @@ export const apiRequest = async <T>(
     throw new Error('Missing VITE_API_URL environment variable');
   }
 
+  // Files are sent as FormData. The browser then sets the Content-Type
+  // itself (multipart/form-data with a "boundary"), so we must not set it.
+  const requestBody =
+    body === undefined
+      ? {}
+      : body instanceof FormData
+        ? { body }
+        : {
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          };
+
   let res: Response;
   try {
     res = await fetch(`${API_URL}${path}`, {
       method,
       credentials: 'include',
-      ...(body !== undefined && {
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      }),
+      ...requestBody,
     });
   } catch {
     // fetch itself only fails when there is no answer at all:

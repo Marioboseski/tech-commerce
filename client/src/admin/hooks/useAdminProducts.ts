@@ -10,8 +10,10 @@ import {
   getAdminProduct,
   getAdminProducts,
   getCategorySpecFields,
+  removeAdminProductImage,
   setAdminProductStatus,
   updateAdminProduct,
+  uploadAdminProductImage,
 } from '../services/adminApi';
 import type { AdminProductFilters } from '../types';
 import { adminKeys } from './useAdminStats';
@@ -86,6 +88,24 @@ export function useSetProductStatus() {
   const refresh = useRefreshAfterProductChange();
   return useMutation({
     mutationFn: setAdminProductStatus,
+    onSuccess: refresh,
+  });
+}
+
+export function useUploadProductImage() {
+  const refresh = useRefreshAfterProductChange();
+  return useMutation({
+    mutationFn: uploadAdminProductImage,
+    // The form shows the error under the image field.
+    meta: { inlineError: true },
+    onSuccess: refresh,
+  });
+}
+
+export function useRemoveProductImage() {
+  const refresh = useRefreshAfterProductChange();
+  return useMutation({
+    mutationFn: removeAdminProductImage,
     onSuccess: refresh,
   });
 }

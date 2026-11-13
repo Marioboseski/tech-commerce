@@ -69,3 +69,24 @@ export const setAdminProductStatus = ({
     method: 'PATCH',
     body: { isActive },
   });
+
+export const uploadAdminProductImage = ({
+  id,
+  file,
+}: {
+  id: number;
+  file: File;
+}) => {
+  const body = new FormData();
+  // Same field name as uploadImage (multer .single("image")) on the server.
+  body.append('image', file);
+  return apiRequest<AdminProduct>(`/api/admin/products/${id}/image`, {
+    method: 'POST',
+    body,
+  });
+};
+
+export const removeAdminProductImage = (id: number) =>
+  apiRequest<AdminProduct>(`/api/admin/products/${id}/image`, {
+    method: 'DELETE',
+  });

@@ -294,3 +294,47 @@
 .admin-form-actions .account-error {
   margin: 0;
 }
+
+/* Product image field */
+.admin-image-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+  margin-top: 14px;
+}
+.admin-image-preview {
+  width: 140px;
+  height: 140px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #f0edff;
+  object-fit: cover;
+}
+.admin-image-actions {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+.admin-image-actions button {
+  border: 0;
+  background: none;
+  color: var(--purple);
+  font-weight: 700;
+  cursor: pointer;
+}
+.admin-image-actions button:disabled {
+  opacity: 0.5;
+}
+.admin-file-button {
+  cursor: pointer;
+}
+/* Hidden from the eye, but still usable by keyboard and screen readers. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

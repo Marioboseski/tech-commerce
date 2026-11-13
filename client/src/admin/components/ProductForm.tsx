@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import type { Path, Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -5,6 +6,8 @@ import { z } from 'zod';
 import FormField from '../../components/forms/FormField';
 import { showServerFieldErrors } from '../../lib/formErrors';
 import { specLabels } from '../../lib/productSpecs';
+import { defaultPlaceholder, getProductImage } from '../../lib/productImage';
+import ProductImageField from './ProductImageField';
 import type {
   AdminCategory,
   AdminProductInput,
@@ -58,7 +61,16 @@ type ProductFormProps = {
   // Edit: the category is fixed (the server refuses to change it).
   lockCategory: boolean;
   submitLabel: string;
-  onSubmit: (input: AdminProductInput) => Promise<unknown>;
+  // The saved image (edit), or null.
+  imageUrl: string | null;
+  // Edit only: removes the saved image right away.
+  onRemoveImage?: () => void;
+  removingImage?: boolean;
+  // imageFile: a newly chosen photo, uploaded after the product is saved.
+  onSubmit: (
+    input: AdminProductInput,
+    imageFile: File | null,
+  ) => Promise<unknown>;
 };
 
 export default function ProductForm({
@@ -67,8 +79,13 @@ export default function ProductForm({
   defaultValues,
   lockCategory,
   submitLabel,
+  imageUrl,
+  onRemoveImage,
+  removingImage,
   onSubmit,
 }: ProductFormProps) {
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
   const slugFor = (categoryId: number) =>
     categories.find((category) => category.id === categoryId)?.slug;
 
@@ -98,13 +115,19 @@ export default function ProductForm({
   const categoryId = useWatch({ control, name: 'categoryId' });
   const slug = slugFor(categoryId);
   const fieldsOfCategory = slug ? Object.keys(specFields[slug] ?? {}) : [];
+  // Without a saved image the shop shows the category placeholder.
+  const currentImageUrl =
+    imageUrl ??
+    (slug
+      ? getProductImage({ imageUrl: null, category: { name: '', slug } })
+      : defaultPlaceholder);
   const lockedCategory = categories.find(
     (category) => category.id === defaultValues.categoryId,
   );
 
   const submit = handleSubmit(async (values) => {
     try {
-      await onSubmit(values);
+      await onSubmit(values, imageFile);
     } catch (error) {
       const fields = [
         'sku',
@@ -186,6 +209,18 @@ export default function ProductForm({
             <span className="field-error">{errors.description.message}</span>
           )}
         </label>
+      </section>
+
+      <section className="admin-form-section">
+        <h2>Image</h2>
+        <ProductImageField
+          currentImageUrl={currentImageUrl}
+          hasSavedImage={imageUrl !== null}
+          file={imageFile}
+          onFileChange={setImageFile}
+          onRemoveSaved={onRemoveImage}
+          removing={removingImage}
+        />
       </section>
 
       <section className="admin-form-section">

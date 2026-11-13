@@ -27,3 +27,21 @@ export const requiredText = (name: string, maxLength: number) =>
     .trim()
     .min(1, `${name} is required`)
     .max(maxLength, `${name} can be at most ${maxLength} characters`);
+
+const MAX_PAGE_SIZE = 100;
+
+// ?page=2&pageSize=20 for admin tables. Both optional (page 1, 20 rows).
+export const paginationFields = {
+  page: z
+    .string()
+    .regex(/^\d+$/, "page must be a positive integer")
+    .transform(Number)
+    .pipe(z.number().min(1, "page must be a positive integer"))
+    .default(1),
+  pageSize: z
+    .string()
+    .regex(/^\d+$/, `pageSize must be between 1 and ${MAX_PAGE_SIZE}`)
+    .transform(Number)
+    .pipe(z.number().min(1).max(MAX_PAGE_SIZE, `pageSize must be between 1 and ${MAX_PAGE_SIZE}`))
+    .default(20),
+};

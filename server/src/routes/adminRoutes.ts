@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getStats } from "../controllers/adminController.js";
+import { getOrder, listOrders, updateOrderStatus } from "../controllers/adminOrdersController.js";
 import {
   createProduct,
   getCategorySpecFields,
@@ -30,5 +31,9 @@ router.patch("/products/:id/status", setProductStatus);
 // uploadImage reads the file into req.file before the controller runs.
 router.post("/products/:id/image", uploadImage, uploadProductImage);
 router.delete("/products/:id/image", removeProductImage);
+
+router.get("/orders", listOrders);
+router.get("/orders/:orderId", getOrder);
+router.patch("/orders/:orderId/status", updateOrderStatus);
 
 export default router;

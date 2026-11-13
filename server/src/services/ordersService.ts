@@ -6,7 +6,8 @@ import type { DeliveryAddress } from "../schemas/ordersSchemas.js";
 const FREE_SHIPPING_FROM = new Prisma.Decimal(75);
 const SHIPPING_PRICE = new Prisma.Decimal("9.90");
 
-const orderSelect = {
+// Shared with the admin orders, so both return the same order shape.
+export const orderSelect = {
   id: true,
   status: true,
   fullName: true,
@@ -29,9 +30,9 @@ const orderSelect = {
   },
 } satisfies Prisma.OrderSelect;
 
-type DbOrder = Prisma.OrderGetPayload<{ select: typeof orderSelect }>;
+export type DbOrder = Prisma.OrderGetPayload<{ select: typeof orderSelect }>;
 
-const toApiOrder = (order: DbOrder) => ({
+export const toApiOrder = (order: DbOrder) => ({
   ...order,
   subtotal: order.subtotal.toNumber(),
   shippingCost: order.shippingCost.toNumber(),

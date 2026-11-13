@@ -1,26 +1,14 @@
 import { z } from "zod";
-import { idSchema, idTextSchema, requiredText } from "./commonSchemas.js";
+import { idSchema, idTextSchema, paginationFields, requiredText } from "./commonSchemas.js";
 import { categorySpecs } from "../lib/productCategories.js";
 import type { CategorySlug } from "../lib/productCategories.js";
 
-const MAX_PAGE_SIZE = 100;
 // Decimal(12, 2) in the database.
 const MAX_PRICE = 9_999_999_999.99;
 
 // GET /api/admin/products?page=&pageSize=&search=&categoryId=&status=
 export const adminProductsQuerySchema = z.object({
-  page: z
-    .string()
-    .regex(/^\d+$/, "page must be a positive integer")
-    .transform(Number)
-    .pipe(z.number().min(1, "page must be a positive integer"))
-    .default(1),
-  pageSize: z
-    .string()
-    .regex(/^\d+$/, `pageSize must be between 1 and ${MAX_PAGE_SIZE}`)
-    .transform(Number)
-    .pipe(z.number().min(1).max(MAX_PAGE_SIZE, `pageSize must be between 1 and ${MAX_PAGE_SIZE}`))
-    .default(20),
+  ...paginationFields,
   search: z.string().trim().max(100).optional(),
   categoryId: idTextSchema("categoryId").optional(),
   status: z.enum(["active", "archived", "all"], "status must be active, archived or all").default("all"),

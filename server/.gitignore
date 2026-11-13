@@ -6,3 +6,6 @@ node_modules
 
 # Original product photos; optimized copies live in public/images/products
 /images-source
+
+# Product photos uploaded from the admin panel (shop data, not code)
+/public/images/uploads

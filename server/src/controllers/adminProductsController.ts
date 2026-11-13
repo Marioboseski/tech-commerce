@@ -127,3 +127,33 @@ export const getCategorySpecFields = (_req: Request, res: Response) => {
   );
   return res.status(200).json(fields);
 };
+
+// POST /api/admin/products/:id/image   multipart/form-data, field "image"
+export const uploadProductImage = async (req: Request, res: Response) => {
+  const { id } = parseInput(adminProductParamsSchema, req.params);
+
+  if (!req.file) {
+    throw new HttpError(400, "Choose an image to upload", [
+      { field: "image", message: "Choose an image to upload" },
+    ]);
+  }
+
+  const product = await adminProductsService.setProductImage(id, req.file.buffer);
+
+  if (!product) {
+    throw new HttpError(404, "Product not found");
+  }
+
+  return res.status(200).json(product);
+};
+
+export const removeProductImage = async (req: Request, res: Response) => {
+  const { id } = parseInput(adminProductParamsSchema, req.params);
+  const product = await adminProductsService.removeProductImage(id);
+
+  if (!product) {
+    throw new HttpError(404, "Product not found");
+  }
+
+  return res.status(200).json(product);
+};

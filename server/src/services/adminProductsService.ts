@@ -3,6 +3,7 @@ import { toApiProduct } from "../lib/apiProduct.js";
 import { categorySpecs, isCategorySlug } from "../lib/productCategories.js";
 import type { CategorySlug } from "../lib/productCategories.js";
 import type { ProductInput } from "../schemas/adminProductSchemas.js";
+import { deleteUploadedImage, saveProductImage } from "../lib/productImages.js";
 import { Prisma } from "../../generated/prisma/client.js";
 
 type ListFilters = {
@@ -178,4 +179,42 @@ export const setProductActive = async (id: number, isActive: boolean) => {
   ]);
 
   return toApiProduct(product);
+};
+
+// Saves a new photo for a product and replaces the old one.
+// Returns null when the product does not exist.
+export const setProductImage = async (id: number, buffer: Buffer) => {
+  const product = await prisma.product.findUnique({
+    where: { id },
+    select: { sku: true, imageUrl: true },
+  });
+  if (!product) {
+    return null;
+  }
+
+  const newPath = await saveProductImage(buffer, product.sku);
+
+  try {
+    await prisma.product.update({ where: { id }, data: { imageUrl: newPath } });
+  } catch (error) {
+    // The database was not updated, so the new file would never be used.
+    await deleteUploadedImage(newPath);
+    throw error;
+  }
+
+  // Only after the database points to the new file.
+  await deleteUploadedImage(product.imageUrl);
+  return getProduct(id);
+};
+
+// The shop then shows the category placeholder. null if no such product.
+export const removeProductImage = async (id: number) => {
+  const product = await prisma.product.findUnique({ where: { id }, select: { imageUrl: true } });
+  if (!product) {
+    return null;
+  }
+
+  await prisma.product.update({ where: { id }, data: { imageUrl: null } });
+  await deleteUploadedImage(product.imageUrl);
+  return getProduct(id);
 };

@@ -1,5 +1,7 @@
 import type { ErrorRequestHandler } from "express";
+import multer from "multer";
 import { HttpError } from "../lib/httpError.js";
+import { MAX_UPLOAD_BYTES } from "../lib/productImages.js";
 import { Prisma } from "../../generated/prisma/client.js";
 
 // express.json() throws errors with a `type`, e.g. for broken JSON.
@@ -43,6 +45,18 @@ export const errorHandler: ErrorRequestHandler = (error, _req, res, next) => {
     if (error.type === "entity.too.large") {
       return res.status(413).json({ message: "Request body is too large" });
     }
+  }
+
+  // File uploads (multer): too big, too many files, wrong field name.
+  if (error instanceof multer.MulterError) {
+    const tooLarge = error.code === "LIMIT_FILE_SIZE";
+    const message = tooLarge
+      ? `The image can be at most ${MAX_UPLOAD_BYTES / 1024 / 1024} MB`
+      : 'Send exactly one image in the field "image"';
+    return res.status(tooLarge ? 413 : 400).json({
+      message,
+      errors: [{ field: "image", message }],
+    });
   }
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {

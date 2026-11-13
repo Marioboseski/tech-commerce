@@ -5,11 +5,14 @@ import {
   getCategorySpecFields,
   getProduct,
   listProducts,
+  removeProductImage,
   setProductStatus,
   updateProduct,
+  uploadProductImage,
 } from "../controllers/adminProductsController.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { requireAdmin } from "../middleware/requireAdmin.js";
+import { uploadImage } from "../middleware/uploadImage.js";
 
 const router = Router();
 
@@ -24,5 +27,8 @@ router.post("/products", createProduct);
 router.get("/products/:id", getProduct);
 router.put("/products/:id", updateProduct);
 router.patch("/products/:id/status", setProductStatus);
+// uploadImage reads the file into req.file before the controller runs.
+router.post("/products/:id/image", uploadImage, uploadProductImage);
+router.delete("/products/:id/image", removeProductImage);
 
 export default router;

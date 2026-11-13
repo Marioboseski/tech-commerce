@@ -12,7 +12,7 @@ const toApiCartItem = (item: {
 
 export const getCartItems = async (userId: number) => {
   const items = await prisma.cartItem.findMany({
-    where: { userId },
+    where: { userId, product: { isActive: true } },
     orderBy: { createdAt: "asc" },
     include: {
       product: {
@@ -44,7 +44,7 @@ export const addCartItem = async (
   productId: number,
 ): Promise<AddCartItemResult> => {
   const product = await prisma.product.findUnique({
-    where: { id: productId },
+    where: { id: productId, isActive: true },
     select: { id: true },
   });
 

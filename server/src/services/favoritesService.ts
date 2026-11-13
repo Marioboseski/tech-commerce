@@ -3,7 +3,8 @@ import { toApiProduct } from "../lib/apiProduct.js";
 
 export const getFavoriteProducts = async (userId: number) => {
   const favorites = await prisma.favorite.findMany({
-    where: { userId },
+    // Favorites of archived products stay, but are hidden until restored.
+    where: { userId, product: { isActive: true } },
     orderBy: { createdAt: "desc" },
     include: {
       product: {
@@ -24,7 +25,7 @@ export const getFavoriteProducts = async (userId: number) => {
 
 export const addFavorite = async (userId: number, productId: number) => {
   const product = await prisma.product.findUnique({
-    where: { id: productId },
+    where: { id: productId, isActive: true },
     select: { id: true },
   });
 

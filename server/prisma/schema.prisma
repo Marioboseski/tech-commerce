@@ -46,6 +46,9 @@ model Product {
   price              Decimal              @db.Decimal(12, 2)
   imageUrl           String?              @map("image_url") @db.VarChar(500)
   categoryId         Int                  @map("category_id")
+  // false = archived: hidden from the shop and cannot be ordered, but kept
+  // in the database (old orders, and it can be restored).
+  isActive           Boolean              @default(true) @map("is_active")
   category           Category             @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   laptopDetails      LaptopDetails?
   mobilePhoneDetails MobilePhoneDetails?
@@ -60,6 +63,7 @@ model Product {
 
   @@index([categoryId])
   @@index([name])
+  @@index([isActive])
   @@map("products")
 }
 

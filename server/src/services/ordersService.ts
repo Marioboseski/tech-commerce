@@ -57,7 +57,9 @@ export const createOrder = async (
   try {
     return await prisma.$transaction(async (tx) => {
       const cartItems = await tx.cartItem.findMany({
-        where: { userId },
+        // Archiving removes a product from carts; this also covers the
+        // moment in between.
+        where: { userId, product: { isActive: true } },
         orderBy: { createdAt: "asc" },
         select: {
           id: true,

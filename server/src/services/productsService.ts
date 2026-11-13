@@ -19,6 +19,8 @@ export const getProducts = async ({ categoryId, minPrice, maxPrice, ids, search,
 
   const products = await prisma.product.findMany({
     where: {
+      // Archived products are hidden from the shop.
+      isActive: true,
       // The MySQL collation (utf8mb4_unicode_ci) makes contains case-insensitive.
       ...(searchTerm !== undefined && {
         OR: [
@@ -57,6 +59,7 @@ export const getProductById = async (id: number) => {
   const product = await prisma.product.findUnique({
     where: {
       id,
+      isActive: true,
     },
     include: {
       category: {

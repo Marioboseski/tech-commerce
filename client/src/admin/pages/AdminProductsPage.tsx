@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import ErrorState from '../../components/feedback/ErrorState';
 import { useCategories } from '../../hooks/useCategories';
-import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { formatDate, money } from '../../lib/formatters';
 import { getProductImage } from '../../lib/productImage';
 import { showToast } from '../../stores/toastStore';
@@ -10,21 +8,24 @@ import {
   useAdminProducts,
   useSetProductStatus,
 } from '../hooks/useAdminProducts';
+import { useTableParams } from '../hooks/useTableParams';
 import type { ProductStatusFilter } from '../types';
 
 const PAGE_SIZE = 20;
-const SEARCH_DELAY_MS = 300;
 const STATUSES: ProductStatusFilter[] = ['all', 'active', 'archived'];
 
 const isStatus = (value: string | null): value is ProductStatusFilter =>
   STATUSES.includes(value as ProductStatusFilter);
 
 export default function AdminProductsPage() {
-  // Filters live in the URL (?page=2&status=archived...), so refresh and
-  // the Back button keep the same view.
-  const [searchParams, setSearchParams] = useSearchParams();
-  const page = Math.max(1, Number(searchParams.get('page')) || 1);
-  const search = searchParams.get('search') ?? '';
+  const {
+    searchParams,
+    page,
+    search,
+    searchInput,
+    setSearchInput,
+    updateParams,
+  } = useTableParams();
   const categoryParam = Number(searchParams.get('categoryId'));
   const categoryId = categoryParam > 0 ? categoryParam : undefined;
   const statusParam = searchParams.get('status');
@@ -32,36 +33,6 @@ export default function AdminProductsPage() {
 
   const { categories } = useCategories();
   const setStatus = useSetProductStatus();
-
-  // The input updates at once; the URL (and the request) only after a pause.
-  const [searchInput, setSearchInput] = useState(search);
-  const debouncedSearch = useDebouncedValue(searchInput, SEARCH_DELAY_MS);
-
-  const updateParams = (updates: Record<string, string | undefined>) => {
-    setSearchParams(
-      (current) => {
-        const next = new URLSearchParams(current);
-        for (const [key, value] of Object.entries(updates)) {
-          if (value) {
-            next.set(key, value);
-          } else {
-            next.delete(key);
-          }
-        }
-        return next;
-      },
-      { replace: true },
-    );
-  };
-
-  useEffect(() => {
-    if (debouncedSearch.trim() !== search) {
-      // A new search starts again at page 1.
-      updateParams({ search: debouncedSearch.trim(), page: undefined });
-    }
-    // updateParams changes every render; only the debounced text matters.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, search]);
 
   const { data, isPending, isError, refetch, isPlaceholderData } =
     useAdminProducts({ page, pageSize: PAGE_SIZE, search, categoryId, status });

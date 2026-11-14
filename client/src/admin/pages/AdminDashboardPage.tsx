@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import ErrorState from '../../components/feedback/ErrorState';
 import { useAdminStats } from '../hooks/useAdminStats';
 
@@ -21,10 +22,14 @@ export default function AdminDashboardPage() {
             <span>Orders</span>
             <strong>{stats.orders}</strong>
           </div>
-          <div className="admin-stat-card">
+          {/* Opens the orders that still need to be shipped. */}
+          <Link
+            className="admin-stat-card admin-stat-card-link"
+            to="/admin/orders?status=PENDING"
+          >
             <span>Pending orders</span>
             <strong>{stats.pendingOrders}</strong>
-          </div>
+          </Link>
           <div className="admin-stat-card">
             <span>Customers</span>
             <strong>{stats.customers}</strong>

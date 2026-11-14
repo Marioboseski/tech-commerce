@@ -1,5 +1,8 @@
 import { apiRequest } from '../../lib/apiClient';
 import type {
+  AdminOrder,
+  AdminOrderFilters,
+  AdminOrderListItem,
   AdminProduct,
   AdminProductFilters,
   AdminProductInput,
@@ -8,6 +11,7 @@ import type {
   CategorySpecFields,
   Paginated,
 } from '../types';
+import type { OrderStatus } from '../../types/order';
 
 export const getAdminStats = () => apiRequest<AdminStats>('/api/admin/stats');
 
@@ -89,4 +93,38 @@ export const uploadAdminProductImage = ({
 export const removeAdminProductImage = (id: number) =>
   apiRequest<AdminProduct>(`/api/admin/products/${id}/image`, {
     method: 'DELETE',
+  });
+
+export const getAdminOrders = ({
+  page,
+  pageSize,
+  status,
+  search,
+}: AdminOrderFilters) => {
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
+    status,
+  });
+  if (search.trim()) {
+    params.set('search', search.trim());
+  }
+  return apiRequest<Paginated<AdminOrderListItem>>(
+    `/api/admin/orders?${params}`,
+  );
+};
+
+export const getAdminOrder = (orderId: number) =>
+  apiRequest<AdminOrder>(`/api/admin/orders/${orderId}`);
+
+export const setAdminOrderStatus = ({
+  orderId,
+  status,
+}: {
+  orderId: number;
+  status: OrderStatus;
+}) =>
+  apiRequest<AdminOrder>(`/api/admin/orders/${orderId}/status`, {
+    method: 'PATCH',
+    body: { status },
   });

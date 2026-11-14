@@ -1,3 +1,5 @@
+import type { Order, OrderStatus } from '../types/order';
+
 export type AdminStats = {
   products: number;
   orders: number;
@@ -67,3 +69,35 @@ export type AdminProductInput = {
 
 // Category slug → spec field → max length, e.g. laptops → { ram: 50, ... }.
 export type CategorySpecFields = Record<string, Record<string, number>>;
+
+export type OrderStatusFilter = OrderStatus | 'ALL';
+
+export type AdminOrderFilters = {
+  page: number;
+  pageSize: number;
+  status: OrderStatusFilter;
+  search: string;
+};
+
+export type AdminCustomer = {
+  id: number;
+  fullName: string;
+  email: string;
+};
+
+// One row of the admin orders table.
+export type AdminOrderListItem = {
+  id: number;
+  status: OrderStatus;
+  total: number;
+  createdAt: string;
+  itemCount: number;
+  user: AdminCustomer;
+};
+
+// The same order the customer sees, plus who ordered it and the statuses
+// it may move to next (the server decides, see lib/orderStatus.ts there).
+export type AdminOrder = Order & {
+  customer: AdminCustomer;
+  nextStatuses: OrderStatus[];
+};

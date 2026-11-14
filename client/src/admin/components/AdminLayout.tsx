@@ -13,6 +13,7 @@ type AdminLayoutProps = {
 const navItems = [
   { label: 'Dashboard', to: '/admin', end: true },
   { label: 'Products', to: '/admin/products', end: false },
+  { label: 'Orders', to: '/admin/orders', end: false },
 ];
 
 export default function AdminLayout({ user, children }: AdminLayoutProps) {

@@ -2,9 +2,27 @@ import type { Order, OrderStatus } from '../types/order';
 
 export type AdminStats = {
   products: number;
+  activeProducts: number;
   orders: number;
   pendingOrders: number;
   customers: number;
+  // Cancelled orders are not counted as sales.
+  totalSales: number;
+  salesLast30Days: number;
+  ordersLast30Days: number;
+  recentOrders: {
+    id: number;
+    status: OrderStatus;
+    total: number;
+    createdAt: string;
+    user: AdminCustomer;
+  }[];
+  topProducts: {
+    id: number;
+    name: string;
+    imageUrl: string | null;
+    quantitySold: number;
+  }[];
 };
 
 export type AdminCategory = {

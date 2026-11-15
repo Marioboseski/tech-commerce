@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { FormEvent } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import CategoryCard from '../components/catalog/CategoryCard';
 import ProductCard from '../components/catalog/ProductCard';
 import SearchBar from '../components/catalog/SearchBar';
@@ -102,7 +102,7 @@ export default function StorefrontPage() {
               <p className="eyebrow">MODERN TECH STORE</p>
               <h1>Find the right tech for work, play and everyday life.</h1>
               <p className="hero-text">
-                Shop laptops, smartphones, tablets, desktops and accessories.
+                Shop laptops, smartphones, tablets, desktops and consoles.
                 Compare products, save your favorites and build your cart with
                 confidence.
               </p>
@@ -135,7 +135,7 @@ export default function StorefrontPage() {
               <p className="eyebrow">BROWSE THE COLLECTION</p>
               <h2 className="section-title">Shop by category</h2>
               <p className="subheading">
-                Visual category cards with subtle gradients and device artwork.
+                Find the right device for work, study and play.
               </p>
             </div>
           </div>
@@ -152,21 +152,26 @@ export default function StorefrontPage() {
               <h2 className="section-title">Tech for every day</h2>
             </div>
           </div>
+          {/* Each panel opens a category we really sell. */}
           <div className="panel-grid">
-            <article className="info-panel">
-              <span className="panel-kicker">Workspace</span>
-              <h3>Build a workspace that works for you.</h3>
-              <p>
-                Browse laptops, desktops and accessories for focused work and
-                everyday productivity.
-              </p>
+            <Link className="info-panel" to="/categories/computers">
+              {/* Text and picture side by side, so the picture can never
+                  cover the text. */}
+              <div className="panel-copy">
+                <span className="panel-kicker">Workspace</span>
+                <h3>Build a workspace that works for you.</h3>
+                <p>
+                  Browse laptops and desktops for focused work and everyday
+                  productivity.
+                </p>
+              </div>
               <img
                 className="panel-image"
                 src="/products/studiodesk.jpg"
                 alt=""
               />
-            </article>
-            <article className="info-panel">
+            </Link>
+            <Link className="info-panel" to="/categories/mobile-phones">
               <span className="panel-kicker">Mobile</span>
               <h3>Take your tech wherever you go.</h3>
               <img
@@ -174,16 +179,16 @@ export default function StorefrontPage() {
                 src="/products/apex-pro.jpg"
                 alt=""
               />
-            </article>
-            <article className="info-panel">
-              <span className="panel-kicker">Accessories</span>
-              <h3>Complete the setup with the right extras.</h3>
+            </Link>
+            <Link className="info-panel" to="/categories/consoles">
+              <span className="panel-kicker">Gaming</span>
+              <h3>Play anywhere, at home or on the go.</h3>
               <img
                 className="panel-image"
-                src="/products/wavepods.jpg"
+                src="/categories/gaming.webp"
                 alt=""
               />
-            </article>
+            </Link>
           </div>
         </section>
         <section className="container section" id="products">

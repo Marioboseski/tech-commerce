@@ -782,12 +782,33 @@
   gap: 18px;
 }
 .info-panel {
+  display: block;
   min-height: 245px;
   position: relative;
   padding: 26px;
   overflow: hidden;
   border-radius: 24px;
   background: linear-gradient(135deg, #e9e5ff, #f9f8ff);
+  /* The panels are links now: keep the text colors, no underline. */
+  color: inherit;
+  text-decoration: none;
+}
+.info-panel:focus-visible {
+  outline: 3px solid var(--purple);
+  outline-offset: 3px;
+}
+/* Workspace: text and picture side by side instead of the picture
+   floating over the text. */
+.info-panel:first-child {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+}
+.info-panel:first-child .panel-image {
+  position: static;
+  width: 100%;
+  height: 190px;
 }
 .info-panel:nth-child(2) {
   background: linear-gradient(135deg, #e2edff, #f9fbff);
@@ -1743,6 +1764,11 @@
   }
   .info-panel:first-child {
     grid-column: auto;
+    /* Phones: text on top, picture below. */
+    grid-template-columns: 1fr;
+  }
+  .info-panel:first-child .panel-image {
+    height: 170px;
   }
   .section {
     padding-top: 44px;

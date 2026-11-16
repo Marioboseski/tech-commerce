@@ -1,75 +1,149 @@
-# React + TypeScript + Vite
+# TechStore
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack online tech store: laptops, phones, computers, consoles and
+tablets. Customers can browse, search, save favorites, fill a cart and place
+orders; admins manage products and orders in their own panel.
 
-Currently, two official plugins are available:
+Built with **React + TypeScript** on the client and **Express + Prisma +
+MySQL** on the server.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+**Shop**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Categories with product specs (each category has its own spec table)
+- Search with live suggestions, price filter and sorting
+- Product pages with specifications and related products
 
-## Expanding the ESLint configuration
+**Account**
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Register and log in (JWT in an httpOnly cookie, passwords hashed with bcrypt)
+- Favorites and cart saved in the database, per account
+- Checkout with pay on delivery; prices and totals are always calculated by
+  the server
+- Order history with order details
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+**Admin panel** (`/admin`, only for users with the ADMIN role)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Dashboard: sales, pending orders, recent orders and top products
+- Products: create, edit, archive / restore, image upload (converted to WebP)
+- Orders: list with filters and search, status changes
+  (pending → shipped → delivered, or cancelled)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+**Quality**
 
+- Validation with Zod on the server and the client (same rules and messages)
+- One JSON error format and a global error handler
+- Clear loading, error and "try again" states in the UI
+- The admin panel is lazy-loaded, so shoppers never download it
+
+## Tech stack
+
+| Part     | Technologies                                                                                       |
+| -------- | -------------------------------------------------------------------------------------------------- |
+| Client   | React 19, TypeScript, Vite, React Router, TanStack Query, Zustand, React Hook Form, Zod, plain CSS |
+| Server   | Node.js, Express 5, TypeScript, Prisma 7, Zod, JSON Web Tokens, bcrypt, multer, sharp              |
+| Database | MySQL 8                                                                                            |
+
+## Getting started
+
+### Requirements
+
+- Node.js 22 or newer
+- MySQL 8 running locally
+
+### 1. Install
+
+```bash
+git clone https://github.com/Marioboseski/tech-commerce.git
+cd tech-commerce
+cd server && npm install
+cd ../client && npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Create the database
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sql
+CREATE DATABASE tech_commerce_db;
 ```
+
+### 3. Environment variables
+
+Copy the example files and fill in your own values:
+
+```bash
+cp server/.env.example server/.env
+cp client/.env.example client/.env
+```
+
+In `server/.env`, set at least your MySQL user and password in
+`DATABASE_URL` and a long random `JWT_SECRET`. The other defaults work for
+local development. Every variable is explained in the example files.
+
+### 4. Set up the database
+
+```bash
+cd server
+npx prisma generate        # creates the Prisma client
+npx prisma migrate deploy  # creates the tables
+npx prisma db seed         # adds categories and 50 products with images
+```
+
+### 5. Run
+
+In two terminals:
+
+```bash
+cd server && npm run dev   # API on http://localhost:5000
+cd client && npm run dev   # shop on http://localhost:5173
+```
+
+### 6. Create an admin
+
+Register an account on the website, then give it the ADMIN role:
+
+```bash
+cd server
+npm run admin:create -- you@example.com
+```
+
+Refresh the page and the **Admin panel** link appears in the profile
+menu. Admins can only be created this way, never through the website.
+
+## Project structure
+
+```text
+tech-commerce/
+├── client/                React app (Vite)
+│   ├── public/            static images (categories, favicon)
+│   └── src/
+│       ├── admin/         admin panel (lazy-loaded)
+│       ├── components/    UI components
+│       ├── hooks/         TanStack Query hooks (cart, favorites, orders...)
+│       ├── pages/         shop pages
+│       ├── schemas/       Zod form validation
+│       ├── services/      API calls
+│       └── stores/        Zustand (UI state only)
+├── server/                Express API
+│   ├── prisma/            schema, migrations, seed
+│   ├── public/images/     product images
+│   ├── scripts/           admin and image CLI scripts
+│   └── src/
+│       ├── controllers/   HTTP layer (read request, send response)
+│       ├── services/      business logic and database queries
+│       ├── routes/        API routes
+│       ├── schemas/       Zod request validation
+│       ├── middleware/    auth, admin check, uploads, errors
+│       └── lib/           shared helpers
+└── docs/NOTES.md          technical notes and decisions
+```
+
+## Technical notes
+
+How authentication, server state, optimistic updates, order transactions and
+error handling work, and why they were built this way, is explained in
+[docs/NOTES.md](docs/NOTES.md).
+
+## Author
+
+Mario Boseski · [GitHub](https://github.com/Marioboseski)

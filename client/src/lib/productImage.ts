@@ -1,16 +1,17 @@
 import type { ApiProduct } from '../types/product';
 
 // Product images come from the API (imageUrl). A product without an image
-// (imageUrl is null) shows a local placeholder for its category.
+// (imageUrl is null) shows the picture of its category instead.
 const categoryPlaceholders: Record<string, string> = {
-  laptops: '/products/novabook-air.jpg',
-  'mobile-phones': '/products/apex-pro.jpg',
-  tablets: '/products/slatepad.jpg',
-  computers: '/products/tower-core.jpg',
+  laptops: '/categories/laptops.webp',
+  'mobile-phones': '/categories/mobile-phones.webp',
+  tablets: '/categories/tablets.webp',
+  computers: '/categories/computers.webp',
+  consoles: '/categories/consoles.webp',
 };
 
 // Also used for order items, which have no category.
-export const defaultPlaceholder = '/products/studiodesk.jpg';
+export const defaultPlaceholder = '/product-placeholder.svg';
 
 export const getProductImage = (
   product: Pick<ApiProduct, 'imageUrl' | 'category'>,

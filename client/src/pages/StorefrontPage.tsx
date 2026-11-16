@@ -124,7 +124,7 @@ export default function StorefrontPage() {
             </div>
             <div className="hero-visual" aria-hidden="true">
               <div className="hero-product-photo hero-product-main">
-                <img src="/products/novabook-air.jpg" alt="" />
+                <img src="/categories/laptops.webp" alt="" />
               </div>
             </div>
           </div>
@@ -166,7 +166,7 @@ export default function StorefrontPage() {
               </div>
               <img
                 className="panel-image"
-                src="/products/studiodesk.jpg"
+                src="/categories/laptops.webp"
                 alt=""
               />
             </Link>
@@ -175,7 +175,7 @@ export default function StorefrontPage() {
               <h3>Take your tech wherever you go.</h3>
               <img
                 className="panel-image"
-                src="/products/apex-pro.jpg"
+                src="/categories/mobile.webp"
                 alt=""
               />
             </Link>

@@ -31,7 +31,6 @@ export default function AdminDashboardPage() {
                 {stats.ordersLast30Days === 1 ? '' : 's'}
               </small>
             </div>
-            {/* Opens the orders that still need to be shipped. */}
             <Link
               className="admin-stat-card admin-stat-card-link"
               to="/admin/orders?status=PENDING"

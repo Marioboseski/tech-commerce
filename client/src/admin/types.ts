@@ -31,7 +31,6 @@ export type AdminCategory = {
   slug: string;
 };
 
-// One row of the admin products table.
 export type AdminProductListItem = {
   id: number;
   sku: string;
@@ -63,8 +62,7 @@ export type Paginated<T> = {
 
 type SpecsRow = Record<string, string | number> | null;
 
-// One product with everything the edit form needs. Only the specs row of
-// the product's own category is filled.
+// Only the specs row of the product's own category is filled.
 export type AdminProduct = AdminProductListItem & {
   description: string;
   categoryId: number;
@@ -75,7 +73,6 @@ export type AdminProduct = AdminProductListItem & {
   tabletDetails: SpecsRow;
 };
 
-// What the form sends to POST / PUT.
 export type AdminProductInput = {
   sku: string;
   name: string;
@@ -103,7 +100,6 @@ export type AdminCustomer = {
   email: string;
 };
 
-// One row of the admin orders table.
 export type AdminOrderListItem = {
   id: number;
   status: OrderStatus;

@@ -31,7 +31,6 @@ export default function AdminApp() {
 
   return (
     <AdminLayout user={user}>
-      {/* Paths here are relative to /admin. */}
       <Routes>
         <Route index element={<AdminDashboardPage />} />
         <Route path="products" element={<AdminProductsPage />} />

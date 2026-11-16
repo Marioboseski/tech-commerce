@@ -112,7 +112,6 @@ export function useCart() {
     isPending: userPending || (user !== null && cartQuery.isPending),
     isError: user !== null && cartQuery.isError,
     refetch: cartQuery.refetch,
-    // The whole mutation, so the page can use .mutate, .isPending and .error.
     addToCart: addMutation,
     changeQuantity: (productId: number, quantity: number) =>
       quantityMutation.mutate({ productId, quantity }),

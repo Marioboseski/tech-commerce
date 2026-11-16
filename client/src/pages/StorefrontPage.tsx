@@ -152,7 +152,6 @@ export default function StorefrontPage() {
               <h2 className="section-title">Tech for every day</h2>
             </div>
           </div>
-          {/* Each panel opens a category we really sell. */}
           <div className="panel-grid">
             <Link className="info-panel" to="/categories/computers">
               {/* Text and picture side by side, so the picture can never

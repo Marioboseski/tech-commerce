@@ -7,12 +7,10 @@ const MAX_BYTES = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
 
 type ProductImageFieldProps = {
-  // The saved image (or the category placeholder when there is none).
   currentImageUrl: string;
   hasSavedImage: boolean;
   file: File | null;
   onFileChange: (file: File | null) => void;
-  // Only on edit: removes the saved image right away.
   onRemoveSaved?: () => void;
   removing?: boolean;
 };

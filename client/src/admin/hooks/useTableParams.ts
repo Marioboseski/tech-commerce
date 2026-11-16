@@ -12,7 +12,6 @@ export function useTableParams() {
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
   const search = searchParams.get('search') ?? '';
 
-  // Empty values are removed from the URL instead of written as "?x=".
   const updateParams = useCallback(
     (updates: Record<string, string | undefined>) => {
       setSearchParams(

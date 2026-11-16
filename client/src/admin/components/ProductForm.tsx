@@ -61,9 +61,7 @@ type ProductFormProps = {
   // Edit: the category is fixed (the server refuses to change it).
   lockCategory: boolean;
   submitLabel: string;
-  // The saved image (edit), or null.
   imageUrl: string | null;
-  // Edit only: removes the saved image right away.
   onRemoveImage?: () => void;
   removingImage?: boolean;
   // imageFile: a newly chosen photo, uploaded after the product is saved.

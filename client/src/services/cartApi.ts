@@ -6,7 +6,6 @@ export const MAX_CART_QUANTITY = 10;
 
 export const getCart = () => apiRequest<CartItem[]>('/api/cart');
 
-// Adds one piece (a new row, or quantity + 1).
 export const addToCart = (productId: number) =>
   apiRequest<void>('/api/cart', { method: 'POST', body: { productId } });
 

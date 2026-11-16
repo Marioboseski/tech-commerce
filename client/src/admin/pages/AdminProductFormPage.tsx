@@ -23,7 +23,6 @@ const emptyProduct = {
   details: {},
 } satisfies AdminProductInput;
 
-// The specs row of the product's own category, without id / productId.
 const detailsOf = (product: AdminProduct): Record<string, string> => {
   const row =
     product.laptopDetails ??
@@ -39,7 +38,6 @@ const detailsOf = (product: AdminProduct): Record<string, string> => {
   );
 };
 
-// /admin/products/new and /admin/products/:id/edit
 export default function AdminProductFormPage() {
   const { id } = useParams();
   const productId = id && /^[1-9]\d*$/.test(id) ? Number(id) : null;

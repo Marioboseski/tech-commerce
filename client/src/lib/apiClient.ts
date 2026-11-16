@@ -22,7 +22,6 @@ type ApiRequestOptions = {
   body?: unknown;
 };
 
-// The only function that talks to the API; every services/*Api.ts uses it.
 export const apiRequest = async <T>(
   path: string,
   { method = 'GET', body }: ApiRequestOptions = {},

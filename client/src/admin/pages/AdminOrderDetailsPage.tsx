@@ -35,7 +35,6 @@ export default function AdminOrderDetailsPage() {
       return;
     }
     const action = statusActions[status];
-    // Cancelling cannot be undone, so ask first.
     if (
       action.danger &&
       !window.confirm(`Cancel order #${order.id}? This cannot be undone.`)

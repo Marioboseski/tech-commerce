@@ -40,7 +40,6 @@ export function useSetOrderStatus() {
   return useMutation({
     mutationFn: setAdminOrderStatus,
     onSuccess: (order) => {
-      // The answer is the updated order: show it at once.
       queryClient.setQueryData(adminOrderKeys.detail(order.id), order);
       // Lists and the dashboard (pending count) are now out of date, and so
       // is "My Orders" if the admin also shops on this computer.

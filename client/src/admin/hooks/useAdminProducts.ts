@@ -31,7 +31,6 @@ export function useAdminProducts(filters: AdminProductFilters) {
   return useQuery({
     queryKey: adminProductKeys.list(filters),
     queryFn: () => getAdminProducts(filters),
-    // While the next page loads, keep the current one on screen.
     placeholderData: keepPreviousData,
   });
 }

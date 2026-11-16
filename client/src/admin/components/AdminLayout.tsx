@@ -7,7 +7,6 @@ type AdminLayoutProps = {
   children: ReactNode;
 };
 
-// New admin sections (Products, Orders) are added to this list.
 // end: Dashboard (/admin) is active only on /admin itself; Products stays
 // active on /admin/products/new and /admin/products/5/edit too.
 const navItems = [

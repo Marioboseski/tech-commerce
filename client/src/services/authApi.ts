@@ -1,7 +1,6 @@
 import { ApiError, apiRequest } from '../lib/apiClient';
 import type { ApiUser, LoginInput, RegisterInput } from '../types/auth';
 
-// Creates a new account (does not log in).
 export const registerUser = (data: RegisterInput) =>
   apiRequest<ApiUser>('/api/auth/register', { method: 'POST', body: data });
 

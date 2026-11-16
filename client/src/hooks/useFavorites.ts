@@ -35,7 +35,6 @@ export function useFavorites() {
   });
 
   const favoriteProducts = favoritesQuery.data ?? [];
-  // A Set makes favoriteIds.has(id) quick for every product card.
   const favoriteIds = new Set(favoriteProducts.map((product) => product.id));
 
   const toggleMutation = useMutation({

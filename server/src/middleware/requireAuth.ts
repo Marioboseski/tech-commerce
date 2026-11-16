@@ -11,7 +11,6 @@ declare global {
   }
 }
 
-// Lets the request through only with a valid login cookie; sets req.auth.
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   const token: unknown = req.cookies?.[AUTH_COOKIE_NAME];
 

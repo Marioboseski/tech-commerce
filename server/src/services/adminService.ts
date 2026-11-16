@@ -9,11 +9,9 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 // Cancelled orders were never paid, so they do not count as sales.
 const countedOrder = { status: { not: "CANCELLED" } } satisfies Prisma.OrderWhereInput;
 
-// Everything the admin dashboard shows, in one request.
 export const getAdminStats = async () => {
   const thirtyDaysAgo = new Date(Date.now() - 30 * DAY_MS);
 
-  // All independent, so they run at the same time.
   const [
     products,
     activeProducts,

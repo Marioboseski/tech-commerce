@@ -25,7 +25,6 @@ const prisma = new PrismaClient({ adapter });
 
 const PUBLIC_IMAGES_DIR = path.resolve(import.meta.dirname, "..", "public", "images");
 
-// Relative image path stored in the database, e.g. "products/laptops-001.webp".
 // Products without an optimized image get null, so the client shows a fallback.
 const getProductImagePath = (sku: string) => {
   const imagePath = `products/${sku.toLowerCase()}.webp`;
@@ -40,7 +39,6 @@ const categories = [
   { name: "Tablets", slug: "tablets" },
 ] as const;
 
-// The spec fields of each category (same columns as in schema.prisma).
 type LaptopSpecs = {
   screenSize: string;
   ram: string;

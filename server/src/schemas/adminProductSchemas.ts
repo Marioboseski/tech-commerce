@@ -6,7 +6,6 @@ import type { CategorySlug } from "../lib/productCategories.js";
 // Decimal(12, 2) in the database.
 const MAX_PRICE = 9_999_999_999.99;
 
-// GET /api/admin/products?page=&pageSize=&search=&categoryId=&status=
 export const adminProductsQuerySchema = z.object({
   ...paginationFields,
   search: z.string().trim().max(100).optional(),
@@ -18,7 +17,6 @@ export const adminProductParamsSchema = z.object({
   id: idTextSchema("id"),
 });
 
-// The fields every product has, no matter the category.
 export const productBaseSchema = z.object({
   // Upper case, so "laptops-001" and "LAPTOPS-001" cannot both exist.
   sku: requiredText("SKU", 50)
@@ -41,8 +39,6 @@ export const productBaseSchema = z.object({
 
 export type ProductInput = z.output<typeof productBaseSchema>;
 
-// The spec fields of one category, e.g. laptops → screenSize, ram, ...
-// All are required and limited to the column size.
 export const detailsSchemaFor = (slug: CategorySlug) => {
   const shape: Record<string, ReturnType<typeof requiredText>> = {};
   for (const [field, maxLength] of Object.entries(categorySpecs[slug].fields)) {
@@ -51,7 +47,6 @@ export const detailsSchemaFor = (slug: CategorySlug) => {
   return z.object(shape);
 };
 
-// PATCH /api/admin/products/:id/status   body: { "isActive": false }
 export const productStatusSchema = z.object({
   isActive: z.boolean("isActive must be true or false"),
 });

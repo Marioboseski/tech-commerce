@@ -34,7 +34,6 @@ const detailsInclude = {
   tabletDetails: true,
 } satisfies Prisma.ProductInclude;
 
-// One page of products for the admin table, archived ones included.
 export const listProducts = async ({ page, pageSize, search, categoryId, status }: ListFilters) => {
   const where: Prisma.ProductWhereInput = {
     ...(search && {
@@ -65,7 +64,6 @@ export const listProducts = async ({ page, pageSize, search, categoryId, status 
   };
 };
 
-// One product with its specs, also when archived. null if it does not exist.
 export const getProduct = async (id: number) => {
   const product = await prisma.product.findUnique({ where: { id }, include: detailsInclude });
   return product ? toApiProduct(product) : null;
@@ -112,7 +110,6 @@ export const createProduct = async (
       description: input.description,
       price: input.price,
       categoryId: input.categoryId,
-      // e.g. laptopDetails: { create: { screenSize, ram, ... } }
       [relation]: { create: details },
     } as Prisma.ProductUncheckedCreateInput,
     include: detailsInclude,
@@ -164,7 +161,6 @@ export const updateProduct = async (
   return { status: "saved", product: toApiProduct(product) };
 };
 
-// Archive (isActive = false) or restore. Returns null if it does not exist.
 export const setProductActive = async (id: number, isActive: boolean) => {
   const exists = await prisma.product.findUnique({ where: { id }, select: { id: true } });
   if (!exists) {
@@ -181,8 +177,6 @@ export const setProductActive = async (id: number, isActive: boolean) => {
   return toApiProduct(product);
 };
 
-// Saves a new photo for a product and replaces the old one.
-// Returns null when the product does not exist.
 export const setProductImage = async (id: number, buffer: Buffer) => {
   const product = await prisma.product.findUnique({
     where: { id },
@@ -207,7 +201,7 @@ export const setProductImage = async (id: number, buffer: Buffer) => {
   return getProduct(id);
 };
 
-// The shop then shows the category placeholder. null if no such product.
+// The shop then shows the category placeholder.
 export const removeProductImage = async (id: number) => {
   const product = await prisma.product.findUnique({ where: { id }, select: { imageUrl: true } });
   if (!product) {

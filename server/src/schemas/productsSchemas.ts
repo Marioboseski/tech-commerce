@@ -21,7 +21,6 @@ export const productsQuerySchema = z
       .min(1, `search must be between 1 and ${MAX_SEARCH_LENGTH} characters`)
       .max(MAX_SEARCH_LENGTH, `search must be between 1 and ${MAX_SEARCH_LENGTH} characters`)
       .optional(),
-    // Maximum number of products to return, e.g. 6 for search suggestions.
     limit: z
       .string(`limit must be an integer between 1 and ${MAX_LIMIT}`)
       .regex(/^\d+$/, `limit must be an integer between 1 and ${MAX_LIMIT}`)

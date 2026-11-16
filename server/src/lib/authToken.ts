@@ -26,7 +26,6 @@ export const signAuthToken = ({ userId, role }: AuthTokenPayload): string =>
     expiresIn: AUTH_TOKEN_MAX_AGE_MS / 1000,
   });
 
-// Returns null when the token is fake, changed or expired.
 export const verifyAuthToken = (token: string): AuthTokenPayload | null => {
   try {
     const payload = jwt.verify(token, JWT_SECRET);

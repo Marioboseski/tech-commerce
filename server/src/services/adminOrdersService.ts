@@ -12,13 +12,11 @@ type ListFilters = {
 
 const customerSelect = { id: true, fullName: true, email: true } satisfies Prisma.UserSelect;
 
-// "12" or "#12" → 12, anything else → null.
 const orderNumberFrom = (search: string) => {
   const match = /^#?(\d{1,9})$/.exec(search);
   return match ? Number(match[1]) : null;
 };
 
-// One page of all orders (every customer), newest first.
 export const listOrders = async ({ page, pageSize, status, search }: ListFilters) => {
   const orderNumber = search ? orderNumberFrom(search) : null;
 
@@ -67,8 +65,6 @@ export const listOrders = async ({ page, pageSize, status, search }: ListFilters
   };
 };
 
-// One order with its customer and the statuses it may move to next.
-// null if it does not exist.
 export const getOrder = async (id: number) => {
   const order = await prisma.order.findUnique({
     where: { id },

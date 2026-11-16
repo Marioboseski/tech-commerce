@@ -47,7 +47,6 @@ export const errorHandler: ErrorRequestHandler = (error, _req, res, next) => {
     }
   }
 
-  // File uploads (multer): too big, too many files, wrong field name.
   if (error instanceof multer.MulterError) {
     const tooLarge = error.code === "LIMIT_FILE_SIZE";
     const message = tooLarge

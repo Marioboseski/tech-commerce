@@ -22,7 +22,6 @@ const publicUserSelect = {
   createdAt: true,
 } as const;
 
-// Returns null when the email is already registered.
 export const registerUser = async ({ fullName, email, password }: RegisterInput) => {
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
@@ -53,7 +52,6 @@ type LoginInput = {
 // cannot guess from the response time which emails are registered.
 const DUMMY_PASSWORD_HASH = bcrypt.hashSync(crypto.randomUUID(), PASSWORD_SALT_ROUNDS);
 
-// Returns null when the email or the password is wrong.
 export const loginUser = async ({ email, password }: LoginInput) => {
   const user = await prisma.user.findUnique({
     where: { email },
@@ -69,7 +67,6 @@ export const loginUser = async ({ email, password }: LoginInput) => {
     return null;
   }
 
-  // Take passwordHash out so it is never sent to the client.
   const { passwordHash: _passwordHash, ...publicUser } = user;
   const token = signAuthToken({ userId: user.id, role: user.role });
 

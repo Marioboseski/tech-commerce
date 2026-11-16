@@ -18,8 +18,6 @@ const QUALITY = 80;
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
-// Turns an uploaded photo into a small WebP file and returns the path to
-// store in the database, e.g. "uploads/laptops-001-1731500000000.webp".
 // The time in the name makes every upload a new URL, so browsers do not
 // keep showing the old cached picture.
 export const saveProductImage = async (buffer: Buffer, sku: string) => {
@@ -46,8 +44,6 @@ export const saveProductImage = async (buffer: Buffer, sku: string) => {
   return relativePath;
 };
 
-// Deletes an image that was uploaded through the admin panel.
-// Seed photos (products/...) are never deleted.
 export const deleteUploadedImage = async (relativePath: string | null) => {
   if (!relativePath?.startsWith(`${UPLOADS_FOLDER}/`)) {
     return;

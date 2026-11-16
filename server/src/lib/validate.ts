@@ -1,8 +1,6 @@
 import type { z } from "zod";
 import { HttpError } from "./httpError.js";
 
-// Returns the parsed (typed, trimmed) value, or throws a 400 HttpError
-// with one { field, message } per invalid field.
 export const parseInput = <Schema extends z.ZodType>(
   schema: Schema,
   value: unknown,

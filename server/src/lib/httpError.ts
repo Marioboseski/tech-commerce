@@ -3,8 +3,7 @@ export type FieldError = {
   message: string;
 };
 
-// An expected error with an HTTP status, e.g. 404 "Product not found".
-// The global errorHandler turns it into the JSON response.
+// Thrown for expected errors; errorHandler turns it into the JSON response.
 export class HttpError extends Error {
   readonly status: number;
   readonly errors: FieldError[] | undefined;

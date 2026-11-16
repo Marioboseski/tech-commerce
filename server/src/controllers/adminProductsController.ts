@@ -120,7 +120,6 @@ export const setProductStatus = async (req: Request, res: Response) => {
   return res.status(200).json(product);
 };
 
-// The spec fields per category, so the admin form knows what to show.
 export const getCategorySpecFields = (_req: Request, res: Response) => {
   const fields = Object.fromEntries(
     Object.entries(categorySpecs).map(([slug, spec]) => [slug, spec.fields]),
@@ -128,7 +127,6 @@ export const getCategorySpecFields = (_req: Request, res: Response) => {
   return res.status(200).json(fields);
 };
 
-// POST /api/admin/products/:id/image   multipart/form-data, field "image"
 export const uploadProductImage = async (req: Request, res: Response) => {
   const { id } = parseInput(adminProductParamsSchema, req.params);
 

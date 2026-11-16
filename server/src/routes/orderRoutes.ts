@@ -8,7 +8,6 @@ router.use(requireAuth);
 
 router.post("/", createOrder);
 router.get("/", getOrders);
-// The name after ":" must match req.params.orderId in the controller.
 router.get("/:orderId", getOrder);
 
 export default router;

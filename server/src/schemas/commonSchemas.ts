@@ -30,7 +30,6 @@ export const requiredText = (name: string, maxLength: number) =>
 
 const MAX_PAGE_SIZE = 100;
 
-// ?page=2&pageSize=20 for admin tables. Both optional (page 1, 20 rows).
 export const paginationFields = {
   page: z
     .string()

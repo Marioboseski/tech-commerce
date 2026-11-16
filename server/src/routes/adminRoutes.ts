@@ -28,7 +28,6 @@ router.post("/products", createProduct);
 router.get("/products/:id", getProduct);
 router.put("/products/:id", updateProduct);
 router.patch("/products/:id/status", setProductStatus);
-// uploadImage reads the file into req.file before the controller runs.
 router.post("/products/:id/image", uploadImage, uploadProductImage);
 router.delete("/products/:id/image", removeProductImage);
 

@@ -85,7 +85,7 @@ export default function StorefrontPage() {
   };
 
   return (
-    <div className="storefront" id="home">
+    <div className="storefront">
       <StoreHeader
         middle={
           <SearchBar

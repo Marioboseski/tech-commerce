@@ -2,6 +2,7 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { money } from '../lib/formatters';
 import { getProductImage } from '../lib/productImage';
 import { getProductSpecs } from '../lib/productSpecs';
+import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductGallery from '../components/product/ProductGallery';
 import ProductCard from '../components/catalog/ProductCard';
@@ -180,6 +181,7 @@ export default function StoreProductPage() {
           )}
         </section>
       </main>
+      <StoreFooter />
     </div>
   );
 }

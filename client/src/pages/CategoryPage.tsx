@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Navigate, useParams, useSearchParams } from 'react-router-dom';
+import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductCard from '../components/catalog/ProductCard';
 import { useCategories } from '../hooks/useCategories';
@@ -216,6 +217,7 @@ export default function CategoryPage() {
           </div>
         </section>
       </main>
+      <StoreFooter />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductCard from '../components/catalog/ProductCard';
 import ErrorState from '../components/feedback/ErrorState';
@@ -66,6 +67,7 @@ export default function FavoritesPage() {
           )}
         </section>
       </main>
+      <StoreFooter />
     </div>
   );
 }

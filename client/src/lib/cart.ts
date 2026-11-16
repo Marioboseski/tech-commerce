@@ -1,6 +1,6 @@
 import type { CartItem } from '../types/cart';
 
-const FREE_SHIPPING_FROM = 75;
+export const FREE_SHIPPING_FROM = 75;
 const SHIPPING_PRICE = 9.9;
 
 export const getCartQuantity = (items: CartItem[]) =>

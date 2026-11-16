@@ -1,7 +1,6 @@
 import { z } from "zod";
-import { MAX_INT_ID, idTextSchema } from "./commonSchemas.js";
+import { idTextSchema } from "./commonSchemas.js";
 
-const MAX_IDS = 100;
 const MAX_SEARCH_LENGTH = 100;
 const MAX_LIMIT = 100;
 
@@ -16,22 +15,6 @@ export const productsQuerySchema = z
     categoryId: idTextSchema("categoryId").optional(),
     minPrice: priceText("minPrice").optional(),
     maxPrice: priceText("maxPrice").optional(),
-    ids: z
-      .string("ids must be a comma-separated list of positive integers")
-      .regex(/^\d+(,\d+)*$/, "ids must be a comma-separated list of positive integers")
-      .transform((value) => value.split(",").map(Number))
-      .pipe(
-        z
-          .array(
-            z
-              .number()
-              .int()
-              .min(1, "ids must be a comma-separated list of positive integers")
-              .max(MAX_INT_ID, "ids contains a number that is too big"),
-          )
-          .max(MAX_IDS, `ids can contain at most ${MAX_IDS} values`),
-      )
-      .optional(),
     search: z
       .string(`search must be between 1 and ${MAX_SEARCH_LENGTH} characters`)
       .trim()

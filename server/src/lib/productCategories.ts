@@ -27,7 +27,6 @@ export const categorySpecs = {
 } as const;
 
 export type CategorySlug = keyof typeof categorySpecs;
-export type DetailsRelation = (typeof categorySpecs)[CategorySlug]["relation"];
 
 export const isCategorySlug = (slug: string): slug is CategorySlug =>
   Object.hasOwn(categorySpecs, slug);

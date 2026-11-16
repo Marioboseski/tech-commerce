@@ -5,7 +5,7 @@ import { productParamsSchema, productsQuerySchema } from "../schemas/productsSch
 import type { Request, Response } from "express";
 
 export const getProducts = async (req: Request, res: Response) => {
-  const { categoryId, minPrice, maxPrice, ids, search, limit } = parseInput(
+  const { categoryId, minPrice, maxPrice, search, limit } = parseInput(
     productsQuerySchema,
     req.query,
   );
@@ -14,7 +14,6 @@ export const getProducts = async (req: Request, res: Response) => {
     categoryId,
     minPrice,
     maxPrice,
-    ids,
     search,
     limit,
   });

@@ -5,7 +5,6 @@ export type ProductFilters = {
   categoryId?: number;
   minPrice?: number;
   maxPrice?: number;
-  ids?: number[];
   search?: string;
   limit?: number;
 };
@@ -14,7 +13,7 @@ export const getProducts = (filters: ProductFilters = {}) => {
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([key, value]) => {
     if (value !== undefined) {
-      params.set(key, Array.isArray(value) ? value.join(',') : String(value));
+      params.set(key, String(value));
     }
   });
   const query = params.size ? `?${params}` : '';

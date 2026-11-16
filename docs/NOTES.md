@@ -167,7 +167,7 @@ cookie (`requireAuth`).
 
 | Method | Path | Notes |
 |---|---|---|
-| GET | `/api/products` | Query: `categoryId`, `minPrice`, `maxPrice`, `ids`, `search`, `limit` |
+| GET | `/api/products` | Query: `categoryId`, `minPrice`, `maxPrice`, `search`, `limit` |
 | GET | `/api/products/:id` | 404 if it does not exist |
 | GET | `/api/categories` | |
 | POST | `/api/auth/register`, `/login`, `/logout` | |

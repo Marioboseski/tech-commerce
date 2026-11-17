@@ -1,26 +1,45 @@
 import { useMemo } from 'react';
 import type { FormEvent } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { categories, products } from '../data/catalog';
-import type { Category } from '../data/catalog';
+import { Link, useSearchParams } from 'react-router-dom';
 import CategoryCard from '../components/catalog/CategoryCard';
 import ProductCard from '../components/catalog/ProductCard';
 import SearchBar from '../components/catalog/SearchBar';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
 import { useFavorites } from '../hooks/useFavorites';
+import { useCategories } from '../hooks/useCategories';
+import { useProducts } from '../hooks/useProducts';
+import ErrorState from '../components/feedback/ErrorState';
+import type { ApiProduct } from '../types/product';
+
+// Stable empty list while the first request is loading.
+const NO_PRODUCTS: ApiProduct[] = [];
 
 export default function StorefrontPage() {
+  const { categories, categoriesLoaded, categoriesError, refetchCategories } =
+    useCategories();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { favorites, toggleFavorite } = useFavorites();
-  const requestedCategory = searchParams.get('category') as Category | null;
-  const category =
-    requestedCategory === 'All' ||
-    categories.some((item) => item.name === requestedCategory)
-      ? (requestedCategory ?? 'All')
-      : 'All';
+  const { favoriteIds, toggleFavorite } = useFavorites();
+  const requestedCategory = searchParams.get('category');
+  const category = requestedCategory &&
+    categories.some((item) => item.slug === requestedCategory)
+    ? (requestedCategory) : 'All';
+  const selectedCategory = categories.find((item) => item.slug === category);
+  const selectedCategoryId = selectedCategory?.id;
   const query = searchParams.get('search') ?? '';
   const sort = searchParams.get('sort') ?? 'featured';
+
+  // Waits for the categories, because ?category=<slug> in the URL is turned
+  // into a category id. The previous list stays visible while switching.
+  const {
+    data: products = NO_PRODUCTS,
+    isPending: productsPending,
+    isError: productsError,
+    refetch: refetchProducts,
+  } = useProducts(
+    { categoryId: selectedCategoryId },
+    { enabled: categoriesLoaded, keepPrevious: true },
+  );
 
   const updateFilters = (updates: Record<string, string>) => {
     setSearchParams(
@@ -44,8 +63,7 @@ export default function StorefrontPage() {
       products
         .filter(
           (product) =>
-            (category === 'All' || product.category === category) &&
-            `${product.name} ${product.category} ${product.description}`
+            `${product.name} ${product.category.name} ${product.description}`
               .toLowerCase()
               .includes(query.toLowerCase()),
         )
@@ -58,7 +76,7 @@ export default function StorefrontPage() {
                 ? a.name.localeCompare(b.name)
                 : 0,
         ),
-    [category, query, sort],
+    [products, query, sort],
   );
 
   const submitSearch = (event: FormEvent) => {
@@ -67,7 +85,7 @@ export default function StorefrontPage() {
   };
 
   return (
-    <div className="storefront" id="home">
+    <div className="storefront">
       <StoreHeader
         middle={
           <SearchBar
@@ -84,7 +102,7 @@ export default function StorefrontPage() {
               <p className="eyebrow">MODERN TECH STORE</p>
               <h1>Find the right tech for work, play and everyday life.</h1>
               <p className="hero-text">
-                Shop laptops, smartphones, tablets, desktops and accessories.
+                Shop laptops, smartphones, tablets, desktops and consoles.
                 Compare products, save your favorites and build your cart with
                 confidence.
               </p>
@@ -106,7 +124,7 @@ export default function StorefrontPage() {
             </div>
             <div className="hero-visual" aria-hidden="true">
               <div className="hero-product-photo hero-product-main">
-                <img src="/products/novabook-air.jpg" alt="" />
+                <img src="/categories/laptops.webp" alt="" />
               </div>
             </div>
           </div>
@@ -117,7 +135,7 @@ export default function StorefrontPage() {
               <p className="eyebrow">BROWSE THE COLLECTION</p>
               <h2 className="section-title">Shop by category</h2>
               <p className="subheading">
-                Visual category cards with subtle gradients and device artwork.
+                Find the right device for work, study and play.
               </p>
             </div>
           </div>
@@ -135,37 +153,41 @@ export default function StorefrontPage() {
             </div>
           </div>
           <div className="panel-grid">
-            <article className="info-panel">
-              <span className="panel-kicker">Workspace</span>
-              <h3>Build a workspace that works for you.</h3>
-              <p>
-                Browse laptops, desktops and accessories for focused work and
-                everyday productivity.
-              </p>
+            <Link className="info-panel" to="/categories/computers">
+              {/* Text and picture side by side, so the picture can never
+                  cover the text. */}
+              <div className="panel-copy">
+                <span className="panel-kicker">Workspace</span>
+                <h3>Build a workspace that works for you.</h3>
+                <p>
+                  Browse laptops and desktops for focused work and everyday
+                  productivity.
+                </p>
+              </div>
               <img
                 className="panel-image"
-                src="/products/studiodesk.jpg"
+                src="/categories/laptops.webp"
                 alt=""
               />
-            </article>
-            <article className="info-panel">
+            </Link>
+            <Link className="info-panel" to="/categories/mobile-phones">
               <span className="panel-kicker">Mobile</span>
               <h3>Take your tech wherever you go.</h3>
               <img
                 className="panel-image"
-                src="/products/apex-pro.jpg"
+                src="/categories/mobile.webp"
                 alt=""
               />
-            </article>
-            <article className="info-panel">
-              <span className="panel-kicker">Accessories</span>
-              <h3>Complete the setup with the right extras.</h3>
+            </Link>
+            <Link className="info-panel" to="/categories/consoles">
+              <span className="panel-kicker">Gaming</span>
+              <h3>Play anywhere, at home or on the go.</h3>
               <img
                 className="panel-image"
-                src="/products/wavepods.jpg"
+                src="/categories/gaming.webp"
                 alt=""
               />
-            </article>
+            </Link>
           </div>
         </section>
         <section className="container section" id="products">
@@ -187,7 +209,7 @@ export default function StorefrontPage() {
               >
                 <option value="All">All categories</option>
                 {categories.map((item) => (
-                  <option key={item.name}>{item.name}</option>
+                  <option key={item.id} value={item.slug}>{item.name}</option>
                 ))}
               </select>
               <select
@@ -203,14 +225,20 @@ export default function StorefrontPage() {
               </select>
             </div>
           </div>
-          {shown.length ? (
+          {categoriesError ? (
+            <ErrorState what="the categories" onRetry={refetchCategories} />
+          ) : productsError ? (
+            <ErrorState what="the products" onRetry={refetchProducts} />
+          ) : productsPending ? (
+            <p className="subheading">Loading products…</p>
+          ) : shown.length ? (
             <div className="product-grid">
               {shown.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
                   onFavorite={toggleFavorite}
-                  isFavorite={favorites.has(product.id)}
+                  isFavorite={favoriteIds.has(product.id)}
                 />
               ))}
             </div>

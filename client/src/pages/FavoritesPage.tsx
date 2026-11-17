@@ -1,13 +1,20 @@
+import { Link } from 'react-router-dom';
+import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
 import ProductCard from '../components/catalog/ProductCard';
-import { products } from '../data/catalog';
+import ErrorState from '../components/feedback/ErrorState';
 import { useFavorites } from '../hooks/useFavorites';
 
 export default function FavoritesPage() {
-  const { favorites, toggleFavorite } = useFavorites();
-  const favoriteProducts = products.filter((product) =>
-    favorites.has(product.id),
-  );
+  const {
+    favoriteProducts,
+    toggleFavorite,
+    isLoggedIn,
+    isPending,
+    isError,
+    refetch,
+  } = useFavorites();
+  const count = favoriteProducts.length;
 
   return (
     <div className="listing-page">
@@ -19,13 +26,29 @@ export default function FavoritesPage() {
             <div>
               <h1 className="section-title">Favorites</h1>
               <p className="subheading">
-                {favoriteProducts.length
-                  ? `${favoriteProducts.length} saved product${favoriteProducts.length === 1 ? '' : 's'}.`
-                  : 'There is nothing in your favorites yet.'}
+                {isPending
+                  ? 'Loading favorites…'
+                  : isError
+                    ? ''
+                    : !isLoggedIn
+                      ? 'Sign in to see your favorites.'
+                      : count
+                        ? `${count} saved product${count === 1 ? '' : 's'}.`
+                        : 'There is nothing in your favorites yet.'}
               </p>
             </div>
           </div>
-          {favoriteProducts.length ? (
+          {isPending ? null : isError ? (
+            <ErrorState what="your favorites" onRetry={refetch} />
+          ) : !isLoggedIn ? (
+            <div className="favorites-empty-state">
+              <h2>Your favorites are saved to your account</h2>
+              <p>
+                <Link to="/login">Sign in</Link> to see and save your favorite
+                products.
+              </p>
+            </div>
+          ) : count ? (
             <div className="product-grid">
               {favoriteProducts.map((product) => (
                 <ProductCard
@@ -44,6 +67,7 @@ export default function FavoritesPage() {
           )}
         </section>
       </main>
+      <StoreFooter />
     </div>
   );
 }

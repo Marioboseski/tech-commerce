@@ -1,19 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
-import { products } from '../../data/catalog';
 import { money } from '../../lib/formatters';
+import { getProductImage } from '../../lib/productImage';
 import { useFavorites } from '../../hooks/useFavorites';
+
+const PREVIEW_COUNT = 3;
 
 export default function FavoritesMenu() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { favorites } = useFavorites();
-  const favoriteProducts = useMemo(
-    () => products.filter((product) => favorites.has(product.id)),
-    [favorites],
-  );
-  const previewProducts = favoriteProducts.slice(0, 3);
+  // Same cached list as the favorites page, so no extra request here.
+  const { favoriteProducts, isLoggedIn, isPending, isError } = useFavorites();
+  // The list is newest first, so the preview shows the latest saved products.
+  const previewProducts = favoriteProducts.slice(0, PREVIEW_COUNT);
+  const favoritesCount = favoriteProducts.length;
 
   useEffect(() => {
     if (!open) {
@@ -44,16 +45,14 @@ export default function FavoritesMenu() {
       <button
         className={`icon-button header-action ${open ? 'is-active' : ''}`}
         type="button"
-        aria-label={`Open favorites${favoriteProducts.length ? `, ${favoriteProducts.length} saved` : ''}`}
+        aria-label={`Open favorites${favoritesCount ? `, ${favoritesCount} saved` : ''}`}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
         <span className="icon-wrap">
           <Heart className="header-action-icon" aria-hidden="true" />
-          {favoriteProducts.length > 0 && (
-            <b className="cart-count">{favoriteProducts.length}</b>
-          )}
+          {favoritesCount > 0 && <b className="cart-count">{favoritesCount}</b>}
         </span>
         <span className="action-label">Favorites</span>
       </button>
@@ -63,9 +62,25 @@ export default function FavoritesMenu() {
           role="menu"
           aria-label="Favorite products"
         >
-          {previewProducts.length ? (
+          {isPending ? (
+            <p className="favorites-empty">Loading favorites…</p>
+          ) : isError ? (
+            <p className="favorites-empty">Could not load your favorites.</p>
+          ) : !isLoggedIn ? (
+            <p className="favorites-empty">
+              <Link to="/login" onClick={() => setOpen(false)}>
+                Sign in
+              </Link>{' '}
+              to save favorites.
+            </p>
+          ) : (
             <>
               <p className="favorites-dropdown-title">Favorites</p>
+              {previewProducts.length === 0 && (
+                <p className="favorites-empty">
+                  There is nothing in your favorites yet.
+                </p>
+              )}
               {previewProducts.map((product) => (
                 <Link
                   className="favorite-preview"
@@ -75,7 +90,7 @@ export default function FavoritesMenu() {
                   onClick={() => setOpen(false)}
                 >
                   <span className="favorite-preview-icon">
-                    <img src={product.image} alt="" />
+                    <img src={getProductImage(product)} alt="" />
                   </span>
                   <span>
                     <strong>{product.name}</strong>
@@ -83,21 +98,16 @@ export default function FavoritesMenu() {
                   </span>
                 </Link>
               ))}
-              {favoriteProducts.length > 3 && (
-                <Link
-                  className="favorites-view-all"
-                  role="menuitem"
-                  to="/favorites"
-                  onClick={() => setOpen(false)}
-                >
-                  View all favorites
-                </Link>
-              )}
+              {/* Always shown, so the favorites page can always be reached. */}
+              <Link
+                className="favorites-view-all"
+                role="menuitem"
+                to="/favorites"
+                onClick={() => setOpen(false)}
+              >
+                View all favorites
+              </Link>
             </>
-          ) : (
-            <p className="favorites-empty">
-              There is nothing in your favorites yet.
-            </p>
           )}
         </div>
       )}

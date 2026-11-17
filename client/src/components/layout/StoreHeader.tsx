@@ -2,9 +2,9 @@ import { useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { categories } from '../../data/catalog';
 import { useCart } from '../../hooks/useCart';
-import { getCartQuantity } from '../../lib/cart';
+import { useCategories } from '../../hooks/useCategories';
+import { useCartDrawerStore } from '../../stores/cartDrawerStore';
 import SearchBar from '../catalog/SearchBar';
 import FavoritesMenu from './FavoritesMenu';
 import ProfileMenu from './ProfileMenu';
@@ -17,9 +17,10 @@ type StoreHeaderProps = {
 export default function StoreHeader({ middle, actions }: StoreHeaderProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { cart, setCartOpen } = useCart();
+  const { cartCount: cartQuantity } = useCart();
+  const openCart = useCartDrawerStore((state) => state.openCart);
+  const { categories } = useCategories();
   const [headerQuery, setHeaderQuery] = useState('');
-  const cartQuantity = getCartQuantity(cart);
 
   const submitHeaderSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -32,7 +33,7 @@ export default function StoreHeader({ middle, actions }: StoreHeaderProps) {
       className="icon-button header-action"
       type="button"
       aria-label="Open shopping cart"
-      onClick={() => setCartOpen(true)}
+      onClick={openCart}
     >
       <span className="icon-wrap">
         <ShoppingCart className="header-action-icon" aria-hidden="true" />
@@ -75,9 +76,9 @@ export default function StoreHeader({ middle, actions }: StoreHeaderProps) {
           </Link>
           {categories.map((item) => (
             <Link
-              key={item.name}
-              className={`nav-link ${pathname === `/categories/${item.name.toLowerCase()}` ? 'active' : ''}`}
-              to={`/categories/${item.name.toLowerCase()}`}
+              key={item.id}
+              className={`nav-link ${pathname === `/categories/${item.slug}` ? 'active' : ''}`}
+              to={`/categories/${item.slug}`}
             >
               {item.name}
             </Link>

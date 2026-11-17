@@ -1,10 +1,44 @@
 import { prisma } from "../lib/prisma.js"
+import { toApiProduct } from "../lib/apiProduct.js"
 
-export const getProducts = async (categoryId?: number) => {
+// `contains` becomes SQL LIKE, where % and _ are wildcards. Escape them so a
+// search for "%" looks for the character itself instead of matching everything.
+const escapeLike = (value: string) => value.replace(/[\\%_]/g, "\\$&");
+
+type ProductFilters = {
+  categoryId: number | undefined;
+  minPrice: number | undefined;
+  maxPrice: number | undefined;
+  search: string | undefined;
+  limit: number | undefined;
+};
+
+export const getProducts = async ({ categoryId, minPrice, maxPrice, search, limit }: ProductFilters) => {
+  const searchTerm = search !== undefined ? escapeLike(search) : undefined;
+
   const products = await prisma.product.findMany({
-    ...(categoryId !== undefined && {
-      where: { categoryId }
-    }),
+    where: {
+      isActive: true,
+      // The MySQL collation (utf8mb4_unicode_ci) makes contains case-insensitive.
+      ...(searchTerm !== undefined && {
+        OR: [
+          { name: { contains: searchTerm } },
+          { description: { contains: searchTerm } },
+          { category: { name: { contains: searchTerm } } },
+        ]
+      }),
+      ...(categoryId !== undefined && { categoryId }),
+      ...((minPrice !== undefined || maxPrice !== undefined) && {
+        price: {
+          ...(minPrice !== undefined && { gte: minPrice }),
+          ...(maxPrice !== undefined && { lte: maxPrice }),
+        }
+      }),
+    },
+
+    // A stable order is needed so that `limit` always returns the same products.
+    orderBy: { id: "asc" },
+    ...(limit !== undefined && { take: limit }),
 
     include: {
       category: {
@@ -15,20 +49,20 @@ export const getProducts = async (categoryId?: number) => {
       }
     }
   });
-  return products.map((product) => ({
-    ...product, price: product.price.toNumber()
-  }));
+  return products.map(toApiProduct);
 };
 
 export const getProductById = async (id: number) => {
   const product = await prisma.product.findUnique({
     where: {
       id,
+      isActive: true,
     },
     include: {
       category: {
         select: {
           name: true,
+          slug: true,
         }
       },
 
@@ -89,8 +123,5 @@ export const getProductById = async (id: number) => {
     return null;
   }
 
-  return {
-    ...product,
-    price: product.price.toNumber(),
-  };
+  return toApiProduct(product);
 };

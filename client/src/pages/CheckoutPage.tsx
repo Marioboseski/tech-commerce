@@ -1,17 +1,17 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
-import { products } from '../data/catalog';
 import { money } from '../lib/formatters';
-import { getCartEntries, getCartTotals } from '../lib/cart';
+import ErrorState from '../components/feedback/ErrorState';
+import DeliveryForm from '../components/checkout/DeliveryForm';
 import { useCart } from '../hooks/useCart';
+import { useCurrentUser } from '../hooks/useCurrentUser';
 
 export default function CheckoutPage() {
-  const [submitted, setSubmitted] = useState(false);
-  const { cart } = useCart();
-  const entries = getCartEntries(cart, products);
-  const { subtotal, shipping, total } = getCartTotals(cart, products);
+  const { user } = useCurrentUser();
+  const { cartItems, totals, isLoggedIn, isPending, isError, refetch } =
+    useCart();
+  const { subtotal, shipping, total } = totals;
 
   return (
     <div className="checkout-page">
@@ -19,51 +19,24 @@ export default function CheckoutPage() {
       <main className="container section">
         <p className="eyebrow">CHECKOUT</p>
         <h1 className="section-title">Complete your order</h1>
-        {entries.length ? (
+        {isPending ? (
+          <p className="subheading">Loading your order…</p>
+        ) : isError ? (
+          <ErrorState what="your cart" onRetry={refetch} />
+        ) : !isLoggedIn || !user ? (
+          <div className="favorites-empty-state">
+            <h2>Sign in to check out</h2>
+            <p>Your cart is saved to your account.</p>
+            <Link className="primary-button" to="/login">
+              Sign in
+            </Link>
+          </div>
+        ) : cartItems.length ? (
           <div className="checkout-layout">
-            <form
-              className="checkout-form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                setSubmitted(true);
-              }}
-            >
-              <h2>Delivery details</h2>
-              <label>
-                Full name
-                <input required autoComplete="name" />
-              </label>
-              <label>
-                Email address
-                <input required type="email" autoComplete="email" />
-              </label>
-              <label>
-                Street address
-                <input required autoComplete="street-address" />
-              </label>
-              <div className="checkout-form-row">
-                <label>
-                  City
-                  <input required autoComplete="address-level2" />
-                </label>
-                <label>
-                  Postal code
-                  <input required autoComplete="postal-code" />
-                </label>
-              </div>
-              <button className="primary-button" type="submit">
-                Place demo order
-              </button>
-              {submitted && (
-                <p className="checkout-message">
-                  Order UI is ready; payment and order submission will be
-                  connected with the backend.
-                </p>
-              )}
-            </form>
+            <DeliveryForm defaultFullName={user.fullName} />
             <aside className="checkout-summary">
               <h2>Order summary</h2>
-              {entries.map(({ product, quantity }) => {
+              {cartItems.map(({ product, quantity }) => {
                 return (
                   <div className="checkout-item" key={product.id}>
                     <span>

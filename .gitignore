@@ -34,3 +34,6 @@ server/generated
 *.njsproj
 *.sln
 *.sw?
+
+# Original category photos; small WebP copies live in client/public/categories
+/client/images-source

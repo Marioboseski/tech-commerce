@@ -1,20 +1,20 @@
 import { Link } from 'react-router-dom';
-import type { CatalogCategory } from '../../data/catalog';
+import { getCategoryMeta } from '../../lib/categoryMeta';
+import type { ApiCategory } from '../../types/category';
 type Props = {
-  category: CatalogCategory;
+  category: ApiCategory;
 };
 export default function CategoryCard({ category }: Props) {
+  const { image } = getCategoryMeta(category.slug);
+
   return (
-    <Link
-      className="category-card"
-      to={`/categories/${category.name.toLowerCase()}`}
-    >
+    <Link className="category-card" to={`/categories/${category.slug}`}>
       <div className="category-art">
-        <img src={category.image} alt="" />
+        {/* alt="" : the category name is already written on the card. */}
+        {image && <img src={image} alt="" loading="lazy" />}
         <span>{category.name}</span>
       </div>
       <strong>{category.name}</strong>
-      <small>{category.tagline}</small>
       <span>Browse category →</span>
     </Link>
   );

@@ -1,0 +1,38 @@
+import { Router } from "express";
+import { getStats } from "../controllers/adminController.js";
+import { getOrder, listOrders, updateOrderStatus } from "../controllers/adminOrdersController.js";
+import {
+  createProduct,
+  getCategorySpecFields,
+  getProduct,
+  listProducts,
+  removeProductImage,
+  setProductStatus,
+  updateProduct,
+  uploadProductImage,
+} from "../controllers/adminProductsController.js";
+import { requireAuth } from "../middleware/requireAuth.js";
+import { requireAdmin } from "../middleware/requireAdmin.js";
+import { uploadImage } from "../middleware/uploadImage.js";
+
+const router = Router();
+
+// Order matters: first "who are you" (401), then "are you an admin" (403).
+router.use(requireAuth, requireAdmin);
+
+router.get("/stats", getStats);
+
+router.get("/category-spec-fields", getCategorySpecFields);
+router.get("/products", listProducts);
+router.post("/products", createProduct);
+router.get("/products/:id", getProduct);
+router.put("/products/:id", updateProduct);
+router.patch("/products/:id/status", setProductStatus);
+router.post("/products/:id/image", uploadImage, uploadProductImage);
+router.delete("/products/:id/image", removeProductImage);
+
+router.get("/orders", listOrders);
+router.get("/orders/:orderId", getOrder);
+router.patch("/orders/:orderId/status", updateOrderStatus);
+
+export default router;

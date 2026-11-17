@@ -1,27 +1,19 @@
-import type { Product } from '../data/catalog';
+import type { CartItem } from '../types/cart';
 
-export const getCartQuantity = (cart: Record<number, number>) =>
-  Object.values(cart).reduce((total, quantity) => total + quantity, 0);
+export const FREE_SHIPPING_FROM = 75;
+const SHIPPING_PRICE = 9.9;
 
-export const getCartEntries = (
-  cart: Record<number, number>,
-  products: Product[],
-) =>
-  Object.entries(cart)
-    .filter(([, quantity]) => quantity > 0)
-    .flatMap(([id, quantity]) => {
-      const product = products.find((item) => item.id === Number(id));
-      return product ? [{ product, quantity }] : [];
-    });
+export const getCartQuantity = (items: CartItem[]) =>
+  items.reduce((total, item) => total + item.quantity, 0);
 
-export const getCartTotals = (
-  cart: Record<number, number>,
-  products: Product[],
-) => {
-  const subtotal = getCartEntries(cart, products).reduce(
-    (total, { product, quantity }) => total + product.price * quantity,
+// Only for display: the order total is calculated by the server, because
+// prices on the client can be old or changed by the user.
+export const getCartTotals = (items: CartItem[]) => {
+  const subtotal = items.reduce(
+    (total, item) => total + item.product.price * item.quantity,
     0,
   );
-  const shipping = subtotal === 0 || subtotal >= 75 ? 0 : 9.9;
+  const shipping =
+    subtotal === 0 || subtotal >= FREE_SHIPPING_FROM ? 0 : SHIPPING_PRICE;
   return { subtotal, shipping, total: subtotal + shipping };
 };

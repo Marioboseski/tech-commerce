@@ -1,26 +1,33 @@
 import * as productService from "../services/productsService.js";
+import { HttpError } from "../lib/httpError.js";
+import { parseInput } from "../lib/validate.js";
+import { productParamsSchema, productsQuerySchema } from "../schemas/productsSchemas.js";
 import type { Request, Response } from "express";
 
 export const getProducts = async (req: Request, res: Response) => {
-  const categoryIdParam = req.query.categoryId;
+  const { categoryId, minPrice, maxPrice, search, limit } = parseInput(
+    productsQuerySchema,
+    req.query,
+  );
 
-  let categoryId: number | undefined;
-
-  if (categoryIdParam !== undefined) {
-    if (typeof categoryIdParam !== "string" || !/^[1-9]\d*$/.test(categoryIdParam)) {
-      return res.status(400).json({
-        message: "categoryId must be a positive integer"
-      })
-    }
-    categoryId = Number(categoryIdParam);
-  }
-
-  const products = await productService.getProducts(categoryId);
+  const products = await productService.getProducts({
+    categoryId,
+    minPrice,
+    maxPrice,
+    search,
+    limit,
+  });
   return res.json(products);
-}
+};
 
 export const getProductById = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const product = await productService.getProductById(Number(id));
+  const { id } = parseInput(productParamsSchema, req.params);
+
+  const product = await productService.getProductById(id);
+
+  if (!product) {
+    throw new HttpError(404, "Product not found");
+  }
+
   return res.json(product);
-}
+};

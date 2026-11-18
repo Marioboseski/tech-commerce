@@ -162,7 +162,7 @@ when **both** sides agree:
 
 ## API overview
 
-All routes except products, categories, register and login need the login
+All routes except products, categories, health, register and login need the login
 cookie (`requireAuth`).
 
 | Method | Path | Notes |
@@ -170,6 +170,7 @@ cookie (`requireAuth`).
 | GET | `/api/products` | Query: `categoryId`, `minPrice`, `maxPrice`, `search`, `limit` |
 | GET | `/api/products/:id` | 404 if it does not exist |
 | GET | `/api/categories` | |
+| GET | `/api/health` | 200 `{status: "ok"}` when the API can reach the database, else 503. Used by the Docker healthcheck |
 | POST | `/api/auth/register`, `/login`, `/logout` | |
 | GET | `/api/auth/me` | 401 when not logged in |
 | GET / POST | `/api/favorites` | POST body `{ productId }`; adding twice is not an error (upsert) |

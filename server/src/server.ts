@@ -10,6 +10,7 @@ import favoriteRoutes from "./routes/favoriteRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import healthRoutes from "./routes/healthRoutes.js";
 import { notFound } from "./middleware/notFound.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -29,6 +30,7 @@ app.use(cookieParser());
 
 app.use("/images", express.static(path.join(import.meta.dirname, "..", "public", "images")));
 
+app.use("/api/health", healthRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/auth", authRoutes);

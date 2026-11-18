@@ -1,0 +1,73 @@
+# Local development: database + API + React app.
+#   docker compose -f compose.dev.yaml up --watch
+# The values below are for local development only. Real secrets for a
+# deployed app are set on the hosting platform, never in this file.
+
+name: tech-commerce
+
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tech_commerce_db
+    ports:
+      # 3307 on your computer, so it does not clash with a local MySQL on 3306.
+      - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  server:
+    build: ./server
+    environment:
+      DATABASE_URL: mysql://root:root@db:3306/tech_commerce_db
+      IMAGE_BASE_URL: http://localhost:5000/images
+      JWT_SECRET: local-development-secret-do-not-use-in-production
+      CLIENT_URL: http://localhost:5173
+    # Create or update the tables and fill the shop (safe to repeat), then start.
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed && npm run dev"
+    ports:
+      - "5000:5000"
+    volumes:
+      # Images uploaded in the admin panel survive restarts and rebuilds.
+      - uploads:/app/public/images/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: ./server/src
+          target: /app/src
+        - action: rebuild
+          path: ./server/package.json
+        - action: rebuild
+          path: ./server/prisma
+
+  client:
+    build: ./client
+    environment:
+      VITE_API_URL: http://localhost:5000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+    develop:
+      watch:
+        - action: sync
+          path: ./client/src
+          target: /app/src
+        - action: sync
+          path: ./client/public
+          target: /app/public
+        - action: rebuild
+          path: ./client/package.json
+
+volumes:
+  db-data:
+  uploads:

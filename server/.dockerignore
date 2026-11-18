@@ -1,0 +1,9 @@
+node_modules
+generated
+.env
+.env.*
+!.env.example
+images-source
+public/images/uploads
+.claude
+npm-debug.log*

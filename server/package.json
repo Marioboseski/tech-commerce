@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
     "images:optimize": "tsx scripts/optimize-images.ts",
     "admin:create": "tsx scripts/set-admin.ts",
     "admin:remove": "tsx scripts/set-admin.ts --remove"
@@ -23,6 +24,7 @@
     "express": "^5.3.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.5.0",
+    "prisma": "^7.10.1",
     "sharp": "^0.35.5",
     "zod": "^4.6.7"
   },
@@ -33,7 +35,6 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.3.0",
     "@types/node": "^26.6.5",
-    "prisma": "^7.10.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   }

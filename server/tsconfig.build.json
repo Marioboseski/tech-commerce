@@ -1,0 +1,14 @@
+{
+  // Production build: compiles the server, the Prisma client, the seed and the
+  // admin script to JavaScript in dist/, keeping the same folder layout
+  // (dist/src, dist/generated, dist/prisma, dist/scripts).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    "sourceMap": false,
+    "declaration": false,
+    "declarationMap": false
+  },
+  "include": ["src", "generated", "prisma/seed.ts", "scripts/set-admin.ts"]
+}

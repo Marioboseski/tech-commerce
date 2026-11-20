@@ -9,3 +9,6 @@ node_modules
 
 # Product photos uploaded from the admin panel (shop data, not code)
 /public/images/uploads
+
+# Production build output (npm run build)
+/dist

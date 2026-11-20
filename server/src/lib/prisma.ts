@@ -32,9 +32,12 @@ const adapter = new PrismaMariaDb({
   database: databaseName,
   connectionLimit: 5,
   // MySQL 8 needs the server's public key for the first login after it
-  // (re)starts. Allowed only outside production, where the database is local
-  // or inside Docker; production should use SSL instead.
-  allowPublicKeyRetrieval: process.env.NODE_ENV !== "production",
+  // (re)starts. Always allowed outside production. In production only when
+  // DB_ALLOW_PUBLIC_KEY_RETRIEVAL=true, i.e. the database is on a private
+  // network (our Docker setup); an external database should use SSL.
+  allowPublicKeyRetrieval:
+    process.env.NODE_ENV !== "production" ||
+    process.env.DB_ALLOW_PUBLIC_KEY_RETRIEVAL === "true",
 });
 
 export const prisma = new PrismaClient({ adapter });

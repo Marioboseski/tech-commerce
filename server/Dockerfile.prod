@@ -1,0 +1,53 @@
+# Production image for the API (see compose.prod.yaml).
+# Stage 1 compiles TypeScript; stage 2 only gets the compiled JavaScript and
+# the packages needed at runtime.
+
+# ---------- Stage 1: build ----------
+FROM node:22-slim AS build
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+
+# Generating the client does not connect to the database, but the Prisma
+# config requires DATABASE_URL to be set.
+RUN DATABASE_URL="mysql://build:build@localhost:3306/build" npx prisma generate \
+  && npm run build
+
+# ---------- Stage 2: run ----------
+FROM node:22-slim
+
+# Prisma's migration engine needs OpenSSL, which the slim image does not have.
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends openssl \
+  && rm -rf /var/lib/apt/lists/*
+
+ENV NODE_ENV=production
+
+WORKDIR /app
+
+# Runtime packages only (no TypeScript, tsx, types...).
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+# The compiled files go to the same places as the source files
+# (/app/src/server.js, /app/prisma/seed.js...), so paths such as
+# "../public/images" work exactly as in development.
+COPY --from=build /app/dist ./
+COPY prisma/schema.prisma ./prisma/
+COPY prisma/migrations ./prisma/migrations
+COPY prisma7.config.ts ./
+COPY public ./public
+
+# Do not run as root. The uploads folder must belong to this user, because
+# the admin panel writes new product images there.
+RUN mkdir -p public/images/uploads && chown -R node:node public/images/uploads
+USER node
+
+EXPOSE 5000
+
+# Create or update the tables, then start the API.
+CMD ["sh", "-c", "npx prisma migrate deploy && node src/server.js"]

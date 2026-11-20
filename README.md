@@ -39,12 +39,12 @@ MySQL** on the server.
 
 ## Tech stack
 
-| Part      | Technologies                                                                                       |
-| --------- | -------------------------------------------------------------------------------------------------- |
-| Client    | React 19, TypeScript, Vite, React Router, TanStack Query, Zustand, React Hook Form, Zod, plain CSS |
-| Server    | Node.js, Express 5, TypeScript, Prisma 7, Zod, JSON Web Tokens, bcrypt, multer, sharp              |
-| Database  | MySQL 8                                                                                            |
-| Dev setup | Docker Compose                                                                                     |
+| Part     | Technologies                                                                                       |
+| -------- | -------------------------------------------------------------------------------------------------- |
+| Client   | React 19, TypeScript, Vite, React Router, TanStack Query, Zustand, React Hook Form, Zod, plain CSS |
+| Server   | Node.js, Express 5, TypeScript, Prisma 7, Zod, JSON Web Tokens, bcrypt, multer, sharp              |
+| Database | MySQL 8                                                                                            |
+| Docker   | Docker Compose (development and production), Nginx                                                 |
 
 ## Getting started
 
@@ -168,11 +168,81 @@ npm run admin:create -- you@example.com
 Refresh the page and the **Admin panel** link appears in the profile
 menu. Admins can only be created this way, never through the website.
 
+## Production (Docker)
+
+The production setup runs the same app as optimized images: the React build
+is served by **Nginx**, which also forwards `/api` and `/images` to the API,
+so the whole shop is on one address. The database and the API are not
+reachable from outside.
+
+```text
+Browser ──▶ client (Nginx, port 80) ──▶ server (Node.js) ──▶ db (MySQL)
+             /           React build
+             /api, /images  → server
+```
+
+| File                     | Purpose                                                              |
+| ------------------------ | -------------------------------------------------------------------- |
+| `server/Dockerfile.prod` | Compiles TypeScript, then runs `node` with runtime packages only     |
+| `client/Dockerfile.prod` | Builds the React app, then serves it with Nginx                      |
+| `client/nginx.conf`      | Static files, `/api` and `/images` forwarding, React Router fallback |
+| `compose.prod.yaml`      | Runs the three containers from images on Docker Hub                  |
+| `.env.prod.example`      | Template for the secrets (copy to `.env.prod`, never commit it)      |
+
+### 1. Build and publish the images
+
+From the project root, with the version you are releasing:
+
+```bash
+docker login
+docker build -f server/Dockerfile.prod -t marioboseski/tech-commerce-server:1.0.0 ./server
+docker build -f client/Dockerfile.prod -t marioboseski/tech-commerce-client:1.0.0 ./client
+docker push marioboseski/tech-commerce-server:1.0.0
+docker push marioboseski/tech-commerce-client:1.0.0
+```
+
+### 2. Run on the server
+
+The server only needs Docker, `compose.prod.yaml` and `.env.prod`:
+
+```bash
+cp .env.prod.example .env.prod   # then set IMAGE_TAG, CLIENT_URL and new random secrets
+docker compose -f compose.prod.yaml --env-file .env.prod up -d
+```
+
+On the first start, add the categories and products, then create an admin
+(register on the website first):
+
+```bash
+docker compose -f compose.prod.yaml --env-file .env.prod exec server node prisma/seed.js
+docker compose -f compose.prod.yaml --env-file .env.prod exec server node scripts/set-admin.js you@example.com
+```
+
+The shop is then on `http://<server address>`. Migrations run automatically
+on every start; the seed only once, because running it again would overwrite
+specs edited in the admin panel.
+
+### Release a new version
+
+Build and push the images with a new tag (for example `1.0.1`), set
+`IMAGE_TAG=1.0.1` in `.env.prod`, then:
+
+```bash
+docker compose -f compose.prod.yaml --env-file .env.prod pull
+docker compose -f compose.prod.yaml --env-file .env.prod up -d
+```
+
+To roll back, set the previous tag and run the same two commands.
+
+> Without a domain the shop runs on plain HTTP. The login cookie is marked
+> `Secure`, which browsers accept over HTTP only on `localhost`, so test from
+> a browser on the same machine. A real deployment needs a domain and HTTPS.
+
 ## Project structure
 
 ```text
 tech-commerce/
-├── client/                React app (Vite) + Dockerfile
+├── client/                React app (Vite), Dockerfiles, nginx.conf
 │   ├── public/            static images (categories, favicon)
 │   └── src/
 │       ├── admin/         admin panel (lazy-loaded)
@@ -182,7 +252,7 @@ tech-commerce/
 │       ├── schemas/       Zod form validation
 │       ├── services/      API calls
 │       └── stores/        Zustand (UI state only)
-├── server/                Express API + Dockerfile
+├── server/                Express API, Dockerfiles
 │   ├── prisma/            schema, migrations, seed
 │   ├── public/images/     product images
 │   ├── scripts/           admin and image CLI scripts
@@ -194,7 +264,9 @@ tech-commerce/
 │       ├── middleware/    auth, admin check, uploads, errors
 │       └── lib/           shared helpers
 ├── docs/NOTES.md          technical notes and decisions
-└── compose.dev.yaml       Docker setup for local development
+├── compose.dev.yaml       Docker setup for local development
+├── compose.prod.yaml      Docker setup for production
+└── .env.prod.example      production secrets template
 ```
 
 ## Technical notes

@@ -20,7 +20,9 @@ const adapter = new PrismaMariaDb({
   database: database.pathname.slice(1),
   connectionLimit: 5,
   // Same reason as in src/lib/prisma.ts.
-  allowPublicKeyRetrieval: process.env.NODE_ENV !== "production",
+  allowPublicKeyRetrieval:
+    process.env.NODE_ENV !== "production" ||
+    process.env.DB_ALLOW_PUBLIC_KEY_RETRIEVAL === "true",
 });
 
 const prisma = new PrismaClient({ adapter });

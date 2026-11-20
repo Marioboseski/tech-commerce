@@ -26,7 +26,9 @@ export const apiRequest = async <T>(
   path: string,
   { method = 'GET', body }: ApiRequestOptions = {},
 ): Promise<T> => {
-  if (!API_URL) {
+  // An empty value is allowed: requests then go to /api on the same address
+  // (production, where Nginx forwards /api to the server).
+  if (API_URL === undefined) {
     throw new Error('Missing VITE_API_URL environment variable');
   }
 

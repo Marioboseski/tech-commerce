@@ -1,0 +1,81 @@
+# Production: Nginx (client) + API (server) + MySQL, from images on Docker Hub.
+#   1. cp .env.prod.example .env.prod   and fill in your own secrets
+#   2. docker compose -f compose.prod.yaml --env-file .env.prod up -d
+# Secrets come from .env.prod (never committed), not from this file.
+
+name: tech-commerce-prod
+
+# Keep container logs from filling the disk: at most 3 files of 10 MB each.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env.prod}
+      MYSQL_DATABASE: tech_commerce_db
+      # The app uses its own user with rights only on this database, not root.
+      MYSQL_USER: ${MYSQL_USER:?Set MYSQL_USER in .env.prod}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env.prod}
+    # No "ports": the database is reachable only inside this Docker network.
+    volumes:
+      - db-data:/var/lib/mysql
+    # 127.0.0.1 (TCP), so the temporary server MySQL runs on its first start
+    # does not count as ready. MYSQL_PWD keeps the password off the command line.
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_ROOT_PASSWORD\" mysqladmin ping -h 127.0.0.1 -uroot --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+      start_interval: 2s
+    logging: *logging
+
+  server:
+    image: marioboseski/tech-commerce-server:${IMAGE_TAG:?Set IMAGE_TAG in .env.prod}
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/tech_commerce_db
+      # Safe here: the database is on the private Docker network only.
+      DB_ALLOW_PUBLIC_KEY_RETRIEVAL: "true"
+      # Relative: images are served by Nginx on the same address as the shop.
+      IMAGE_BASE_URL: /images
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env.prod}
+      CLIENT_URL: ${CLIENT_URL:?Set CLIENT_URL in .env.prod}
+    volumes:
+      - uploads:/app/public/images/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://localhost:5000/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+      start_interval: 2s
+    logging: *logging
+
+  client:
+    image: marioboseski/tech-commerce-client:${IMAGE_TAG:?Set IMAGE_TAG in .env.prod}
+    restart: unless-stopped
+    # The only port open to the outside.
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    depends_on:
+      server:
+        condition: service_healthy
+    logging: *logging
+
+volumes:
+  db-data:
+  uploads:

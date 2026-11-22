@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:db": "docker compose -f ../compose.test.yaml up -d --wait",
+    "test:db:stop": "docker compose -f ../compose.test.yaml down",
     "images:optimize": "tsx scripts/optimize-images.ts",
     "admin:create": "tsx scripts/set-admin.ts",
     "admin:remove": "tsx scripts/set-admin.ts --remove"
@@ -35,7 +39,10 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.3.0",
     "@types/node": "^26.6.5",
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.3.2",
     "tsx": "^4.23.15",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^3.2.7"
   }
 }

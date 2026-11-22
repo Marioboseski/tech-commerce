@@ -10,5 +10,6 @@
     "declaration": false,
     "declarationMap": false
   },
-  "include": ["src", "generated", "prisma/seed.ts", "scripts/set-admin.ts"]
+  "include": ["src", "generated", "prisma/seed.ts", "scripts/set-admin.ts"],
+  "exclude": ["**/*.test.ts"]
 }

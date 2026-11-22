@@ -93,7 +93,7 @@ jobs:
           TEST_DATABASE_URL: mysql://root:test@127.0.0.1:3308/tech_commerce_test
 
   client:
-    name: Client (lint + format + build)
+    name: Client (lint + format + tests + build)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -119,6 +119,9 @@ jobs:
 
       - name: Check formatting
         run: npm run format:check
+
+      - name: Run the tests
+        run: npm test
 
       - name: Type check and build
         run: npm run build

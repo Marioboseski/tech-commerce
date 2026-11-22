@@ -46,6 +46,52 @@ jobs:
       - name: Production build
         run: npm run build
 
+  server-tests:
+    name: Server tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: server
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: test
+          MYSQL_DATABASE: tech_commerce_test
+        ports:
+          - 3308:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -ptest"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate the Prisma client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: mysql://ci:ci@localhost:3306/ci
+
+      - name: Run the tests
+        run: npm test
+        env:
+          TEST_DATABASE_URL: mysql://root:test@127.0.0.1:3308/tech_commerce_test
+
   client:
     name: Client (lint + format + build)
     runs-on: ubuntu-latest
@@ -84,12 +130,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
-    needs: [server, client]
+    needs: [server, server-tests, client]
 
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
-        
+
       - name: Build the server image
         run: docker build -f server/Dockerfile.prod -t tech-commerce-server:ci ./server
 

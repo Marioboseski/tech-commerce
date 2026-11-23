@@ -1,0 +1,88 @@
+# Publishes the production images to Docker Hub when a version tag is pushed:
+#   git tag v1.0.1
+#   git push origin v1.0.1
+# Can also be started by hand (Actions -> Release -> Run workflow).
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish, e.g. 1.0.1"
+        required: true
+
+# Two releases of the same version never run at the same time.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+# Same image names as in compose.prod.yaml. Not a secret; only the login is.
+env:
+  IMAGE_PREFIX: marioboseski/tech-commerce
+
+jobs:
+  publish:
+    name: Build and push images to Docker Hub
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      # "v1.0.1" from the tag, or "1.0.1" typed in by hand -> "1.0.1".
+      # The input goes through env, never straight into the script.
+      - name: Work out the version
+        id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            VERSION="$INPUT_VERSION"
+          else
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::The version must look like 1.0.1 (got '$VERSION')"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push the server image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./server
+          file: ./server/Dockerfile.prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}-server:${{ steps.version.outputs.version }}
+            ${{ env.IMAGE_PREFIX }}-server:latest
+          # Reuse unchanged layers from the previous release (faster builds).
+          cache-from: type=gha,scope=server
+          cache-to: type=gha,scope=server,mode=max
+
+      - name: Build and push the client image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./client
+          file: ./client/Dockerfile.prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}-client:${{ steps.version.outputs.version }}
+            ${{ env.IMAGE_PREFIX }}-client:latest
+          cache-from: type=gha,scope=client
+          cache-to: type=gha,scope=client,mode=max

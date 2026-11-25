@@ -1,0 +1,22 @@
+# Throwaway MySQL for the automated server tests.
+#   docker compose -f compose.test.yaml up -d --wait   (or: cd server && npm run test:db)
+# Data lives in memory (tmpfs): fast, and gone when the container stops.
+
+name: tech-commerce-test
+
+services:
+  test-db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: tech_commerce_test
+    ports:
+      # 3308, so it does not clash with a local MySQL (3306) or the dev database (3307).
+      - "3308:3306"
+    tmpfs:
+      - /var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-ptest"]
+      interval: 2s
+      timeout: 5s
+      retries: 30

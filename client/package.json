@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\" eslint.config.js vite.config.ts package.json",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" eslint.config.js vite.config.ts package.json",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^7.0.6",
@@ -35,6 +37,7 @@
     "prettier": "^3.9.10",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.71.2",
-    "vite": "^8.3.4"
+    "vite": "^8.3.4",
+    "vitest": "^3.2.7"
   }
 }

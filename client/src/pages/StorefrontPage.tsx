@@ -21,9 +21,11 @@ export default function StorefrontPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { favoriteIds, toggleFavorite } = useFavorites();
   const requestedCategory = searchParams.get('category');
-  const category = requestedCategory &&
+  const category =
+    requestedCategory &&
     categories.some((item) => item.slug === requestedCategory)
-    ? (requestedCategory) : 'All';
+      ? requestedCategory
+      : 'All';
   const selectedCategory = categories.find((item) => item.slug === category);
   const selectedCategoryId = selectedCategory?.id;
   const query = searchParams.get('search') ?? '';
@@ -61,11 +63,10 @@ export default function StorefrontPage() {
   const shown = useMemo(
     () =>
       products
-        .filter(
-          (product) =>
-            `${product.name} ${product.category.name} ${product.description}`
-              .toLowerCase()
-              .includes(query.toLowerCase()),
+        .filter((product) =>
+          `${product.name} ${product.category.name} ${product.description}`
+            .toLowerCase()
+            .includes(query.toLowerCase()),
         )
         .sort((a, b) =>
           sort === 'price-asc'
@@ -209,7 +210,9 @@ export default function StorefrontPage() {
               >
                 <option value="All">All categories</option>
                 {categories.map((item) => (
-                  <option key={item.id} value={item.slug}>{item.name}</option>
+                  <option key={item.id} value={item.slug}>
+                    {item.name}
+                  </option>
                 ))}
               </select>
               <select

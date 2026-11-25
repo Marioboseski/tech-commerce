@@ -238,6 +238,41 @@ To roll back, set the previous tag and run the same two commands.
 > `Secure`, which browsers accept over HTTP only on `localhost`, so test from
 > a browser on the same machine. A real deployment needs a domain and HTTPS.
 
+## CI/CD (GitHub Actions)
+
+| Workflow                        | When                                        | What it does                                                                                                                          |
+| ------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `.github/workflows/ci.yml`      | every pull request and every push to `main` | Server: type check, build and tests (with a MySQL service). Client: lint, formatting, tests, build. Both production images must build |
+| `.github/workflows/release.yml` | a pushed version tag such as `v1.0.1`       | Builds both production images and pushes them to Docker Hub as `1.0.1` and `latest`                                                   |
+
+Release a new version from `main`:
+
+```bash
+git switch main && git pull
+git tag v1.0.1
+git push origin v1.0.1
+```
+
+Then on the server set `IMAGE_TAG=1.0.1` in `.env.prod` and run `pull` and
+`up -d` as shown above. The release workflow needs two repository secrets:
+`DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` (a Docker Hub access token with
+read and write access).
+
+### Run the tests locally
+
+```bash
+cd server
+npm run test:db      # starts a throwaway MySQL for tests (Docker, port 3308)
+npm test
+npm run test:db:stop
+
+cd ../client
+npm test
+```
+
+The server tests refuse to run against a database whose name does not end
+with `_test`, because they delete all data before each test.
+
 ## Project structure
 
 ```text
@@ -263,6 +298,7 @@ tech-commerce/
 │       ├── schemas/       Zod request validation
 │       ├── middleware/    auth, admin check, uploads, errors
 │       └── lib/           shared helpers
+├── .github/workflows/     CI (checks and tests) and release (Docker Hub)
 ├── docs/NOTES.md          technical notes and decisions
 ├── compose.dev.yaml       Docker setup for local development
 ├── compose.prod.yaml      Docker setup for production

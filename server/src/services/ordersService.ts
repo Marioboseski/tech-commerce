@@ -17,7 +17,15 @@ export const orderSelect = {
   subtotal: true,
   shippingCost: true,
   total: true,
+  carrier: true,
+  trackingNumber: true,
   createdAt: true,
+  // Oldest first, so it reads like a timeline. The customer does not see
+  // who made each change; the admin view adds that.
+  statusHistory: {
+    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    select: { status: true, createdAt: true },
+  },
   items: {
     orderBy: { id: "asc" },
     select: {
@@ -89,6 +97,7 @@ export const createOrder = async (
           subtotal,
           shippingCost,
           total: subtotal.plus(shippingCost),
+          statusHistory: { create: { status: "PENDING", changedById: userId } },
           items: {
             create: cartItems.map((item) => ({
               productId: item.productId,

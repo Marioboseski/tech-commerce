@@ -22,13 +22,17 @@ MySQL** on the server.
 - Checkout with pay on delivery; prices and totals are always calculated by
   the server
 - Order history with order details
+- Order tracking: a timeline of every step (placed, processing, shipped,
+  delivered) with its date, plus the carrier and tracking number once shipped
 
 **Admin panel** (`/admin`, only for users with the ADMIN role)
 
 - Dashboard: sales, pending orders, recent orders and top products
 - Products: create, edit, archive / restore, image upload (converted to WebP)
 - Orders: list with filters and search, status changes
-  (pending → shipped → delivered, or cancelled)
+  (pending → processing → shipped → delivered, or cancelled before shipping).
+  Shipping an order requires a carrier and a tracking number, and every
+  change is kept in the order's history with who made it and when
 
 **Quality**
 
@@ -232,7 +236,9 @@ docker compose -f compose.prod.yaml --env-file .env.prod pull
 docker compose -f compose.prod.yaml --env-file .env.prod up -d
 ```
 
-To roll back, set the previous tag and run the same two commands.
+New database migrations run automatically when the server container starts.
+To roll back, set the previous tag and run the same two commands (this
+changes the app only; migrations already applied to the database stay).
 
 > Without a domain the shop runs on plain HTTP. The login cookie is marked
 > `Secure`, which browsers accept over HTTP only on `localhost`, so test from

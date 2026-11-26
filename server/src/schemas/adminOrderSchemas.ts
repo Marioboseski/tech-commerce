@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { idTextSchema, paginationFields } from "./commonSchemas.js";
 
-const ORDER_STATUSES = ["PENDING", "SHIPPED", "DELIVERED", "CANCELLED"] as const;
+const ORDER_STATUSES = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] as const;
 
 export const adminOrdersQuerySchema = z.object({
   ...paginationFields,
@@ -17,5 +17,5 @@ export const adminOrderParamsSchema = z.object({
 });
 
 export const orderStatusSchema = z.object({
-  status: z.enum(ORDER_STATUSES, "status must be PENDING, SHIPPED, DELIVERED or CANCELLED"),
+  status: z.enum(ORDER_STATUSES, "status must be PENDING, PROCESSING, SHIPPED, DELIVERED or CANCELLED"),
 });

@@ -3,21 +3,26 @@ import { canChangeOrderStatus } from "./orderStatus.js";
 
 describe("canChangeOrderStatus", () => {
   it.each([
-    ["PENDING", "SHIPPED"],
+    ["PENDING", "PROCESSING"],
     ["PENDING", "CANCELLED"],
+    ["PROCESSING", "SHIPPED"],
+    ["PROCESSING", "CANCELLED"],
     ["SHIPPED", "DELIVERED"],
   ] as const)("allows %s -> %s", (from, to) => {
     expect(canChangeOrderStatus(from, to)).toBe(true);
   });
 
   it.each([
+    ["PENDING", "SHIPPED"],
     ["PENDING", "DELIVERED"],
+    ["PROCESSING", "PENDING"],
+    ["PROCESSING", "DELIVERED"],
     ["SHIPPED", "CANCELLED"],
-    ["SHIPPED", "PENDING"],
+    ["SHIPPED", "PROCESSING"],
     ["DELIVERED", "CANCELLED"],
     ["DELIVERED", "PENDING"],
     ["CANCELLED", "PENDING"],
-    ["CANCELLED", "SHIPPED"],
+    ["CANCELLED", "PROCESSING"],
   ] as const)("refuses %s -> %s", (from, to) => {
     expect(canChangeOrderStatus(from, to)).toBe(false);
   });

@@ -2,6 +2,7 @@ import { Link, Navigate, useLocation, useParams } from 'react-router-dom';
 import StoreFooter from '../components/layout/StoreFooter';
 import StoreHeader from '../components/layout/StoreHeader';
 import OrderStatusBadge from '../components/orders/OrderStatusBadge';
+import OrderTracking from '../components/orders/OrderTracking';
 import { formatDate, money } from '../lib/formatters';
 import { defaultPlaceholder } from '../lib/productImage';
 import ErrorState from '../components/feedback/ErrorState';
@@ -57,6 +58,13 @@ export default function OrderDetailsPage() {
               Placed on {formatDate(order.createdAt)} ·{' '}
               <OrderStatusBadge status={order.status} />
             </p>
+
+            <OrderTracking
+              status={order.status}
+              statusHistory={order.statusHistory}
+              carrier={order.carrier}
+              trackingNumber={order.trackingNumber}
+            />
 
             <div className="checkout-layout">
               <section className="checkout-summary">

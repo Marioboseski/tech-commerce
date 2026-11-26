@@ -122,8 +122,8 @@ export const updateOrderStatus = async (
     // changed it in between, nothing is updated and we say so.
     const { count } = await tx.order.updateMany({
       where: { id, status: order.status },
-      // The schema already requires both for SHIPPED; "?? null" only tells
-      // TypeScript what to store if they were missing.
+      // Both are always set for SHIPPED (the schema checks it); "?? null" is
+      // only for TypeScript.
       data: {
         status: next,
         ...(next === "SHIPPED" && {

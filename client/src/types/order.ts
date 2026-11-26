@@ -3,7 +3,6 @@ export type OrderStatus =
 
 export type Carrier = 'DHL' | 'UPS' | 'FEDEX' | 'MK_POST' | 'OTHER';
 
-// One step in the order's history (oldest first).
 export type OrderStatusEvent = {
   status: OrderStatus;
   createdAt: string;

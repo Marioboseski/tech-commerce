@@ -38,7 +38,7 @@ export default function AdminOrderDetailsPage() {
   const id = orderId && /^[1-9]\d*$/.test(orderId) ? Number(orderId) : null;
   const { data: order, isPending, isError, error, refetch } = useAdminOrder(id);
   const setStatus = useSetOrderStatus();
-  // "Mark as shipped" first asks for the carrier and tracking number.
+  // True while the shipment form is open.
   const [shipping, setShipping] = useState(false);
 
   const ship = async (shipment: Shipment) => {

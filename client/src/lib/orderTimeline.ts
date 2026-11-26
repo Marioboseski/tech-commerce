@@ -2,7 +2,6 @@ import type { OrderStatus, OrderStatusEvent } from '../types/order';
 
 const FLOW = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED'] as const;
 
-// How the customer reads each step.
 export const timelineLabels: Record<OrderStatus, string> = {
   PENDING: 'Order placed',
   PROCESSING: 'Processing',

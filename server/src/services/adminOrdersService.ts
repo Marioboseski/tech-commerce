@@ -2,6 +2,7 @@ import { prisma } from "../lib/prisma.js";
 import { canChangeOrderStatus, nextOrderStatuses } from "../lib/orderStatus.js";
 import { orderSelect, toApiOrder } from "./ordersService.js";
 import type { OrderStatus, Prisma } from "../../generated/prisma/client.js";
+import type { OrderStatusInput } from "../schemas/adminOrderSchemas.js";
 
 type ListFilters = {
   page: number;
@@ -68,16 +69,28 @@ export const listOrders = async ({ page, pageSize, status, search }: ListFilters
 export const getOrder = async (id: number) => {
   const order = await prisma.order.findUnique({
     where: { id },
-    select: { ...orderSelect, user: { select: customerSelect } },
+    select: {
+      ...orderSelect,
+      user: { select: customerSelect },
+      // Same history as the customer sees, plus who made each change.
+      statusHistory: {
+        ...orderSelect.statusHistory,
+        select: {
+          ...orderSelect.statusHistory.select,
+          changedBy: { select: { id: true, fullName: true } },
+        },
+      },
+    },
   });
 
   if (!order) {
     return null;
   }
 
-  const { user, ...rest } = order;
+  const { user, statusHistory, ...rest } = order;
   return {
-    ...toApiOrder(rest),
+    ...toApiOrder({ ...rest, statusHistory }),
+    statusHistory,
     customer: user,
     nextStatuses: nextOrderStatuses[order.status],
   };
@@ -89,7 +102,11 @@ type StatusResult =
   | { status: "not_allowed"; from: OrderStatus }
   | { status: "changed" };
 
-export const updateOrderStatus = async (id: number, next: OrderStatus): Promise<StatusResult> => {
+export const updateOrderStatus = async (
+  id: number,
+  { status: next, carrier, trackingNumber }: OrderStatusInput,
+  adminId: number,
+): Promise<StatusResult> => {
   const order = await prisma.order.findUnique({ where: { id }, select: { status: true } });
 
   if (!order) {
@@ -99,14 +116,34 @@ export const updateOrderStatus = async (id: number, next: OrderStatus): Promise<
     return { status: "not_allowed", from: order.status };
   }
 
-  // "Only if it is still in the status we just read": if another admin
-  // changed it in between, nothing is updated and we say so.
-  const { count } = await prisma.order.updateMany({
-    where: { id, status: order.status },
-    data: { status: next },
+  // The new status and its history row are saved together, or not at all.
+  const changed = await prisma.$transaction(async (tx) => {
+    // "Only if it is still in the status we just read": if another admin
+    // changed it in between, nothing is updated and we say so.
+    const { count } = await tx.order.updateMany({
+      where: { id, status: order.status },
+      // Both are always set for SHIPPED (the schema checks it); "?? null" is
+      // only for TypeScript.
+      data: {
+        status: next,
+        ...(next === "SHIPPED" && {
+          carrier: carrier ?? null,
+          trackingNumber: trackingNumber ?? null,
+        }),
+      },
+    });
+
+    if (count === 0) {
+      return false;
+    }
+
+    await tx.orderStatusEvent.create({
+      data: { orderId: id, status: next, changedById: adminId },
+    });
+    return true;
   });
 
-  if (count === 0) {
+  if (!changed) {
     return { status: "changed" };
   }
 

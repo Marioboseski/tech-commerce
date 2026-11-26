@@ -1,4 +1,12 @@
-export type OrderStatus = 'PENDING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+export type OrderStatus =
+  'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+
+export type Carrier = 'DHL' | 'UPS' | 'FEDEX' | 'MK_POST' | 'OTHER';
+
+export type OrderStatusEvent = {
+  status: OrderStatus;
+  createdAt: string;
+};
 
 // What the checkout form sends. No products or prices: the server takes
 // them from the user's cart.
@@ -25,6 +33,10 @@ export type Order = DeliveryAddress & {
   subtotal: number;
   shippingCost: number;
   total: number;
+  // Set once the order is shipped.
+  carrier: Carrier | null;
+  trackingNumber: string | null;
   createdAt: string;
+  statusHistory: OrderStatusEvent[];
   items: OrderItem[];
 };

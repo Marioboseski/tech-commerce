@@ -15,3 +15,13 @@ export const formatDate = (isoDate: string) =>
     month: 'short',
     year: 'numeric',
   }).format(new Date(isoDate));
+
+// "2026-11-11T16:03:23.549Z" → "11 Nov 2026, 17:03" (in the viewer's time zone)
+export const formatDateTime = (isoDate: string) =>
+  new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(isoDate));

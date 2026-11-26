@@ -384,6 +384,37 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+.admin-ship-form {
+  margin-bottom: 20px;
+  padding: 16px 18px 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+.admin-ship-form .admin-form-actions {
+  margin-top: 16px;
+}
+.admin-tracking-number {
+  font-family: ui-monospace, Consolas, monospace;
+  word-break: break-all;
+}
+.admin-order-history {
+  display: grid;
+  gap: 12px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.admin-order-history li {
+  display: grid;
+  gap: 2px;
+  padding-left: 14px;
+  border-left: 2px solid var(--border);
+  font-size: 14px;
+}
+.admin-order-history li:last-child {
+  border-left-color: var(--purple);
+}
 .admin-danger-button {
   border-color: #f0c7d0;
   color: #b53850;

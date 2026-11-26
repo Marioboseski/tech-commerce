@@ -1,6 +1,7 @@
 import * as adminOrdersService from "../services/adminOrdersService.js";
 import { HttpError } from "../lib/httpError.js";
 import { parseInput } from "../lib/validate.js";
+import { getAuthUserId } from "../middleware/requireAuth.js";
 import {
   adminOrderParamsSchema,
   adminOrdersQuerySchema,
@@ -27,9 +28,10 @@ export const getOrder = async (req: Request, res: Response) => {
 
 export const updateOrderStatus = async (req: Request, res: Response) => {
   const { orderId } = parseInput(adminOrderParamsSchema, req.params);
-  const { status } = parseInput(orderStatusSchema, req.body);
+  const input = parseInput(orderStatusSchema, req.body);
+  const { status } = input;
 
-  const result = await adminOrdersService.updateOrderStatus(orderId, status);
+  const result = await adminOrdersService.updateOrderStatus(orderId, input, getAuthUserId(req));
 
   switch (result.status) {
     case "updated":

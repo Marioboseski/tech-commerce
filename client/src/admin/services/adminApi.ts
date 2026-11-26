@@ -12,6 +12,7 @@ import type {
   Paginated,
 } from '../types';
 import type { OrderStatus } from '../../types/order';
+import type { Shipment } from '../../schemas/shipmentSchema';
 
 export const getAdminStats = () => apiRequest<AdminStats>('/api/admin/stats');
 
@@ -117,14 +118,17 @@ export const getAdminOrders = ({
 export const getAdminOrder = (orderId: number) =>
   apiRequest<AdminOrder>(`/api/admin/orders/${orderId}`);
 
+// shipment (carrier + tracking number) is sent only with SHIPPED.
 export const setAdminOrderStatus = ({
   orderId,
   status,
+  shipment,
 }: {
   orderId: number;
   status: OrderStatus;
+  shipment?: Shipment;
 }) =>
   apiRequest<AdminOrder>(`/api/admin/orders/${orderId}/status`, {
     method: 'PATCH',
-    body: { status },
+    body: { status, ...shipment },
   });

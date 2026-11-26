@@ -1,4 +1,4 @@
-import type { Order, OrderStatus } from '../types/order';
+import type { Order, OrderStatus, OrderStatusEvent } from '../types/order';
 
 export type AdminStats = {
   products: number;
@@ -109,9 +109,14 @@ export type AdminOrderListItem = {
   user: AdminCustomer;
 };
 
-// The same order the customer sees, plus who ordered it and the statuses
-// it may move to next (the server decides, see lib/orderStatus.ts there).
-export type AdminOrder = Order & {
+// The same order the customer sees, plus who ordered it, who made each
+// status change, and the statuses it may move to next (the server decides,
+// see lib/orderStatus.ts there).
+export type AdminOrder = Omit<Order, 'statusHistory'> & {
   customer: AdminCustomer;
+  statusHistory: (OrderStatusEvent & {
+    // null for history created by the migration, or a deleted user.
+    changedBy: { id: number; fullName: string } | null;
+  })[];
   nextStatuses: OrderStatus[];
 };

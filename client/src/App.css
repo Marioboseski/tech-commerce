@@ -1345,6 +1345,10 @@
   font-size: 12px;
   font-weight: 700;
 }
+.order-status-processing {
+  background: #fff6e5;
+  color: #9a5b00;
+}
 .order-status-delivered {
   background: #ecf8f0;
   color: #23784a;
